@@ -5,3 +5,5 @@ Diego/
 Query/
 output/
 pdf_re/
+__pycache__/
+.ipynb_checkpoints/
