@@ -16,7 +16,7 @@ from whoosh.lang.porter import stem
 import re
 import nltk as nltk
 
-def prepare_keywords(keywrds_string, exception_dict=None, stop_words=None):
+def prepare_keywords(keywrds_string, stop_words, exception_dict=None):
     """
     Prepare keywords for mapping.
     """
@@ -36,11 +36,14 @@ def prepare_keywords(keywrds_string, exception_dict=None, stop_words=None):
     
     reverse_exception_dict={value : key for key, value in exception_dict.items()}
     
-    #remove all from stop_words to keep in keywords
-    if stop_words==None:
-        stop_words = set(nltk.corpus.stopwords.words("english"))
-        stop_words.remove("all")
-    
+    #remove all from stop_words to keep in keywords.
+    # Review scoping rules in python, this fails with:
+    # NameError: name 'stop_words' is not defined when called in lambda function
+    # I would expect the variable to always exist whenever calling the function, but it does not.
+    #if stop_words==None:
+    #    stop_words = set(nltk.corpus.stopwords.words("english"))
+    #    stop_words.remove("all")
+   
     keywrds_string = keywrds_string.split(";")
     keywrds_list = map(lambda term: term.split(),  keywrds_string)
     
