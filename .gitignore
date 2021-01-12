@@ -1,9 +1,0 @@
-*.xlsx
-!keys_from_RAKE-GBV_DB_SB_v3.xlsx
-!keys_goal_level_GBV.xlsx
-Diego/
-Query/
-pdf_re/
-results/
-output/
-*/__pycache__/

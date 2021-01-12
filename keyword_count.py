@@ -1,5 +1,5 @@
 import io, csv, re, os, json
-from os import listdir
+from os import listdir #MM I would use pathlib insted of os, so that we can make path definition os independent
 from os.path import isfile, join
 from nltk.corpus import stopwords
 import pandas as pd
@@ -12,10 +12,54 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
+import xlsxwriter
+from itertools import chain
+##MM imports
+import datetime as dt
+import pathlib
 import logging
-import time
 
-###########read in all keywords
+
+########### MM 1) Define global variables like time, input_dir, ouput_dirs
+
+#def make_directories(project='TEI'): #MM start func definition
+date = dt.datetime.now().date().isoformat()
+time = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
+current_date = '_'+date+'_T'+time
+
+project_title = 'TEI'+str(current_date) #TEI shall be replace with project string varible provided by the user
+
+#try
+out_dir = pathlib.Path.cwd() / 'output' / project_title 
+log_dir = out_dir / 'logs'
+results_dir = out_dir / 'results'
+
+dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir] } #Set exist_ok=False later on
+#except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
+
+#return #MM end func 
+
+####### Create logfile for current run.
+
+log_file = log_dir / 'mapping_{}.log'.format(project_title)
+log_file.touch(mode=0o666)
+logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
+
+####### Read all files in input directory and select allowed filetypes
+
+input_dir = pathlib.Path.cwd() / 'pdf_re' / 'TEI' #MM let user provide an input dir
+input_folder_name = input_dir.name
+
+allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
+
+files = sorted(input_dir.glob('**/*.pdf'))
+files = [ file for file in files if file.suffix in allowed_filetypes]
+#MM assert files==False and log assertion error.
+
+######################################
+
+########### 2) read in all keywords #MM this could be moved below after the pdf conversion and before the counting, to have a little bit more of a flow:
+#e.g. 1) create global variable, 2) convert doc to text 3) load keywords, lemmatize keywords and text, 4) count keys in text 5) save output
 
 keys = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' )
 
@@ -30,7 +74,6 @@ keys['Keys'] = keys['Keys'].str.split(pat = ";")
 stop_words = set(stopwords.words("english"))
 #remove all from stop_words to keep in keywords
 stop_words.remove("all")
-
 
 # lemmatizer = WordNetLemmatizer()
 for i in range(0, len(keys['Keys'])):
@@ -64,37 +107,9 @@ for i in range(0, len(keys['Keys'])):
         #add leading and trailing whitespace
         keys['Keys'][i][j] = " " + keys['Keys'][i][j] + " "
 
-
 ######################################
 
-####### read in pdf
-##go into folder of 1 policy and read in all docs
-#path = os.getcwd()+str("\\pdf_re\\Final_Run_UPDATE\\")
-#path = os.getcwd()+str("\\pdf_re\\VDL_POL_until_2020-10-14\\All_merged\\")
-path = os.getcwd()+str("\\pdf_re\\Final_Run_Old_Clean\\")
-folders = [folder for folder in listdir(path)]
-
-
-#####uncomment the bottom chunk if you want to export the list of folders to excel
-
-# print(len(folders), " Policies found")
-# workbook = xlsxwriter.Workbook('list_old_policies.xlsx')
-# worksheet = workbook.add_worksheet()
-# row = 0
-# column = 0
-# for item in folders:
-#     # write operation perform
-#     worksheet.write(row, column, item)
-#
-#     # incrementing the value of row by one
-#     # with each iteratons.
-#     row += 1
-#
-# workbook.close()
-#
-# print("Done")
-
-
+########### 3) Read pdf files and convert them into text 
 ##create class for PDFMining
 ###use PDF miner
 class PdfConverter:
@@ -123,54 +138,22 @@ class PdfConverter:
        return str
 
 PDFtext = []
-typeerror_ls = []
-valueerror_ls = []
-syntaxerror_ls = []
 counter = 0
-for item in folders:
-    print(item)
-    temp_path = path + str(item)
-    files = [file for file in listdir(temp_path) if isfile(join(temp_path, file))]
-    if len(files) > 0:
-        count_docs = len(files)
-        try:
-            policy_texts = []
-            for pdf_item in files:
-                #scrape text from pdf
-                file_path = temp_path + "\\" + str(pdf_item)
-                pdfConverter = PdfConverter(file_path=file_path)
-                try:
-                    policy_texts.append(pdfConverter.convert_pdf_to_txt())
-                except ValueError:
-                    valueerror_ls.append(tuple((item, pdf_item)))
-                    pass
-                except SyntaxError:
-                    syntaxerror_ls.append(tuple((item, pdf_item)))
-                    pass
-                except TypeError:
-                    typeerror_ls.append(tuple((item, pdf_item)))
-                    pass
-            PDFtext.append([item, ' ; '.join(policy_texts)])
-        except ValueError:
-            valueerror_ls.append(tuple((item, pdf_item)))
-            print("Value Error for: ", item)
-            pass
-        except TypeError:
-            typeerror_ls.append(tuple((item, pdf_item)))
-            pass
-        counter = counter + count_docs
-print("Number of folders: ", len(PDFtext))
-print("Number of docs: ", counter)
+for pdf_item in files:
+    print(pdf_item)
+    counter += 1
+    try:
+        policy_texts = [] # def pdf_to_text (pdf_file): #MM this should be turned into the body of a function that gets a pdf file and returns the text of it.
+        pdfConverter = PdfConverter(file_path=pdf_item) 
+        policy_texts.append(pdfConverter.convert_pdf_to_txt())
+        pdf_item_name='/'.join(pdf_item.parts[pdf_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
+        PDFtext.append([pdf_item_name,' ; '.join(policy_texts)])
+    except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
+        logging.exception('{doc_file} raised exception {exception} \n'.format(doc_file=pdf_item.name, exception=excptn))
 
-with open(os.getcwd()+str("\\error_reports\\type_errors_16122020.txt"), 'w') as fp:
-    fp.write('\n'.join('%s %s' % x for x in typeerror_ls))
-
-with open(os.getcwd()+str("\\error_reports\\value_errors_16122020.txt"), 'w') as fp:
-    fp.write('\n'.join('%s %s' % x for x in valueerror_ls))
-
-with open(os.getcwd()+str("\\error_reports\\syntax_errors_16122020.txt"), 'w') as fp:
-    fp.write('\n'.join('%s %s' % x for x in syntaxerror_ls))
-
+#print(PDFtext)
+print("Number of docs: ", len(PDFtext))
+print("Number of folders: ", counter)
 
 lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
@@ -179,15 +162,10 @@ for item in PDFtext:
     item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
     #get indices of soft hyphens
     indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
-    #print(len(indices))
     #merge the separated words
     for index in indices:
         item[1][index] = item[1][index].replace('\xad', '')
-        #use indexerror to avoid out of range error in case hyphen is last element in the list
-        try:
-            item[1][index+1] = item[1][index]+item[1][index+1]
-        except IndexError:
-            pass
+        item[1][index+1] = item[1][index]+item[1][index+1]
     #remove unnecessary list elements
     for index in sorted(indices, reverse=True):
         del item[1][index]
@@ -208,6 +186,7 @@ for item in PDFtext:
     item[1] = [w.replace("productivity", "pro&ductivity&") for w in item[1]]
     item[1] = [w.replace("remittances", "remit&tance&") for w in item[1]]
     item[1] = [w.replace("remittance", "remit&tance&") for w in item[1]]
+    print(item[1])
     # stem words
     item[1] = [stem(word) for word in item[1] if not word in stop_words]
     #remove special char for detection in text
@@ -223,13 +202,14 @@ for item in PDFtext:
     item = item.append(len(item[1]))
 
 
-
 ##make list pandas df and export to check intermediately
 # Create the pandas DataFrame
 df = pd.DataFrame(PDFtext, columns = ['Policy', 'Text', 'Textlength'])
 #no point in exporting since excel cuts off text after char len >32767
 #change directory respectively
-#df.to_excel(os.getcwd()+str("\\results\\raw\\policy_mapping_textdat_EU_Rec_21072020.xlsx"), sheet_name="RAW")
+res_df_name = results_dir / 'polmap_transformation_out_{}.xlsx'.format(project_title)
+df.to_excel(res_df_name, sheet_name="RAW") 
+#MM here we could parametrize also the project (TEI) by using str("mystr_{project}_{date}.xlsx).format(project=my_project, date=current_date)
 
 ################################
 
@@ -257,16 +237,15 @@ final_df = final_df[final_df.Count != 0]
 # print(len(final_df['Target']))
 
 # Create a Pandas Excel writer using XlsxWriter as the engine.
-writer = pd.ExcelWriter(os.getcwd()+str("\\results\\raw\\mapping_old_16122020.xlsx"), engine='xlsxwriter')
+
+write_name = results_dir / 'mapping_{}.xlsx'.format(project_title)
+writer = pd.ExcelWriter(write_name, engine='xlsxwriter')
+#SB writer = pd.ExcelWriter(os.getcwd()+str("\\results\\raw\\mapping_TEI_{}.xlsx").format(current_date), engine='xlsxwriter')
 
 #export final output
 final_df.to_excel(writer, sheet_name='RAW')
 
 #############################
-
-
-###try approach with proximity check
-
 
 ##county names
 
@@ -316,7 +295,6 @@ for i in range(0, len(dev_count_keys['Keys'])):
 
 
 #make final count
-
 
 final_ls = []
 ##make the count
