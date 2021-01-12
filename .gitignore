@@ -6,3 +6,4 @@ Query/
 pdf_re/
 results/
 output/
+*/__pycache__/
