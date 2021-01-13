@@ -35,8 +35,9 @@ project_title = 'TEI'+str(current_date) #TEI shall be replace with project strin
 out_dir = pathlib.Path.cwd() / 'output' / project_title 
 log_dir = out_dir / 'logs'
 results_dir = out_dir / 'results'
+docs2txt_dir = out_dir / 'docs2txt'
 
-dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir] } #Set exist_ok=False later on
+dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir] } #Set exist_ok=False later on
 #except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
 
 #return #MM end func 
@@ -54,7 +55,7 @@ input_folder_name = input_dir.name
 
 allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
 
-files = sorted(input_dir.glob('**/*.pdf'))
+files = sorted(input_dir.glob('**/*.*'))
 files = [ file for file in files if file.suffix in allowed_filetypes]
 #MM assert files==False and log assertion error.
 
@@ -102,17 +103,23 @@ class PdfConverter:
 
 PDFtext = []
 counter = 0
-for pdf_item in files:
-    print(pdf_item)
+for doc_item in files:
+    print(doc_item)
     counter += 1
     try:
-        policy_texts = [] # def pdf_to_text (pdf_file): #MM this should be turned into the body of a function that gets a pdf file and returns the text of it.
-        pdfConverter = PdfConverter(file_path=pdf_item) 
-        policy_texts.append(pdfConverter.convert_pdf_to_txt())
-        pdf_item_name='/'.join(pdf_item.parts[pdf_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
-        PDFtext.append([pdf_item_name,' ; '.join(policy_texts)])
+        policy_text=[]
+        pdfConverter = PdfConverter(file_path=doc_item) 
+        doc_text = pdfConverter.convert_pdf_to_txt()
+        policy_text.append(doc_text)
+        doc_item_name = '/'.join(doc_item.parts[doc_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
+        doc_filename = docs2txt_dir.joinpath(doc_item.parts[-2])
+        doc_filename.mkdir(mode=0o777, parents=True, exist_ok=True)
+        doc_filename = doc_filename.joinpath(doc_item.stem+'.txt')
+        with open(doc_filename, 'w') as doctext:
+           doctext.write(doc_text)
+        PDFtext.append([doc_item_name,' ; '.join(policy_text)])
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
-        logging.exception('{doc_file} raised exception {exception} \n'.format(doc_file=pdf_item.name, exception=excptn))
+        logging.exception('{doc_file} raised exception {exception} \n\n'.format(doc_file=doc_item.name, exception=excptn))
 
 #print(PDFtext)
 print("Number of docs: ", len(PDFtext))
