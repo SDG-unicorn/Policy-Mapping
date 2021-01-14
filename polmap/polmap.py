@@ -15,6 +15,7 @@
 from whoosh.lang.porter import stem
 import re
 import nltk as nltk
+from docx2python import docx2python
 
 def prepare_keywords(keywrds_string, stop_words, exception_dict=None):
     """
@@ -83,3 +84,21 @@ def prepare_keywords(keywrds_string, stop_words, exception_dict=None):
     keywrds_list = [terms for terms in keywrds_list if terms!='  ']
     
     return keywrds_list
+
+def doc2text(a_document_path):
+    """
+    Helper function that calls different document to text converting functions 
+    based on the document filetype.
+
+    Expected input is a path to a document, ideally as pathlib.
+    """
+
+    suffix = a_document_path.suffix
+
+    d2t_dict = {'.doc' : docx2python,
+                '.docx' : docx2python,
+                #'.pdf' : pdfminer.high_level.extract_text
+                
+    }
+
+    return d2t_dict[suffix](a_document_path).text 

@@ -19,7 +19,9 @@ import datetime as dt
 import pathlib
 import logging
 
-from polmap.polmap import prepare_keywords # replaced the keyword processing block
+from docx2python import docx2python
+
+from polmap.polmap import prepare_keywords, doc2text # replaced the keyword processing block
 
 
 ########### MM 1) Define global variables like time, input_dir, ouput_dirs
@@ -29,7 +31,7 @@ date = dt.datetime.now().date().isoformat()
 time = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+time
 
-project_title = 'TEI'+str(current_date) #TEI shall be replace with project string varible provided by the user
+project_title = 'Export_Projects_Overview_08012021_162543'+str(current_date) #TEI shall be replace with project string varible provided by the user
 
 #try
 out_dir = pathlib.Path.cwd() / 'output' / project_title 
@@ -50,7 +52,7 @@ logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
 
 ####### Read all files in input directory and select allowed filetypes
 
-input_dir = pathlib.Path.cwd() / 'pdf_re' / 'TEI' #MM let user provide an input dir
+input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Export_Projects_Overview_08012021_162543' #MM let user provide an input dir
 input_folder_name = input_dir.name
 
 allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
@@ -108,8 +110,8 @@ for doc_item in files:
     counter += 1
     try:
         policy_text=[]
-        pdfConverter = PdfConverter(file_path=doc_item) 
-        doc_text = pdfConverter.convert_pdf_to_txt()
+        doc_text = doc2text(doc_item)
+        while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n')
         policy_text.append(doc_text)
         doc_item_name = '/'.join(doc_item.parts[doc_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
         doc_filename = docs2txt_dir.joinpath(doc_item.parts[-2])
