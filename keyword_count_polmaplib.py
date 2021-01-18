@@ -64,7 +64,7 @@ files = [ file for file in files if file.suffix in allowed_filetypes]
 ######################################
 # MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 
-keys = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' )
+keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
 
 #remove all from stop_words to keep in keywords
 stop_words = set(stopwords.words("english"))
@@ -111,7 +111,7 @@ for doc_item in files:
     try:
         policy_text=[]
         doc_text = doc2text(doc_item)
-        while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n')
+        while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         policy_text.append(doc_text)
         doc_item_name = '/'.join(doc_item.parts[doc_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
         doc_filename = docs2txt_dir.joinpath(doc_item.parts[-2])
@@ -141,7 +141,7 @@ for item in PDFtext:
     #remove unnecessary list elements
     for index in sorted(indices, reverse=True):
         del item[1][index]
-    #remove special character, numbers, lowercase
+    #remove special character, numbers, lowercase #MM from here until @ this code is identical to prepare keywords correct?
     item[1] = [re.sub(r"[^a-zA-Z-\.]+", '', t.lower().strip()) for t in item[1]]
     #add whitespaces
     item[1] = [word.center(len(word)+2) for word in item[1]]
@@ -171,7 +171,7 @@ for item in PDFtext:
     item[1] = ' '.join(item[1])
     #add trailing leading whitespace
     item[1] = " " + item[1] + " "
-    item = item.append(len(item[1]))
+    item = item.append(len(item[1])) #MM @
 
 
 ##make list pandas df and export to check intermediately
@@ -221,7 +221,7 @@ final_df.to_excel(writer, sheet_name='RAW')
 
 ##county names
 
-countries_in = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries')
+countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
 countries = countries_in['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -232,7 +232,7 @@ for element in countries:
     country_ls.append(element)
 
 ##specific subset of relevant targets
-dev_count_keys = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' )
+dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
 
 #split keys
 dev_count_keys['Keys'] = dev_count_keys['Keys'].str.split(pat = ";")

@@ -102,3 +102,5 @@ def doc2text(a_document_path):
     }
 
     return d2t_dict[suffix](a_document_path).text 
+
+  
