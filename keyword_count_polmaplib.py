@@ -18,41 +18,20 @@ from itertools import chain
 import datetime as dt
 import pathlib
 import logging
+import time
 
 from docx2python import docx2python
 
 from polmap.polmap import prepare_keywords, doc2text # replaced the keyword processing block
 
 
-########### MM 1) Define global variables like time, input_dir, ouput_dirs
+######################################
+########### 1) Define global variables like time, input_dir, ouput_dirs
+start_time = time.time()
 
-#def make_directories(project='TEI'): #MM start func definition
-date = dt.datetime.now().date().isoformat()
-time = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
-current_date = '_'+date+'_T'+time
+## 1.a) Read all files in input directory and select allowed filetypes
 
-project_title = 'Export_Projects_Overview_08012021_162543'+str(current_date) #TEI shall be replace with project string varible provided by the user
-
-#try
-out_dir = pathlib.Path.cwd() / 'output' / project_title 
-log_dir = out_dir / 'logs'
-results_dir = out_dir / 'results'
-docs2txt_dir = out_dir / 'docs2txt'
-
-dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir] } #Set exist_ok=False later on
-#except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
-
-#return #MM end func 
-
-####### Create logfile for current run.
-
-log_file = log_dir / 'mapping_{}.log'.format(project_title)
-log_file.touch(mode=0o666)
-logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
-
-####### Read all files in input directory and select allowed filetypes
-
-input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Export_Projects_Overview_08012021_162543' #MM let user provide an input dir
+input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Test' #MM let user provide an input dir
 input_folder_name = input_dir.name
 
 allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
@@ -61,52 +40,78 @@ files = sorted(input_dir.glob('**/*.*'))
 files = [ file for file in files if file.suffix in allowed_filetypes]
 #MM assert files==False and log assertion error.
 
+## 1.b) Create output folder structure based on input name, date and time of exectution
+
+date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI'): #MM start func definition
+hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
+current_date = '_'+date+'_T'+hour
+
+project_title = input_folder_name+str(current_date) 
+
+out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
+log_dir = out_dir / 'logs'
+results_dir = out_dir / 'results'
+docs2txt_dir = out_dir / 'docs2txt'
+stemmed_doctext_dir = out_dir / 'docs2txt_stemmed'
+
+dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, ] } #Set exist_ok=False later on
+#except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
+
+#return #MM end func 
+
+## 1.c) Create logfile for current run.
+
+log_file = log_dir / 'mapping_{}.log'.format(project_title)
+log_file.touch(mode=0o666)
+logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
+
+with open(log_file, 'a') as f:
+    f.write( 
+        '1) Creating folders, reading input folder and listing all file paths : {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
+
+print('Step 1: Listed paths of documents and created main outpout folders')
 ######################################
-# MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
+########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
+start_time = time.time()
 
 keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
+goal_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
+dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
 
 #remove all from stop_words to keep in keywords
 stop_words = set(stopwords.words("english"))
 stop_words.remove("all")
 
 keys['Keys']=keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
+goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
+dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
 
+##Country names
+countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
+countries = countries_in['Name'].values.tolist()
+country_ls = []
+for element in countries:
+    element = [re.sub(r"[^a-zA-Z-]+", '', t.lower().strip()) for t in element.split()]
+    # countries = [x.strip(' ') for x in countries]
+    element = [stem(word) for word in element if not word in stop_words]
+    element = ' '.join(element)
+    country_ls.append(element)
 
+with open(log_file, 'a') as f:
+    f.write( 
+        '2) Reading and preprocessing keywords: {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
+
+print('Step 2: Read and processed keywords')
 ######################################
-
-########### 3) Read pdf files and convert them into text 
-##create class for PDFMining
-###use PDF miner
-class PdfConverter:
-   def __init__(self, file_path):
-       self.file_path = file_path
-# convert pdf file to a string which has space among words
-   def convert_pdf_to_txt(self):
-       rsrcmgr = PDFResourceManager()
-       retstr = StringIO()
-       laparams = LAParams()
-       logging.propagate = False
-       logging.getLogger().setLevel(logging.ERROR)
-       device = TextConverter(rsrcmgr, retstr, laparams=laparams)
-       fp = open(self.file_path, 'rb')
-       interpreter = PDFPageInterpreter(rsrcmgr, device)
-       password = ""
-       maxpages = 0
-       caching = True
-       pagenos = set()
-       for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
-           interpreter.process_page(page)
-       fp.close()
-       device.close()
-       str = retstr.getvalue()
-       retstr.close()
-       return str
+########### 3) Read document files and convert them into text
+start_time = time.time()
 
 PDFtext = []
 counter = 0
 for doc_item in files:
-    print(doc_item)
+    #print(doc_item)
     counter += 1
     try:
         policy_text=[]
@@ -126,6 +131,16 @@ for doc_item in files:
 #print(PDFtext)
 print("Number of docs: ", len(PDFtext))
 print("Number of folders: ", counter)
+
+with open(log_file, 'a') as f:
+    f.write( 
+        '3) Reading, converting and saving documents as text: {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
+
+print('Step 3: Converted documents to text')
+######################################
+########### 4) Read document files and convert them into text
+start_time = time.time()
 
 lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
@@ -158,7 +173,6 @@ for item in PDFtext:
     item[1] = [w.replace("productivity", "pro&ductivity&") for w in item[1]]
     item[1] = [w.replace("remittances", "remit&tance&") for w in item[1]]
     item[1] = [w.replace("remittance", "remit&tance&") for w in item[1]]
-    print(item[1])
     # stem words
     item[1] = [stem(word) for word in item[1] if not word in stop_words]
     #remove special char for detection in text
@@ -171,21 +185,31 @@ for item in PDFtext:
     item[1] = ' '.join(item[1])
     #add trailing leading whitespace
     item[1] = " " + item[1] + " "
+    #save out
+    item_file=pathlib.PurePath(item[0])
+    parent, stem_ = item_file.parent, item_file.stem
+    item_path = stemmed_doctext_dir / parent
+    item_path.mkdir(mode=0o777, parents=True, exist_ok=True)
+    item_path = item_path.joinpath(stem_+'_stemmed.txt')
+    with open(item_path, 'w') as stemdoctext:
+           stemdoctext.write(item[1]+'\n\nTextlenght: {}'.format(len(item[1])))
+    #Append textlenght
     item = item.append(len(item[1])) #MM @
 
 
-##make list pandas df and export to check intermediately
-# Create the pandas DataFrame
-df = pd.DataFrame(PDFtext, columns = ['Policy', 'Text', 'Textlength'])
-#no point in exporting since excel cuts off text after char len >32767
-#change directory respectively
-res_df_name = results_dir / 'polmap_transformation_out_{}.xlsx'.format(project_title)
-df.to_excel(res_df_name, sheet_name="RAW") 
-#MM here we could parametrize also the project (TEI) by using str("mystr_{project}_{date}.xlsx).format(project=my_project, date=current_date)
+with open(log_file, 'a') as f:
+    f.write( 
+        '4) Processing and stemming text of documents: {:.3e} seconds\n\n5) Counting of keywords in text:\n\n'.format(time.time()-start_time)
+    )
 
-################################
+print('Step 4: Processed and stemmed text from documents')
+######################################
+########### 5) Counting keywords within text
+start_count_time = time.time()
+start_time = time.time()
 
-final_ls = []
+## 5.1) Count Target keywords
+target_ls = []
 ##make the count
 for item in PDFtext:
     for i in range(0, len(keys['Keys'])):
@@ -194,18 +218,18 @@ for item in PDFtext:
             counter = item[1].count(str(keys['Keys'][i][j]))
             #write counter together with target, policy, keyword as new row in df
             #first write output to list
-            final_ls.append([item[0], keys['Target'][i], keys['Keys'][i][j], counter, len(item[1])])
+            target_ls.append([item[0], keys['Target'][i], keys['Keys'][i][j], counter, len(item[1])])
 
-final_df = pd.DataFrame(final_ls, columns=['Policy', 'Target', 'Keyword', "Count", "Textlength"])
+target_df = pd.DataFrame(target_ls, columns=['Policy', 'Target', 'Keyword', "Count", "Textlength"])
 
 #drop rows where keyword = ""
 # print(len(final_df['Target']))
-final_df = final_df[final_df.Keyword != ""]
+target_df = target_df[target_df.Keyword != ""]
 # print(len(final_df['Target']))
 
 #drop rows where count = 0
 # print(len(final_df['Target']))
-final_df = final_df[final_df.Count != 0]
+target_df = target_df[target_df.Count != 0]
 # print(len(final_df['Target']))
 
 # Create a Pandas Excel writer using XlsxWriter as the engine.
@@ -215,59 +239,53 @@ writer = pd.ExcelWriter(write_name, engine='xlsxwriter')
 #SB writer = pd.ExcelWriter(os.getcwd()+str("\\results\\raw\\mapping_TEI_{}.xlsx").format(current_date), engine='xlsxwriter')
 
 #export final output
-final_df.to_excel(writer, sheet_name='RAW')
+target_df.to_excel(writer, sheet_name='Target_raw_count')
 
-#############################
+with open(log_file, 'a') as f:
+    f.write( 
+        '- 5.1) Counting target keywords in texts: {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
 
-##county names
+## 5.2) Count Goals keywords
+start_time = time.time()
 
-countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
-countries = countries_in['Name'].values.tolist()
-country_ls = []
-for element in countries:
-    element = [re.sub(r"[^a-zA-Z-]+", '', t.lower().strip()) for t in element.split()]
-    # countries = [x.strip(' ') for x in countries]
-    element = [stem(word) for word in element if not word in stop_words]
-    element = ' '.join(element)
-    country_ls.append(element)
+goal_ls = []
+##make the count
+for item in PDFtext:
+    for i in range(0, len(goal_keys['Keys'])):
+        for j in range(0,len(goal_keys['Keys'][i])):
+            # print(keys['Keys'][i][j])
+            counter = item[1].count(str(goal_keys['Keys'][i][j]))
+            #write counter together with target, policy, keyword as new row in df
+            #first write output to list
+            goal_ls.append([item[0], goal_keys['Goal'][i], goal_keys['Keys'][i][j], counter, len(item[1])])
 
-##specific subset of relevant targets
-dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
+goal_df = pd.DataFrame(goal_ls, columns=['Policy', 'Goal', 'Keyword', "Count", "Textlength"])
 
-#split keys
-dev_count_keys['Keys'] = dev_count_keys['Keys'].str.split(pat = ";")
+#drop rows where keyword = ""
+# print(len(final_df['Target']))
+goal_df= goal_df[goal_df.Keyword != ""]
+# print(len(final_df['Target']))
 
-#apply simple text processing steps
-for i in range(0, len(dev_count_keys['Keys'])):
-    for j in range(0,len(dev_count_keys['Keys'][i])):
-        # dev_count_keys['Keys'][i][j] = word_tokenize(dev_count_keys['Keys'][i][j])
-        dev_count_keys['Keys'][i][j] = [re.sub(r"[^a-zA-Z-]+", '', t.lower().strip()) for t in dev_count_keys['Keys'][i][j].split()]
-        #add whitespaces to words
-        dev_count_keys['Keys'][i][j] = [word.center(len(word)+2) for word in dev_count_keys['Keys'][i][j]]
-        #transform rd back to R&D for later detection
-        dev_count_keys['Keys'][i][j] = [w.replace(" rd ", "R&D") for w in dev_count_keys['Keys'][i][j]]
-        #remove words > 2
-        dev_count_keys['Keys'][i][j] = [word for word in dev_count_keys['Keys'][i][j] if len(word) > 2 or word == "ph"]
-        # remove '
-        # dev_count_keys['Keys'][i][j] = [s.replace('\'', '') for s in dev_count_keys['Keys'][i][j]]
-        # remove whitespaces
-        dev_count_keys['Keys'][i][j] = [x.strip(' ') for x in dev_count_keys['Keys'][i][j]]
-        # add special char to prevent aids from being stemmed to aid
-        dev_count_keys['Keys'][i][j] = [w.replace("aids", "ai&ds&") for w in dev_count_keys['Keys'][i][j]]
-        #stem words
-        dev_count_keys['Keys'][i][j] = [stem(word) for word in dev_count_keys['Keys'][i][j] if not word in stop_words if word != "aids"]
-        # remove special char for detection in text
-        dev_count_keys['Keys'][i][j] = [w.replace("ai&ds&", "aids") for w in dev_count_keys['Keys'][i][j]]
-        # lemmatizing words
-        # dev_count_keys['Keys'][i][j] = [lemmatizer.lemmatize(word) for word in dev_count_keys['Keys'][i][j] if not word in stop_words]
-        #merge back together to 1 string
-        dev_count_keys['Keys'][i][j] = ' '.join(dev_count_keys['Keys'][i][j])
-        #add trailing and leading whitespace
-        dev_count_keys['Keys'][i][j] = " " + dev_count_keys['Keys'][i][j] + " "
+#drop rows where count = 0
+# print(len(final_df['Target']))
+goal_df = goal_df[goal_df.Count != 0]
+# print(len(final_df['Target']))
 
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+
+#export final output
+goal_df.to_excel(writer, sheet_name='Goal_raw_count')
+
+with open(log_file, 'a') as f:
+    f.write( 
+        '- 5.2) Counting goal keywords in texts: {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
+
+## 5.3) Count developing countries keywords
+start_time = time.time()
 
 #make final count
-
 final_ls = []
 ##make the count
 for item in PDFtext:
@@ -301,10 +319,23 @@ final_df = final_df[final_df.Count != 0]
 # print(len(final_df['Target']))
 
 #export final output
-final_df.to_excel(writer, sheet_name='RAW_dev_countries')
+final_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+
+with open(log_file, 'a') as f:
+    f.write( 
+        '- 5.2) Counting developing countries keywords in texts: {:.3e} seconds\n\n'.format(time.time()-start_time)
+    )
 
 #policies for which no keys were detected
 detected_pol = final_df['Policy'].tolist()
 
 writer.save()
 
+with open(log_file, 'a') as f:
+    f.write( 
+        '5) Counting keywords in texts: {:.3e} seconds\n\n'.format(time.time()-start_count_time) + 
+        'Number of documents: {}\n'.format(len(PDFtext)) +
+        'Number of folders: {}'.format(counter)
+    )
+
+print('Step 5: Counted keywords in texts')
