@@ -16,8 +16,9 @@ from whoosh.lang.porter import stem
 import re
 import nltk as nltk
 from docx2python import docx2python
+import pdfminer.high_level as pdfhl
 
-def prepare_keywords(keywrds_string, stop_words, exception_dict=None):
+def preprocess_text(text_string, stop_words, exception_dict=None):
     """
     Prepare keywords for mapping.
     """
@@ -45,45 +46,45 @@ def prepare_keywords(keywrds_string, stop_words, exception_dict=None):
     #    stop_words = set(nltk.corpus.stopwords.words("english"))
     #    stop_words.remove("all")
    
-    keywrds_string = keywrds_string.split(";")
-    keywrds_list = map(lambda term: term.split(),  keywrds_string)
+    text_string = text_string.split(";")
+    text_list = map(lambda term: term.split(),  text_string)
     
-    keywrds_list = [ [term.lower().strip() for term in terms]
-                      for terms in keywrds_list ]
-    keywrds_list = [ [re.sub(r"[^a-zA-Z-]+", '', term) for term in terms]
-                      for terms in keywrds_list ]
-    keywrds_list = [ [term.center(len(term)+2) for term in terms]
-                      for terms in keywrds_list ]
-    keywrds_list = [ [term.replace(" rd ", "R&D") for term in terms]
-                      for terms in keywrds_list ]
-    keywrds_list = [ [term for term in terms if len(term) > 2 or term == "ph" ]
-                      for terms in keywrds_list ] 
+    text_list = [ [term.lower().strip() for term in terms]
+                      for terms in text_list ]
+    text_list = [ [re.sub(r"[^a-zA-Z-]+", '', term) for term in terms]
+                      for terms in text_list ]
+    text_list = [ [term.center(len(term)+2) for term in terms]
+                      for terms in text_list ]
+    text_list = [ [term.replace(" rd ", "R&D") for term in terms]
+                      for terms in text_list ]
+    text_list = [ [term for term in terms if len(term) > 2 or term == "ph" ]
+                      for terms in text_list ] 
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,
     # it is not  as we are however counting also spaces.
     # an easy fix would be to move it before the centering of the terms
-    keywrds_list = [ [term.strip(' ') for term in terms]
-                      for terms in keywrds_list ]
+    text_list = [ [term.strip(' ') for term in terms]
+                      for terms in text_list ]
     
-    keywrds_list = [ [exception_dict[term] if term in exception_dict.keys() 
+    text_list = [ [exception_dict[term] if term in exception_dict.keys() 
                       else term
                       for term in terms]
-                      for terms in keywrds_list ]
+                      for terms in text_list ]
     
-    keywrds_list = [ [ stem(term) for term in terms 
+    text_list = [ [ stem(term) for term in terms 
                       if not term in stop_words if term != "aids" ]
-                      for terms in keywrds_list ]
+                      for terms in text_list ]
     
-    keywrds_list = [ [reverse_exception_dict[term] if term in reverse_exception_dict.keys() 
+    text_list = [ [reverse_exception_dict[term] if term in reverse_exception_dict.keys() 
                       else term
                       for term in terms]
-                      for terms in keywrds_list ]  
+                      for terms in text_list ]  
         
-    keywrds_list = [ ' '.join(terms) for terms in keywrds_list ]
-    keywrds_list = [ ' '+terms+' ' for terms in keywrds_list ]
-    keywrds_list = [terms for terms in keywrds_list if terms!='  ']
+    text_list = [ ' '.join(terms) for terms in text_list ]
+    text_list = [ ' '+terms+' ' for terms in text_list ]
+    text_list = [terms for terms in text_list if terms!='  ']
     
-    return keywrds_list
+    return text_list
 
 def doc2text(a_document_path):
     """
@@ -95,12 +96,16 @@ def doc2text(a_document_path):
 
     suffix = a_document_path.suffix
 
+    ms_word = ['doc','.docx']
+
     d2t_dict = {'.doc' : docx2python,
                 '.docx' : docx2python,
-                #'.pdf' : pdfminer.high_level.extract_text
+                '.pdf' : pdfhl.extract_text
                 
     }
 
-    return d2t_dict[suffix](a_document_path).text 
+    text_from_doc = d2t_dict[suffix](a_document_path).text if suffix in ms_word else d2t_dict[suffix](a_document_path)
+    
+    return text_from_doc
 
   

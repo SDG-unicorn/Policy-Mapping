@@ -1,16 +1,10 @@
 import io, csv, re, os, json
-from os import listdir #MM I would use pathlib insted of os, so that we can make path definition os independent
-from os.path import isfile, join
 from nltk.corpus import stopwords
 import pandas as pd
 import numpy as np
 from nltk.tokenize import word_tokenize
 from whoosh.lang.porter import stem
 from nltk.stem import WordNetLemmatizer
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
 from io import StringIO
 import xlsxwriter
 from itertools import chain
@@ -22,7 +16,7 @@ import time
 
 from docx2python import docx2python
 
-from polmap.polmap import prepare_keywords, doc2text # replaced the keyword processing block
+from polmap.polmap import preprocess_text, doc2text # replaced the keyword processing block
 
 
 ######################################
@@ -83,9 +77,9 @@ dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) 
 stop_words = set(stopwords.words("english"))
 stop_words.remove("all")
 
-keys['Keys']=keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
-goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
-dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: prepare_keywords(x, stop_words))
+keys['Keys']=keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
+goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
+dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
 
 ##Country names
 countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
@@ -110,21 +104,20 @@ start_time = time.time()
 
 PDFtext = []
 counter = 0
-for doc_item in files:
-    #print(doc_item)
+for doc_path in files:
     counter += 1
     try:
         policy_text=[]
-        doc_text = doc2text(doc_item)
+        doc_text = doc2text(doc_path)
         while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         policy_text.append(doc_text)
-        doc_item_name = '/'.join(doc_item.parts[doc_item.parts.index(input_dir.name)+1:]) #the path string of each file, including all parent directories except that are subdirectories of the input directory. It basically capture the directory tree 
-        doc_filename = docs2txt_dir.joinpath(doc_item.parts[-2])
-        doc_filename.mkdir(mode=0o777, parents=True, exist_ok=True)
-        doc_filename = doc_filename.joinpath(doc_item.stem+'.txt')
-        with open(doc_filename, 'w') as doctext:
-           doctext.write(doc_text)
-        PDFtext.append([doc_item_name,' ; '.join(policy_text)])
+        doctext_ = doc_path.parts[doc_path.parts.index(input_dir.name)+1:]
+        doctext_name =  docs2txt_dir.joinpath(*doctext_)
+        doctext_name.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+        doctext_name = doctext_name.parent.joinpath(doctext_name.stem+'.txt')
+        with open(doctext_name, 'w') as file_:
+           file_.write(doc_text)
+        PDFtext.append(['/'.join(doctext_),' ; '.join(policy_text)])
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
         logging.exception('{doc_file} raised exception {exception} \n\n'.format(doc_file=doc_item.name, exception=excptn))
 
@@ -186,11 +179,9 @@ for item in PDFtext:
     #add trailing leading whitespace
     item[1] = " " + item[1] + " "
     #save out
-    item_file=pathlib.PurePath(item[0])
-    parent, stem_ = item_file.parent, item_file.stem
-    item_path = stemmed_doctext_dir / parent
-    item_path.mkdir(mode=0o777, parents=True, exist_ok=True)
-    item_path = item_path.joinpath(stem_+'_stemmed.txt')
+    item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+    item_path = item_path.parent.joinpath(item_path.stem+'_stemmed.txt')
     with open(item_path, 'w') as stemdoctext:
            stemdoctext.write(item[1]+'\n\nTextlenght: {}'.format(len(item[1])))
     #Append textlenght
