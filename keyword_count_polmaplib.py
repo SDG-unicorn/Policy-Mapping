@@ -21,6 +21,7 @@ from polmap.polmap import preprocess_text, doc2text # replaced the keyword proce
 
 ######################################
 ########### 1) Define global variables like time, input_dir, ouput_dirs
+print('Begin text mapping.\n')
 start_time = time.time()
 
 ## 1.a) Read all files in input directory and select allowed filetypes
@@ -50,7 +51,7 @@ stemmed_doctext_dir = out_dir / 'docs2txt_stemmed'
 
 dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, ] } #Set exist_ok=False later on
 #except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
-
+print('Output folder is: \n'+str(out_dir)+'\n')
 #return #MM end func 
 
 ## 1.c) Create logfile for current run.
@@ -64,7 +65,7 @@ with open(log_file, 'a') as f:
         '1) Creating folders, reading input folder and listing all file paths : {:.3e} seconds\n\n'.format(time.time()-start_time)
     )
 
-print('Step 1: Listed paths of documents and created main outpout folders')
+print('Step 1: Listed paths of documents and created main output folders.\n')
 ######################################
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
@@ -97,7 +98,7 @@ with open(log_file, 'a') as f:
         '2) Reading and preprocessing keywords: {:.3e} seconds\n\n'.format(time.time()-start_time)
     )
 
-print('Step 2: Read and processed keywords')
+print('Step 2: Read and processed keywords.\n')
 ######################################
 ########### 3) Read document files and convert them into text
 start_time = time.time()
@@ -121,16 +122,13 @@ for doc_path in files:
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
         logging.exception('{doc_file} raised exception {exception} \n\n'.format(doc_file=doc_item.name, exception=excptn))
 
-#print(PDFtext)
-print("Number of docs: ", len(PDFtext))
-print("Number of folders: ", counter)
 
 with open(log_file, 'a') as f:
     f.write( 
-        '3) Reading, converting and saving documents as text: {:.3e} seconds\n\n'.format(time.time()-start_time)
+        '3) Reading, converting and saving {docs} documents as text: {seconds:.3e} seconds\n\n'.format(docs=len(PDFtext),seconds=(time.time()-start_time))
     )
 
-print('Step 3: Converted documents to text')
+print('Step 3: Converted {docs} documents to text.\n'.format(docs=len(PDFtext)))
 ######################################
 ########### 4) Read document files and convert them into text
 start_time = time.time()
@@ -190,10 +188,10 @@ for item in PDFtext:
 
 with open(log_file, 'a') as f:
     f.write( 
-        '4) Processing and stemming text of documents: {:.3e} seconds\n\n5) Counting of keywords in text:\n\n'.format(time.time()-start_time)
+        '4) Processing and stemming text of {docs} documents: {seconds:.3e} seconds\n\n5) Counting of keywords in text:\n\n'.format(docs=len(PDFtext),seconds=(time.time()-start_time))
     )
 
-print('Step 4: Processed and stemmed text from documents')
+print('Step 4: Processed and stemmed text from {docs} documents.\n'.format(docs=len(PDFtext)))
 ######################################
 ########### 5) Counting keywords within text
 start_count_time = time.time()
@@ -329,4 +327,4 @@ with open(log_file, 'a') as f:
         'Number of folders: {}'.format(counter)
     )
 
-print('Step 5: Counted keywords in texts')
+print('Step 5: Counted keywords in texts.')
