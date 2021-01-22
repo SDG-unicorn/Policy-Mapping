@@ -17,14 +17,15 @@ import re
 import nltk as nltk
 from docx2python import docx2python
 import pdfminer.high_level as pdfhl
+from bs4 import BeautifulSoup
 
 def preprocess_text(text_string, stop_words, exception_dict=None):
     """
-    Prepare keywords for mapping.
+    Prepare text for mapping.
     """
     
-    # if keywrds_string is not str:
-    #     raise TypeError('keywrds_string is not a string') 
+    # if text_string is not str:
+    #     raise TypeError('text_string is not a string') 
     #     #How to return the name of the variable passed by user with format?
     # Get error when using it with apply and lambda in pandas
     
@@ -86,6 +87,8 @@ def preprocess_text(text_string, stop_words, exception_dict=None):
     
     return text_list
 
+
+
 def doc2text(a_document_path):
     """
     Helper function that calls different document to text converting functions 
@@ -96,15 +99,24 @@ def doc2text(a_document_path):
 
     suffix = a_document_path.suffix
 
-    ms_word = ['doc','.docx']
+    ms_word = ['.doc','.docx']
+
+    html = ['.html', '.mhtml']
 
     d2t_dict = {'.doc' : docx2python,
                 '.docx' : docx2python,
-                '.pdf' : pdfhl.extract_text
-                
+                '.pdf' : pdfhl.extract_text,
+                '.html' : BeautifulSoup,
+                '.mhtml' : BeautifulSoup                
     }
 
-    text_from_doc = d2t_dict[suffix](a_document_path).text if suffix in ms_word else d2t_dict[suffix](a_document_path)
+    if suffix in ms_word:
+        text_from_doc = d2t_dict[suffix](a_document_path).text
+    elif suffix in html:
+        with open(a_document_path, 'r') as file_:
+            text_from_doc = d2t_dict[suffix](file_, "html.parser").get_text()
+    else:
+        text_from_doc = d2t_dict[suffix](a_document_path)
     
     return text_from_doc
 

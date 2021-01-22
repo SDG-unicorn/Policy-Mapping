@@ -120,7 +120,8 @@ for doc_path in files:
            file_.write(doc_text)
         PDFtext.append(['/'.join(doctext_),' ; '.join(policy_text)])
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
-        logging.exception('{doc_file} raised exception {exception} \n\n'.format(doc_file=doc_item.name, exception=excptn))
+        print(excptn)
+        logging.exception('{doc_file} raised exception: {exception} \n\n'.format(doc_file=doc_path.name, exception=excptn))
 
 
 with open(log_file, 'a') as f:
