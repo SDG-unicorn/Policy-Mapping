@@ -115,7 +115,7 @@ for doc_path in files:
         doctext_ = doc_path.parts[doc_path.parts.index(input_dir.name)+1:]
         doctext_name =  docs2txt_dir.joinpath(*doctext_)
         doctext_name.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
-        doctext_name = doctext_name.parent.joinpath(doctext_name.stem+'.txt')
+        doctext_name = doctext_name.parent.joinpath(doctext_name.name.replace('.','_')+'.txt')
         with open(doctext_name, 'w') as file_:
            file_.write(doc_text)
         PDFtext.append(['/'.join(doctext_),' ; '.join(policy_text)])
@@ -180,7 +180,7 @@ for item in PDFtext:
     #save out
     item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
-    item_path = item_path.parent.joinpath(item_path.stem+'_stemmed.txt')
+    item_path = item_path.parent.joinpath(item_path.name.replace('.','_')+'_stemmed.txt')
     with open(item_path, 'w') as stemdoctext:
            stemdoctext.write(item[1]+'\n\nTextlenght: {}'.format(len(item[1])))
     #Append textlenght
