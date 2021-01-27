@@ -116,7 +116,7 @@ for doc_path in files:
         doctext_name =  docs2txt_dir.joinpath(*doctext_)
         doctext_name.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
         doctext_name = doctext_name.parent.joinpath(doctext_name.name.replace('.','_')+'.txt')
-        with open(doctext_name, 'w') as file_:
+        with open(doctext_name, 'w', encoding='utf-8') as file_:
            file_.write(doc_text)
         PDFtext.append(['/'.join(doctext_),' ; '.join(policy_text)])
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
@@ -181,7 +181,7 @@ for item in PDFtext:
     item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent.joinpath(item_path.name.replace('.','_')+'_stemmed.txt')
-    with open(item_path, 'w') as stemdoctext:
+    with open(item_path, 'w', encoding='utf-8') as stemdoctext:
            stemdoctext.write(item[1]+'\n\nTextlenght: {}'.format(len(item[1])))
     #Append textlenght
     item = item.append(len(item[1])) #MM @
@@ -227,6 +227,8 @@ target_df = target_df[target_df.Count != 0]
 write_name = results_dir / 'mapping_{}.xlsx'.format(project_title)
 writer = pd.ExcelWriter(write_name, engine='xlsxwriter')
 #SB writer = pd.ExcelWriter(os.getcwd()+str("\\results\\raw\\mapping_TEI_{}.xlsx").format(current_date), engine='xlsxwriter')
+
+print('Final results are stored in:\n{}\n'.format(write_name))
 
 #export final output
 target_df.to_excel(writer, sheet_name='Target_raw_count')
