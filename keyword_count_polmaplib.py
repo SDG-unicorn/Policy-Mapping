@@ -41,15 +41,16 @@ date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI')
 hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+hour
 
-project_title = input_folder_name+'_with_spaces'+str(current_date) 
+project_title = input_folder_name+str(current_date) 
 
 out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
 log_dir = out_dir / 'logs'
 results_dir = out_dir / 'results'
 docs2txt_dir = out_dir / 'docs2txt'
 stemmed_doctext_dir = out_dir / 'docs2txt_stemmed'
+processed_keywords = out_dir / 'processed_keywords'
 
-dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, ] } #Set exist_ok=False later on
+dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, processed_keywords] } #Set exist_ok=False later on
 #except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
 print('Output folder is: \n'+str(out_dir)+'\n')
 #return #MM end func 
@@ -83,7 +84,7 @@ goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: preprocess_text(x, stop_word
 dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
 
 ##Country names
-countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
+countries_in = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
 countries = countries_in['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -92,6 +93,14 @@ for element in countries:
     element = [stem(word) for word in element if not word in stop_words]
     element = ' '.join(element)
     country_ls.append(element)
+
+keywords_filename = processed_keywords / 'processed_keywords.xlsx'
+keywords_filename = pd.ExcelWriter(keywords_filename, engine='xlsxwriter')
+keys.to_excel(keywords_filename, sheet_name='Targets_kwrds')
+goal_keys.to_excel(keywords_filename, sheet_name='Goal_kwrds')
+dev_count_keys.to_excel(keywords_filename, sheet_name='MOI_kwrds')
+pd.DataFrame(country_ls,columns=['Name']).to_excel(keywords_filename, sheet_name='dev_countries_kwrds')
+keywords_filename.save()
 
 with open(log_file, 'a') as f:
     f.write( 
