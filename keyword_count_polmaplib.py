@@ -41,7 +41,7 @@ date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI')
 hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+hour
 
-project_title = input_folder_name+str(current_date) 
+project_title = input_folder_name+'_with_spaces'+str(current_date) 
 
 out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
 log_dir = out_dir / 'logs'
@@ -70,9 +70,9 @@ print('Step 1: Listed paths of documents and created main output folders.\n')
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
-goal_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
-dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
+keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
+goal_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
+dev_count_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
 
 #remove all from stop_words to keep in keywords
 stop_words = set(stopwords.words("english"))
@@ -138,7 +138,6 @@ lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
     #detect soft hyphen that separates words
     item[1] = item[1].replace('.', ' .')
-    item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
     #get indices of soft hyphens
     indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
     #merge the separated words
@@ -149,7 +148,7 @@ for item in PDFtext:
     for index in sorted(indices, reverse=True):
         del item[1][index]
     #remove special character, numbers, lowercase #MM from here until @ this code is identical to prepare keywords correct?
-    item[1] = [re.sub(r"[^a-zA-Z-\.]+", '', t.lower().strip()) for t in item[1]]
+    item[1] = [re.sub(r"[^a-zA-Z0-9-.]+", '', t.lower().strip()) for t in item[1]]
     #add whitespaces
     item[1] = [word.center(len(word)+2) for word in item[1]]
     #recover R&D for detection
@@ -177,6 +176,7 @@ for item in PDFtext:
     item[1] = ' '.join(item[1])
     #add trailing leading whitespace
     item[1] = " " + item[1] + " "
+    #item[1] = re.sub(r'(\w+) \. (\w+)', r'\1  \.\n\2', item[1])
     #save out
     item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)

@@ -52,7 +52,7 @@ def preprocess_text(text_string, stop_words, exception_dict=None):
     
     text_list = [ [term.lower().strip() for term in terms]
                       for terms in text_list ]
-    text_list = [ [re.sub(r"[^a-zA-Z-]+", '', term) for term in terms]
+    text_list = [ [re.sub(r"[^a-zA-Z0-9-]+", '', term) for term in terms]
                       for terms in text_list ]
     text_list = [ [term.center(len(term)+2) for term in terms]
                       for terms in text_list ]
