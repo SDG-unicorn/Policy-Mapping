@@ -41,15 +41,16 @@ date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI')
 hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+hour
 
-project_title = input_folder_name+str(current_date) 
+project_title = input_folder_name+'_reference'+str(current_date) 
 
 out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
 log_dir = out_dir / 'logs'
 results_dir = out_dir / 'results'
 docs2txt_dir = out_dir / 'docs2txt'
 stemmed_doctext_dir = out_dir / 'docs2txt_stemmed'
+processed_keywords = out_dir / 'processed_keywords'
 
-dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, ] } #Set exist_ok=False later on
+dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, processed_keywords ] } #Set exist_ok=False later on
 #except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
 print('Output folder is: \n'+str(out_dir)+'\n')
 #return #MM end func 
@@ -70,28 +71,36 @@ print('Step 1: Listed paths of documents and created main output folders.\n')
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
-goal_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
-dev_count_keys = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
+keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
+goal_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
+dev_count_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
 
 #remove all from stop_words to keep in keywords
-stop_words = set(stopwords.words("english"))
-stop_words.remove("all")
+stop_words = set(stopwords.words('english'))
+stop_words.remove('all')
 
 keys['Keys']=keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
 goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
 dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
 
 ##Country names
-countries_in = pd.read_excel('keys_update_15012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
+countries_in = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
 countries = countries_in['Name'].values.tolist()
 country_ls = []
 for element in countries:
-    element = [re.sub(r"[^a-zA-Z-]+", '', t.lower().strip()) for t in element.split()]
+    element = [re.sub(r'[^a-zA-Z-]+', '', t.lower().strip()) for t in element.split()]
     # countries = [x.strip(' ') for x in countries]
     element = [stem(word) for word in element if not word in stop_words]
     element = ' '.join(element)
     country_ls.append(element)
+
+keywords_filename = processed_keywords / 'processed_keywords.xlsx'
+keywords_filename = pd.ExcelWriter(keywords_filename, engine='xlsxwriter')
+keys.to_excel(keywords_filename, sheet_name='Targets_kwrds')
+goal_keys.to_excel(keywords_filename, sheet_name='Goal_kwrds')
+dev_count_keys.to_excel(keywords_filename, sheet_name='MOI_kwrds')
+pd.DataFrame(country_ls,columns=['Name']).to_excel(keywords_filename, sheet_name='dev_countries_kwrds')
+keywords_filename.save()
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -116,7 +125,7 @@ for doc_path in files:
         doctext_name =  docs2txt_dir.joinpath(*doctext_)
         doctext_name.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
         doctext_name = doctext_name.parent.joinpath(doctext_name.name.replace('.','_')+'.txt')
-        with open(doctext_name, 'w') as file_:
+        with open(doctext_name, 'w', encoding='utf-8') as file_:
            file_.write(doc_text)
         PDFtext.append(['/'.join(doctext_),' ; '.join(policy_text)])
     except Exception as excptn: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
@@ -138,7 +147,6 @@ lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
     #detect soft hyphen that separates words
     item[1] = item[1].replace('.', ' .')
-    item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
     #get indices of soft hyphens
     indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
     #merge the separated words
@@ -149,39 +157,40 @@ for item in PDFtext:
     for index in sorted(indices, reverse=True):
         del item[1][index]
     #remove special character, numbers, lowercase #MM from here until @ this code is identical to prepare keywords correct?
-    item[1] = [re.sub(r"[^a-zA-Z-\.]+", '', t.lower().strip()) for t in item[1]]
+    item[1] = [re.sub(r'[^a-zA-Z-.]+', '', t.lower().strip()) for t in item[1]]
     #add whitespaces
     item[1] = [word.center(len(word)+2) for word in item[1]]
     #recover R&D for detection
-    item[1] = [w.replace(" rd ", "R&D") for w in item[1]]
+    item[1] = [w.replace(' rd ', 'R&D') for w in item[1]]
     # remove words > 2
-    item[1] = [word for word in item[1] if len(word) > 2 or word == "ph"]
+    item[1] = [word for word in item[1] if len(word) > 2 or word == 'ph']
     # remove '
     # item[1] = [s.replace('\'', '') for s in item[1]]
     #remove whitespaces
     item[1] = [x.strip(' ') for x in item[1]]
     #add special char to prevent aids from being stemmed to aid
-    item[1] = [w.replace("aids", "ai&ds&") for w in item[1]]
-    item[1] = [w.replace("productivity", "pro&ductivity&") for w in item[1]]
-    item[1] = [w.replace("remittances", "remit&tance&") for w in item[1]]
-    item[1] = [w.replace("remittance", "remit&tance&") for w in item[1]]
+    item[1] = [w.replace('aids', 'ai&ds&') for w in item[1]]
+    item[1] = [w.replace('productivity', 'pro&ductivity&') for w in item[1]]
+    item[1] = [w.replace('remittances', 'remit&tance&') for w in item[1]]
+    item[1] = [w.replace('remittance', 'remit&tance&') for w in item[1]]
     # stem words
     item[1] = [stem(word) for word in item[1] if not word in stop_words]
     #remove special char for detection in text
-    item[1] = [w.replace("ai&ds&", "aids") for w in item[1]]
-    item[1] = [w.replace("pro&ductivity&", "productivity") for w in item[1]]
-    item[1] = [w.replace("remit&tance&", "remittance") for w in item[1]]
+    item[1] = [w.replace('ai&ds&', 'aids') for w in item[1]]
+    item[1] = [w.replace('pro&ductivity&', 'productivity') for w in item[1]]
+    item[1] = [w.replace('remit&tance&', 'remittance') for w in item[1]]
     #try lemmatizing
     # item[1] = [lemmatizer.lemmatize(word) for word in item[1] if not word in stop_words]
     # merge back together to 1 string
     item[1] = ' '.join(item[1])
     #add trailing leading whitespace
-    item[1] = " " + item[1] + " "
+    item[1] = ' ' + item[1] + ' '
+    #item[1] = re.sub(r'(\w+) \. (\w+)', r'\1  \.\n\2', item[1])
     #save out
     item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent.joinpath(item_path.name.replace('.','_')+'_stemmed.txt')
-    with open(item_path, 'w') as stemdoctext:
+    with open(item_path, 'w', encoding='utf-8') as stemdoctext:
            stemdoctext.write(item[1]+'\n\nTextlenght: {}'.format(len(item[1])))
     #Append textlenght
     item = item.append(len(item[1])) #MM @
@@ -210,11 +219,11 @@ for item in PDFtext:
             #first write output to list
             target_ls.append([item[0], keys['Target'][i], keys['Keys'][i][j], counter, len(item[1])])
 
-target_df = pd.DataFrame(target_ls, columns=['Policy', 'Target', 'Keyword', "Count", "Textlength"])
+target_df = pd.DataFrame(target_ls, columns=['Policy', 'Target', 'Keyword', 'Count', 'Textlength'])
 
-#drop rows where keyword = ""
+#drop rows where keyword = ''
 # print(len(final_df['Target']))
-target_df = target_df[target_df.Keyword != ""]
+target_df = target_df[target_df.Keyword != '']
 # print(len(final_df['Target']))
 
 #drop rows where count = 0
@@ -226,7 +235,9 @@ target_df = target_df[target_df.Count != 0]
 
 write_name = results_dir / 'mapping_{}.xlsx'.format(project_title)
 writer = pd.ExcelWriter(write_name, engine='xlsxwriter')
-#SB writer = pd.ExcelWriter(os.getcwd()+str("\\results\\raw\\mapping_TEI_{}.xlsx").format(current_date), engine='xlsxwriter')
+#SB writer = pd.ExcelWriter(os.getcwd()+str('\\results\\raw\\mapping_TEI_{}.xlsx').format(current_date), engine='xlsxwriter')
+
+print('Final results are stored in:\n{}\n'.format(write_name))
 
 #export final output
 target_df.to_excel(writer, sheet_name='Target_raw_count')
@@ -250,11 +261,11 @@ for item in PDFtext:
             #first write output to list
             goal_ls.append([item[0], goal_keys['Goal'][i], goal_keys['Keys'][i][j], counter, len(item[1])])
 
-goal_df = pd.DataFrame(goal_ls, columns=['Policy', 'Goal', 'Keyword', "Count", "Textlength"])
+goal_df = pd.DataFrame(goal_ls, columns=['Policy', 'Goal', 'Keyword', 'Count', 'Textlength'])
 
-#drop rows where keyword = ""
+#drop rows where keyword = ''
 # print(len(final_df['Target']))
-goal_df= goal_df[goal_df.Keyword != ""]
+goal_df= goal_df[goal_df.Keyword != '']
 # print(len(final_df['Target']))
 
 #drop rows where count = 0
@@ -289,18 +300,18 @@ for item in PDFtext:
                     for element in country_ls:
                         #check for element 30 chars before match and until the end of the sentence
                         if element in sentence[match.start()-30:match.start()] or element in sentence[match.end():sentence.find('.',match.end())]:
-                            word = word + " " + element
+                            word = word + ' ' + element
                             counter = counter + 1
                 #write counter together with target, policy, keyword as new row in df
                 #first write output to list
                 if counter != 0:
                     final_ls.append([item[0], dev_count_keys['Target'][i], word, counter, len(item[1])])
 
-final_df = pd.DataFrame(final_ls, columns=['Policy', 'Target', 'Keyword', "Count", "Textlength"])
+final_df = pd.DataFrame(final_ls, columns=['Policy', 'Target', 'Keyword', 'Count', 'Textlength'])
 
-#drop rows where keyword = ""
+#drop rows where keyword = ''
 # print(len(final_df['Target']))
-final_df = final_df[final_df.Keyword != ""]
+final_df = final_df[final_df.Keyword != '']
 # print(len(final_df['Target']))
 
 #drop rows where count = 0
