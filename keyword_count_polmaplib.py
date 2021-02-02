@@ -41,7 +41,7 @@ date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI')
 hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+hour
 
-project_title = input_folder_name+str(current_date) 
+project_title = input_folder_name+'_reference'+str(current_date) 
 
 out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
 log_dir = out_dir / 'logs'
