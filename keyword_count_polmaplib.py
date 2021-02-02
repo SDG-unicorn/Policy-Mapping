@@ -147,6 +147,7 @@ lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
     #detect soft hyphen that separates words
     item[1] = item[1].replace('.', ' .')
+    item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
     #get indices of soft hyphens
     indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
     #merge the separated words
