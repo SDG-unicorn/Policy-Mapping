@@ -51,7 +51,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     
 
     if regex_dict == None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z-. ]+', ''), (r'([\w-]+)', r' \1 ')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9. -]+', ''), (r'([\w-]+)', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict):
         raise TypeError('regex_dict is not of type Ordered dict')
         
