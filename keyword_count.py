@@ -13,7 +13,7 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
 import xlsxwriter
-from itertools import chain
+from itertools import chain, count
 ##MM imports
 import datetime as dt
 import pathlib
@@ -27,7 +27,7 @@ date = dt.datetime.now().date().isoformat()
 time = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+time
 
-project_title = 'TEI'+str(current_date) #TEI shall be replace with project string varible provided by the user
+project_title = 'Eurlex_original'+str(current_date) #TEI shall be replace with project string varible provided by the user
 
 #try
 out_dir = pathlib.Path.cwd() / 'output' / project_title 
@@ -47,13 +47,19 @@ logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
 
 ####### Read all files in input directory and select allowed filetypes
 
-input_dir = pathlib.Path.cwd() / 'pdf_re' / 'TEI' #MM let user provide an input dir
+input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Test' / 'Eurlex' #MM let user provide an input dir
 input_folder_name = input_dir.name
 
-allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
+allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] #['.doc','.docx']
 
 files = sorted(input_dir.glob('**/*.pdf'))
 files = [ file for file in files if file.suffix in allowed_filetypes]
+
+file_list = ['{})  '.format(count_)+str(file)+'\n' for count_, file in enumerate(files, start=1)]
+
+with open(results_dir.joinpath('file_list.txt'), 'w') as file_list_name:
+    file_list_name.writelines(file_list)
+
 #MM assert files==False and log assertion error.
 
 ######################################
@@ -61,7 +67,7 @@ files = [ file for file in files if file.suffix in allowed_filetypes]
 ########### 2) read in all keywords #MM this could be moved below after the pdf conversion and before the counting, to have a little bit more of a flow:
 #e.g. 1) create global variable, 2) convert doc to text 3) load keywords, lemmatize keywords and text, 4) count keys in text 5) save output
 
-keys = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' )
+keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Target_keys' )
 
 ##read in 1 row with keys per target
 ## split row by ; - series of list of strings
@@ -249,7 +255,7 @@ final_df.to_excel(writer, sheet_name='RAW')
 
 ##county names
 
-countries_in = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries')
+countries_in = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'developing_countries')
 countries = countries_in['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -260,7 +266,7 @@ for element in countries:
     country_ls.append(element)
 
 ##specific subset of relevant targets
-dev_count_keys = pd.read_excel('keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' )
+dev_count_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'MOI' )
 
 #split keys
 dev_count_keys['Keys'] = dev_count_keys['Keys'].str.split(pat = ";")

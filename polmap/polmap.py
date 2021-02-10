@@ -12,18 +12,30 @@
   :requires: 
 """
 
+#Imports
+
+#preprocess_text
 from whoosh.lang.porter import stem
 import re
 import nltk as nltk
+import collections
+
+#doc2txt
 from docx2python import docx2python
 import pdfminer.high_level as pdfhl
 from bs4 import BeautifulSoup
 
-def preprocess_text(text_string, stop_words, exception_dict=None):
+
+####### Preprocess and stem text.
+
+def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     """
     Prepare text for mapping.
     """
-    
+    text_string = a_string
+
+    if text_string==None: #this should be moved to the prepare keywords wrapper function
+        return None
     # if text_string is not str:
     #     raise TypeError('text_string is not a string') 
     #     #How to return the name of the variable passed by user with format?
@@ -35,10 +47,15 @@ def preprocess_text(text_string, stop_words, exception_dict=None):
                           "remittances" : "remit&tance&"                 
                           }
     elif exception_dict is not dict:
-        raise TypeError('exception_dict is not a dict')
+        raise TypeError('exception_dict is not of type dict')
     
-    reverse_exception_dict={value : key for key, value in exception_dict.items()}
-    
+
+    if regex_dict == None:
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9. -]+', ''), (r'([\w-]+)', r' \1 ')])
+    elif not isinstance(regex_dict, collections.OrderedDict):
+        raise TypeError('regex_dict is not of type Ordered dict')
+        
+
     #remove all from stop_words to keep in keywords.
     # Review scoping rules in python, this fails with:
     # NameError: name 'stop_words' is not defined when called in lambda function
@@ -46,48 +63,47 @@ def preprocess_text(text_string, stop_words, exception_dict=None):
     #if stop_words==None:
     #    stop_words = set(nltk.corpus.stopwords.words("english"))
     #    stop_words.remove("all")
-   
-    text_string = text_string.split(";")
-    text_list = map(lambda term: term.split(),  text_string)
+
+       
+    #text_string = text_string.replace('\xa0',' ') #Remove some weird \xa0 characters
+
+    text_string = text_string.lower().strip()
+
+    for pattern, substitution in regex_dict.items():
+        text_string = re.sub(pattern, substitution, text_string)
     
-    text_list = [ [term.lower().strip() for term in terms]
-                      for terms in text_list ]
-    text_list = [ [re.sub(r"[^a-zA-Z0-9-]+", '', term) for term in terms]
-                      for terms in text_list ]
-    text_list = [ [term.center(len(term)+2) for term in terms]
-                      for terms in text_list ]
-    text_list = [ [term.replace(" rd ", "R&D") for term in terms]
-                      for terms in text_list ]
-    text_list = [ [term for term in terms if len(term) > 2 or term == "ph" ]
-                      for terms in text_list ] 
+    #text_string = re.sub(r'([\w-]+)', r' \1 ', text_string) #Equivalent to center, adds leading and trailing space to the captured group
+    
+    text_string = text_string.replace(' rd ', ' R&D ')
+    
+    text_string = re.sub(r'([a-zA-z-]{3,}|ph)', r'\1', text_string)
+    
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,
     # it is not  as we are however counting also spaces.
     # an easy fix would be to move it before the centering of the terms
-    text_list = [ [term.strip(' ') for term in terms]
-                      for terms in text_list ]
     
-    text_list = [ [exception_dict[term] if term in exception_dict.keys() 
-                      else term
-                      for term in terms]
-                      for terms in text_list ]
+    for key, value in exception_dict.items(): #Protect exceptions from stemming
+        text_string = text_string.replace(key, value)
     
-    text_list = [ [ stem(term) for term in terms 
-                      if not term in stop_words if term != "aids" ]
-                      for terms in text_list ]
+    for word in stop_words: #Remove stopwords
+        text_string = text_string.replace(' '+word+' ', '') 
     
-    text_list = [ [reverse_exception_dict[term] if term in reverse_exception_dict.keys() 
-                      else term
-                      for term in terms]
-                      for terms in text_list ]  
+    text_string = re.sub(r'[a-zA-z&-]+', #Find words wirth regex. It can be improved by capturing pattern between word boundaries.
+    lambda rgx_word: ' '+stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
+    text_string)
         
-    text_list = [ ' '.join(terms) for terms in text_list ]
-    text_list = [ ' '+terms+' ' for terms in text_list ]
-    text_list = [terms for terms in text_list if terms!='  ']
+    for key, value in exception_dict.items(): #Restore words from exception protection
+        text_string = text_string.replace(value, key)
     
-    return text_list
+    text_string = ' '+text_string+' '
+    
+    text_string = re.sub(r' {2,}', r' ', text_string)
+        
+    return text_string
 
 
+###### Extract text from doc and docx files.
 
 def doc2text(a_document_path):
     """
