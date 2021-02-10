@@ -15,7 +15,7 @@ import logging
 import time
 
 from docx2python import docx2python
-
+ 
 from polmap.polmap import preprocess_text, doc2text # replaced the keyword processing block
 
 
@@ -26,13 +26,14 @@ start_time = time.time()
 
 ## 1.a) Read all files in input directory and select allowed filetypes
 
-input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Test' #MM let user provide an input dir
+input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Test' / 'Eurlex' #MM let user provide an input dir
 input_folder_name = input_dir.name
 
-allowed_filetypes=['.pdf','.html','.mhtml','.doc','.docx']
+allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] # ['.html','.mhtml'] # 
 
 files = sorted(input_dir.glob('**/*.*'))
 files = [ file for file in files if file.suffix in allowed_filetypes]
+
 #MM assert files==False and log assertion error.
 
 ## 1.b) Create output folder structure based on input name, date and time of exectution
@@ -41,7 +42,7 @@ date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI')
 hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
 current_date = '_'+date+'_T'+hour
 
-project_title = input_folder_name+'_reference'+str(current_date) 
+project_title = input_folder_name+str(current_date) 
 
 out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
 log_dir = out_dir / 'logs'
@@ -53,7 +54,12 @@ processed_keywords = out_dir / 'processed_keywords'
 dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, processed_keywords ] } #Set exist_ok=False later on
 #except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
 print('Output folder is: \n'+str(out_dir)+'\n')
-#return #MM end func 
+#return #MM end func
+
+file_list = ['{})  '.format(count_)+str(file)+'\n' for count_, file in enumerate(files, start=1)]
+
+with open(results_dir.joinpath('file_list.txt'), 'w') as file_list_name:
+    file_list_name.writelines(file_list)
 
 ## 1.c) Create logfile for current run.
 
@@ -71,20 +77,26 @@ print('Step 1: Listed paths of documents and created main output folders.\n')
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
-goal_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
-dev_count_keys = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
+keywords_excel = 'keys_update_27012020.xlsx'
+
+keys = pd.read_excel(keywords_excel, sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
+goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
+dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
 
 #remove all from stop_words to keep in keywords
 stop_words = set(stopwords.words('english'))
 stop_words.remove('all')
 
-keys['Keys']=keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
-goal_keys['Keys']=goal_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
-dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda x: preprocess_text(x, stop_words))
+keys['Keys']=keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
+goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
+dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
+
+keys['Keys']=keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
 
 ##Country names
-countries_in = pd.read_excel('keys_update_27012020.xlsx', sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
+countries_in = pd.read_excel(keywords_excel, sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
 countries = countries_in['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -146,47 +158,21 @@ start_time = time.time()
 lemmatizer = WordNetLemmatizer()
 for item in PDFtext:
     #detect soft hyphen that separates words
-    item[1] = item[1].replace('.', ' .')
-    item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
-    #get indices of soft hyphens
-    indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
-    #merge the separated words
-    for index in indices:
-        item[1][index] = item[1][index].replace('\xad', '')
-        item[1][index+1] = item[1][index]+item[1][index+1]
-    #remove unnecessary list elements
-    for index in sorted(indices, reverse=True):
-        del item[1][index]
-    #remove special character, numbers, lowercase #MM from here until @ this code is identical to prepare keywords correct?
-    item[1] = [re.sub(r'[^a-zA-Z-.]+', '', t.lower().strip()) for t in item[1]]
-    #add whitespaces
-    item[1] = [word.center(len(word)+2) for word in item[1]]
-    #recover R&D for detection
-    item[1] = [w.replace(' rd ', 'R&D') for w in item[1]]
-    # remove words > 2
-    item[1] = [word for word in item[1] if len(word) > 2 or word == 'ph']
-    # remove '
-    # item[1] = [s.replace('\'', '') for s in item[1]]
-    #remove whitespaces
-    item[1] = [x.strip(' ') for x in item[1]]
-    #add special char to prevent aids from being stemmed to aid
-    item[1] = [w.replace('aids', 'ai&ds&') for w in item[1]]
-    item[1] = [w.replace('productivity', 'pro&ductivity&') for w in item[1]]
-    item[1] = [w.replace('remittances', 'remit&tance&') for w in item[1]]
-    item[1] = [w.replace('remittance', 'remit&tance&') for w in item[1]]
-    # stem words
-    item[1] = [stem(word) for word in item[1] if not word in stop_words]
-    #remove special char for detection in text
-    item[1] = [w.replace('ai&ds&', 'aids') for w in item[1]]
-    item[1] = [w.replace('pro&ductivity&', 'productivity') for w in item[1]]
-    item[1] = [w.replace('remit&tance&', 'remittance') for w in item[1]]
-    #try lemmatizing
-    # item[1] = [lemmatizer.lemmatize(word) for word in item[1] if not word in stop_words]
-    # merge back together to 1 string
-    item[1] = ' '.join(item[1])
-    #add trailing leading whitespace
-    item[1] = ' ' + item[1] + ' '
-    #item[1] = re.sub(r'(\w+) \. (\w+)', r'\1  \.\n\2', item[1])
+    item[1] = item[1].replace('. ', ' . ') # item[1] = re.sub(r'([a-z])([-:,;])(\s)', r'\1 \2\3', item[1])
+    item[1] = re.sub(r'-\n', '', item[1])
+    #item[1] = re.sub(r'(\w+)\n(\w+)', r'\1 \2', item[1]) #remove line returns between words
+    # item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
+    # #get indices of soft hyphens
+    # indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
+    # #merge the separated words
+    # for index in indices:
+    #     item[1][index] = item[1][index].replace('\xad', '')
+    #     item[1][index+1] = item[1][index]+item[1][index+1]
+    # #remove unnecessary list elements
+    # for index in sorted(indices, reverse=True):
+    #     del item[1][index]
+    item[1] = preprocess_text(item[1], stop_words)
+    #item[1] = item[1].replace(' . ', ' . \n')
     #save out
     item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
