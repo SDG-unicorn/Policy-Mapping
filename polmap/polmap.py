@@ -14,6 +14,11 @@
 
 #Imports
 
+#make_directories
+import datetime as dt
+import pathlib
+import warnings
+
 #preprocess_text
 from whoosh.lang.porter import stem
 import re
@@ -24,6 +29,35 @@ import collections
 from docx2python import docx2python
 import pdfminer.high_level as pdfhl
 from bs4 import BeautifulSoup
+
+
+####### Create output directory tree.
+
+def make_directories(input_directory, out_dir='current'):
+
+    current_date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
+
+    project_title = input_directory.name+'_'+current_date
+
+    if out_dir=='current':
+        out_dir = pathlib.Path.cwd() / 'output' / project_title
+    elif not isinstance(out_dir, pathlib.Path): #test if out dir is of type path
+        raise TypeError('out_dir is not pathlib.Path object') #Try to convert out dir into path, test if exist, try to make it.
+
+    directory_dict = {
+        'out_dir' : out_dir ,
+        'log_dir' : out_dir / 'logs' ,
+        'results_dir' : out_dir / 'results' ,
+        'doctext_dir' : out_dir / 'doctext' ,
+        'doctext_stemmed_dir' : out_dir / 'doctext_stemmed' ,
+        'processed_keywords_dir' : out_dir / 'processed_keywords' ,
+    }
+
+    
+    for directory in directory_dict.values():
+        directory.mkdir(mode=0o777, parents=True, exist_ok=True)
+
+    return directory_dict
 
 
 ####### Preprocess and stem text.

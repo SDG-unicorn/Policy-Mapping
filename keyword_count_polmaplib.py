@@ -16,7 +16,7 @@ import time
 
 from docx2python import docx2python
  
-from polmap.polmap import preprocess_text, doc2text # replaced the keyword processing block
+from polmap.polmap import make_directories, preprocess_text, doc2text # replaced the keyword processing block
 
 
 ######################################
@@ -24,37 +24,31 @@ from polmap.polmap import preprocess_text, doc2text # replaced the keyword proce
 print('Begin text mapping.\n')
 start_time = time.time()
 
-## 1.a) Read all files in input directory and select allowed filetypes
-
 input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Test' / 'Eurlex' #MM let user provide an input dir
 input_folder_name = input_dir.name
 
-allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] # ['.html','.mhtml'] # 
+## 1.a) Create output folder structure based on input name, date and time of exectution
+
+output_dir_dict = make_directories(input_dir) #Set exist_ok=False later on
+
+project_title=output_dir_dict['out_dir'].name
+
+out_dir, log_dir, results_dir, doctext_dir, doctext_stemmed_dir, processed_keywords_dir = output_dir_dict.values()
+
+for key, value in output_dir_dict.items():
+    if output_dir_dict[key].exists() and output_dir_dict[key].is_dir():
+        print(key+' succesfully created in:\n'+'{}\n'.format(str(value)))
+
+print('Output folder is: \n'+str(output_dir_dict['out_dir'])+'\n')
+
+## 1.b) Read all files in input directory and select allowed filetypes
+
+allowed_filetypes =  ['.doc','.docx'] # ['.pdf','.html','.mhtml','.doc','.docx'] #
 
 files = sorted(input_dir.glob('**/*.*'))
 files = [ file for file in files if file.suffix in allowed_filetypes]
 
 #MM assert files==False and log assertion error.
-
-## 1.b) Create output folder structure based on input name, date and time of exectution
-
-date = dt.datetime.now().date().isoformat() #def make_directories(project='TEI'): #MM start func definition
-hour = dt.datetime.now().time().isoformat(timespec='seconds').replace(':', '')
-current_date = '_'+date+'_T'+hour
-
-project_title = input_folder_name+str(current_date) 
-
-out_dir = pathlib.Path.cwd() / 'output' / project_title #Beginning of try block
-log_dir = out_dir / 'logs'
-results_dir = out_dir / 'results'
-docs2txt_dir = out_dir / 'docs2txt'
-stemmed_doctext_dir = out_dir / 'docs2txt_stemmed'
-processed_keywords = out_dir / 'processed_keywords'
-
-dir_dict = { directory: directory.mkdir(mode=0o777, parents=True, exist_ok=True) for directory in [out_dir, log_dir, results_dir, docs2txt_dir, processed_keywords ] } #Set exist_ok=False later on
-#except FileExistsError, Error : #MM Deal with cases where directory creation failed. Error occurring here will not be catched in the log.
-print('Output folder is: \n'+str(out_dir)+'\n')
-#return #MM end func
 
 file_list = ['{})  '.format(count_)+str(file)+'\n' for count_, file in enumerate(files, start=1)]
 
@@ -73,6 +67,8 @@ with open(log_file, 'a') as f:
     )
 
 print('Step 1: Listed paths of documents and created main output folders.\n')
+
+
 ######################################
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
@@ -106,7 +102,7 @@ for element in countries:
     element = ' '.join(element)
     country_ls.append(element)
 
-keywords_filename = processed_keywords / 'processed_keywords.xlsx'
+keywords_filename = processed_keywords_dir / 'processed_keywords.xlsx'
 keywords_filename = pd.ExcelWriter(keywords_filename, engine='xlsxwriter')
 keys.to_excel(keywords_filename, sheet_name='Targets_kwrds')
 goal_keys.to_excel(keywords_filename, sheet_name='Goal_kwrds')
@@ -120,6 +116,8 @@ with open(log_file, 'a') as f:
     )
 
 print('Step 2: Read and processed keywords.\n')
+
+
 ######################################
 ########### 3) Read document files and convert them into text
 start_time = time.time()
@@ -134,7 +132,7 @@ for doc_path in files:
         while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         policy_text.append(doc_text)
         doctext_ = doc_path.parts[doc_path.parts.index(input_dir.name)+1:]
-        doctext_name =  docs2txt_dir.joinpath(*doctext_)
+        doctext_name =  doctext_dir.joinpath(*doctext_)
         doctext_name.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
         doctext_name = doctext_name.parent.joinpath(doctext_name.name.replace('.','_')+'.txt')
         with open(doctext_name, 'w', encoding='utf-8') as file_:
@@ -151,6 +149,8 @@ with open(log_file, 'a') as f:
     )
 
 print('Step 3: Converted {docs} documents to text.\n'.format(docs=len(PDFtext)))
+
+
 ######################################
 ########### 4) Read document files and convert them into text
 start_time = time.time()
@@ -174,7 +174,7 @@ for item in PDFtext:
     item[1] = preprocess_text(item[1], stop_words)
     #item[1] = item[1].replace(' . ', ' . \n')
     #save out
-    item_path = stemmed_doctext_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = doctext_stemmed_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent.joinpath(item_path.name.replace('.','_')+'_stemmed.txt')
     with open(item_path, 'w', encoding='utf-8') as stemdoctext:
@@ -189,6 +189,8 @@ with open(log_file, 'a') as f:
     )
 
 print('Step 4: Processed and stemmed text from {docs} documents.\n'.format(docs=len(PDFtext)))
+
+
 ######################################
 ########### 5) Counting keywords within text
 start_count_time = time.time()
