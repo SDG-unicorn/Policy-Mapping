@@ -51,6 +51,7 @@ def make_directories(input_directory, out_dir='current'):
         'doctext_dir' : out_dir / 'doctext' ,
         'doctext_stemmed_dir' : out_dir / 'doctext_stemmed' ,
         'processed_keywords_dir' : out_dir / 'processed_keywords' ,
+        'keyword_count_dir' : out_dir / 'keyword_count'
     }
 
     
