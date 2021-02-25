@@ -1,9 +1,6 @@
 *.xlsx
 !keywords/*.xlsx
 !Reproducible_example_EUR-Lex.xlsx
-Diego/
-Query/
-pdf_re/
-results/
+input/
 output/
 */__pycache__/
