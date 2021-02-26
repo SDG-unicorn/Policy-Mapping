@@ -1,7 +1,5 @@
 import pandas as pd
-import os
-import time
-import json
+import os, time, pathlib , json
 from tkinter import filedialog
 from tkinter import *
 from nltk import tokenize
@@ -156,7 +154,7 @@ def get_target_overview(df, goal_df):
     #add SDG label
     target_df = goal_df.join(target_df.set_index('Target'), on='Target', how="inner")
     #drop target_ID column
-    del target_df['Target_ID']
+    target_df.drop(columns='Target_ID', inplace=True) # MM careful with delete statements: if you pass a mutable object you will affect the orginal object outside of the function
     return target_df
 
 
@@ -181,7 +179,7 @@ def find_undetected_targets(df, goal_df):
     #make series df and assign column names
     undetected_targets = undetected_targets.to_frame()
     undetected_targets = goal_df.join(undetected_targets.set_index('Target'), on='Target', how="inner")
-    del undetected_targets['Target_ID']
+    undetected_targets.drop(columns='Target_ID', inplace=True)
     undetected_targets.columns = ['Target', 'Goal']
     undetected_targets = undetected_targets.reset_index(drop=True)
     return undetected_targets
@@ -284,7 +282,7 @@ def get_number_of_policies_per_goal(df_filtered, dat_goal_level, goal_df):
 ################################################
 
 #specify filename and dirpath is you don't want to call GUI
-def create_json_files_for_bubbleplots(target_df, goal_df, filename = None, output_path = None):
+def create_json_files_for_bubbleplots(target_df, goal_df): #filename=None ,output_path=None
     target_df['Target'] = 'Target ' + target_df['Target'].astype(str)
     #rename both df's for JSON output
     goal_subset = goal_df.rename(columns={'Goal': 'name', 'Policy': 'size'}, inplace=False)
@@ -307,15 +305,15 @@ def create_json_files_for_bubbleplots(target_df, goal_df, filename = None, outpu
         tmp_dict = {'name': label[0], 'size': str(size), 'children': tmp_ls}
         dict_ls.append(tmp_dict)
     final_dict = {'name': "sdgs", 'children': dict_ls}
-    if output_path == None:
-        root = Tk()
-        output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-    if filename == None:
-        filename = str("bubbleplot_" + str(date) + ".json")
-    complete_path = os.path.join(output_path, filename)
-    with open(complete_path, 'w') as fp:
-        json.dump(final_dict, fp)
-    return print("JSON files have been exported to: " + complete_path)
+    # if output_path == None: # MM This is something to be done outside of the function. Would be better to have an ad hoc functions that calls this function
+    #     root = Tk()
+    #     output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+    # if filename == None:
+    #     filename = str("bubbleplot_" + str(date) + ".json")
+    # complete_path = os.path.join(output_path, filename)
+    # with open(complete_path, 'w') as fp:
+    #     json.dump(final_dict, fp)
+    return final_dict
 
 
 
@@ -369,8 +367,8 @@ def add_further_info_to_df(df, color_df, goal_df):
     sankey_df = sankey_df.merge(goal_df, on='Target', how='left')
     #add Target Description from target_texts df, see beginning of script
     sankey_df = sankey_df.merge(target_texts, on='Target', how='left')
-    del sankey_df['Goal_y']
-    del sankey_df['goal']
+    sankey_df.drop(columns='Goal_y', inplace=True)
+    sankey_df.drop(columns='goal', inplace=True)
     sankey_df.rename(columns={'Goal_x': 'Goal', 'Target_ID':'tar_ID'}, inplace=True)
     sankey_df = sankey_df.iloc[sankey_df.Policy.str.lower().argsort()]
     return sankey_df
@@ -390,11 +388,11 @@ def add_further_info_to_df(df, color_df, goal_df):
 ###outputs individual json files, 1 file = 1 policy
 
 #specify dirpath argument if you don't want to call GUI for selecting output_folder
-def create_json_files_for_sankey_charts(df, output_path=None):
-    if output_path == None:
-        #first let user select output folder for json files
-        root = Tk()
-        output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+def create_json_files_for_sankey_charts(df): # output_path=None
+    # if output_path == None:
+    #     #first let user select output folder for json files
+    #     root = Tk()
+    #     output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
     #create list with unique policy names
     pol_ls = df.Policy.unique().tolist()
     for item in pol_ls:
@@ -428,11 +426,11 @@ def create_json_files_for_sankey_charts(df, output_path=None):
         links_ls = [{'source': links_source[i], 'target': links_target[i], 'value': links_val[i], 'color': links_col[i]}
                     for i in range(len(links_source))]
         final_dict = {"nodes": nodes_ls, "links": links_ls}
-        filename = str(temp_df.iloc[0]['ID'] + 1) + '_' + temp_df.iloc[0]['Policy'] + '.json'
-        complete_path = os.path.join(output_path, filename)
-        with open(complete_path, 'w') as fp:
-            json.dump(final_dict, fp)
-    return print("JSON files have been exported to: " + output_path)
+        # filename = str(temp_df.iloc[0]['ID'] + 1) + '_' + temp_df.iloc[0]['Policy'] + '.json'
+        # complete_path = os.path.join(output_path, filename)
+        # with open(complete_path, 'w') as fp:
+        #     json.dump(final_dict, fp)
+    return final_dict 
 
 ####################################################
 #########################################
@@ -448,7 +446,7 @@ def create_json_files_for_sankey_charts(df, output_path=None):
 ##make policy list ready for platform, use output from add_further_info_to_df as input df
 ##functions exports csv table with list of policies
 
-def export_csv_for_policy_list(df, goal_df, filename=None, output_path=None):
+def export_csv_for_policy_list(df, goal_df): # filename=None, output_path=None
     #create unique policy names list
     pol_ls = list(df.Policy.unique())
     goal_ls = list(goal_df.Goal.unique())
@@ -477,16 +475,16 @@ def export_csv_for_policy_list(df, goal_df, filename=None, output_path=None):
         output_df.loc[df_length] = to_append
     #export final df as csv
     #choose output folder
-    if output_path == None:
-        root = Tk()
-        output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-    if filename == None:
-        filename = str("table-policies-sdgs_" + str(date) + ".csv")
+    # if output_path == None:
+    #     root = Tk()
+    #     output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+    # if filename == None:
+    #     filename = str("table-policies-sdgs_" + str(date) + ".csv")
     full_path = os.path.join(output_path, filename)
     #specify semicolon as delimiter for Diego's code to update platform
-    output_df.to_csv(full_path, sep=";", index=False, encoding='utf-8-sig')
+    # output_df.to_csv(full_path, sep=";", index=False, encoding='utf-8-sig')
     output_df = output_df.iloc[output_df.Policy.str.lower().argsort()]
-    print(filename + " has been exported to: " + output_path)
+    # print(filename + " has been exported to: " + output_path)
     return output_df
 
 
@@ -504,7 +502,7 @@ def export_csv_for_policy_list(df, goal_df, filename=None, output_path=None):
 ##function checks which policies addressed the same targets
 
 
-def create_policy_coherence_data(df, goal_df, filename=None, output_path=None):
+def create_policy_coherence_data(df, goal_df): #  filename=None, output_path=None
     #create df with 2 columns showing all possible combinations of targets
     target_list = goal_df['Target'].tolist()
     target_combinations = pd.DataFrame(columns=['tar_1', 'tar_2'])
@@ -546,16 +544,16 @@ def create_policy_coherence_data(df, goal_df, filename=None, output_path=None):
     target_combinations['number_policies'] = pd.to_numeric(target_combinations['number_policies'], downcast="integer")
     target_combinations['tar_1'] = target_combinations['tar_1'].astype(str)
     #prepare export to csv
-    if filename == None:
-        filename = str('policy-coherence_' + str(date) + ".csv")
-    #create file dialogue to select output folder
-    if output_path == None:
-        root = Tk()
-        output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-    full_path = os.path.join(output_path, filename)
-    #write to csv
-    target_combinations.to_csv(full_path, sep=";", index=False, encoding='utf-8-sig')
-    print(filename + " has been exported to: " + output_path)
+    # if filename == None:
+    #     filename = str('policy-coherence_' + str(date) + ".csv")
+    # #create file dialogue to select output folder
+    # if output_path == None:
+    #     root = Tk()
+    #     output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+    # full_path = os.path.join(output_path, filename)
+    # #write to csv
+    # target_combinations.to_csv(full_path, sep=";", index=False, encoding='utf-8-sig')
+    # print(filename + " has been exported to: " + output_path)
     return target_combinations
 
 
@@ -578,23 +576,26 @@ def create_policy_coherence_data(df, goal_df, filename=None, output_path=None):
 
 
 def export_dataframes(target_df, filtered_df, target_overview_df, undetected_targets_df, goal_overview_df,pol_per_goal_df, goal_df, filename=None, output_path=None):
-    if filename == None:
-        filename = "processed_results_" + str(date) + ".xlsx"
-    if output_path == None:
-        root = Tk()
-        output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-    full_path = os.path.join(output_path, filename)
-    writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
-    # export final output
-    target_df.to_excel(writer, sheet_name='aggregated_target_level')
-    filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
-    target_overview_df.to_excel(writer, sheet_name='target_overview')
-    undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
-    goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
-    goal_overview_df.to_excel(writer, sheet_name='goal_overview')
-    pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
-    writer.save()
-    return print("All dataframes were exported as: " + filename + " to: " + output_path)
+  if filename == None:
+    filename = f"processed_results_{date}.xlsx"
+  if output_path == None:
+      # root = Tk()
+      # output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+    full_path = pathlib.Path(output_path) / filename
+  else:
+    full_path = pathlib.Path.cwd() / filename
+
+  writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
+  # export final output
+  target_df.to_excel(writer, sheet_name='aggregated_target_level')
+  filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
+  target_overview_df.to_excel(writer, sheet_name='target_overview')
+  undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
+  goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
+  goal_overview_df.to_excel(writer, sheet_name='goal_overview')
+  pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
+  writer.save()
+  return f"All dataframes were exported as:  {full_path}"
 
 
 #####################################
@@ -647,7 +648,8 @@ color_df = create_color_code_table(goal_df)
 #policy_df = export_csv_for_policy_list(info_added_df)
 
 # 13.) create and export policy coherence df (third viz knowSDGs platform)
-create_policy_coherence_data(dat_filtered, goal_df, output_path=out_dir)
+pol_coher_df=create_policy_coherence_data(dat_filtered, goal_df)#output_path=out_dir
+pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
 # 14.) exoport all df's on results to one Excel workbook
 export_dataframes(target_dat, dat_filtered, target_overview_df, undetected_targets, goal_dat, goal_overview, policies_per_goal, output_path=out_dir)
