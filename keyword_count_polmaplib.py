@@ -1,45 +1,59 @@
-import io, csv, re, os, json
+import re, json, pathlib, logging, time, argparse
+import datetime as dt
 from nltk.corpus import stopwords
 import pandas as pd
 import numpy as np
 from nltk.tokenize import word_tokenize
 from whoosh.lang.porter import stem
-import xlsxwriter
 from itertools import chain
-##MM imports
-import datetime as dt
-import pathlib
-import logging
-import time
 
-from docx2python import docx2python
- 
-from polmap.polmap import make_directories, preprocess_text, doc2text, SDGrefs_mapper # replaced the keyword processing block
+##MM imports
+import polmap.polmap as plmp
 
 
 ######################################
+########### 0) Define helpstring and arguments to be passed when calling the program
+parser = argparse.ArgumentParser(description="""Keyword counting program.
+Given a set of keywords, and a set of pdf, docx and html documents in a directory, it counts in each documents how many times a certain keyword is found.
+The results are provided for both the whole run and for each documents, together with the raw and stemmed text of the documents and keywords.""")
+parser.add_argument('-i', '--input', help='Input directory')
+parser.add_argument('-o', '--output', help='Output directory')
+parser.add_argument('-k', '--keywords', help='Keywords file')
+
+args = parser.parse_args()
+
 ########### 1) Define global variables like time, input_dir, ouput_dirs
-print("Begin text mapping.\n")
+print("\nBegin text mapping.\n")
 start_time = time.time()
 
-input_dir = pathlib.Path.cwd() / 'pdf_re' / 'Priorities' #'Test' / 'Eurlex' #MM let user provide an input dir
-input_folder_name = input_dir.name
+input_dir = pathlib.Path(args.input) if args.input != None else pathlib.Path('input')
+print(f"Input folder is: \n{input_dir}\n")
 
 step = 1
 
 ## 1.a) Create output folder structure based on input name, date and time of exectution
 
-output_dir_dict = make_directories(input_dir) #Set exist_ok=False later on
+timestamp = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
 
-project_title=output_dir_dict['out_dir'].name
+output_directory = pathlib.Path(args.output) if args.output != None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
 
-out_dir, log_dir, results_dir, processed_keywords_dir, doctext_dir, refs_dir ,doctext_stemmed_dir, keyword_count_dir = output_dir_dict.values()
+outdirtree_dict = plmp.make_dirtree(output_directory) #Set exist_ok=False later on
 
-for key, value in output_dir_dict.items():
-    if output_dir_dict[key].exists() and output_dir_dict[key].is_dir():
-        print(key+' succesfully created in:\n'+'{}\n'.format(str(value)))
+for directory in outdirtree_dict.values():
+    try:
+        directory.mkdir(mode=0o777, parents=True, exist_ok=True)
+    except Exception as exception:
+        print(f'Creating {directory} raised exception:\n\n{exception}\n\n')
+        
 
-print(f"Output folder is: \n{output_dir_dict['out_dir']}\n")
+if all(directory.is_dir() for directory in outdirtree_dict.values()):
+    print('Output directories succesfully created.\n')
+    
+project_title=outdirtree_dict['out_dir'].name
+
+out_dir, log_dir, results_dir, processed_keywords_dir, doctext_dir, refs_dir ,doctext_stemmed_dir, keyword_count_dir = outdirtree_dict.values()
+
+print(f"Output folder is: \n{out_dir}\n")
 
 ## 1.b) Read all files in input directory and select allowed filetypes
 
@@ -73,13 +87,13 @@ step += 1
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keywords_excel = 'keys_update_22022020.xlsx'
+keywords_excel = pathlib.Path(args.keywords) if args.keywords != None else pathlib.Path('keywords/keywords.xlsx')
 
 #keywords_sheets= [Targ]
 
-keys = pd.read_excel(keywords_excel, sheet_name= 'Target_keys' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet1' 
-goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' ) #MM Create a dictionary of dataframes for each sheet
-dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' ) #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'Sheet2' 
+keys = pd.read_excel(keywords_excel, sheet_name= 'Target_keys' ) 
+goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' )
+dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' )
 
 
 #remove all from stop_words to keep in keywords
@@ -90,9 +104,9 @@ keys['Keys']=keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
 goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
 dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
 
-keys['Keys']=keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
-goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
-dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: [preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+keys['Keys']=keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
 
 ##Country names
 countries_in = pd.read_excel(keywords_excel, sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
@@ -105,7 +119,7 @@ for element in countries:
     element = ' '.join(element)
     country_ls.append(element)
 
-keywords_filename = processed_keywords_dir / f'{project_title}_processed_{keywords_excel}'
+keywords_filename = processed_keywords_dir / f'{project_title}_processed_{keywords_excel.name}'
 keywords_filename = pd.ExcelWriter(keywords_filename, engine='openpyxl')
 keys.to_excel(keywords_filename, sheet_name='Targets_kwrds')
 goal_keys.to_excel(keywords_filename, sheet_name='Goal_kwrds')
@@ -115,10 +129,10 @@ keywords_filename.save()
 
 with open(log_file, 'a') as f:
     f.write( 
-        f'{step}) Reading and preprocessing keywords: {time.time()-start_time:.3e} seconds\n\n'
+        f'{step}) Reading and preprocessing keywords in {keywords_excel} file: {time.time()-start_time:.3e} seconds\n\n'
     )
 
-print(f'Step {step}: Read and processed keywords.\n')
+print(f'Step {step}: Read and processed keywords in {keywords_excel} file.\n')
 step += 1
 
 ######################################
@@ -130,7 +144,7 @@ counter = 0
 for file_path in files:
     counter += 1
     try:
-        doc_text = doc2text(file_path)
+        doc_text = plmp.doc2text(file_path)
        # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         textfile_dest_ = file_path.parts[file_path.parts.index(input_dir.name)+1:]
         textfile_dest =  doctext_dir.joinpath(*textfile_dest_)
@@ -161,7 +175,7 @@ with open(results_dir / f'{project_title}_Agenda2030_references.json','a') as re
     references_dict = {}
 
     for policy, text in PDFtext:
-        refs = SDGrefs_mapper(text)
+        refs = plmp.SDGrefs_mapper(text)
         if bool(refs):
             references_dict[str(policy)] = {'References' : refs, 'Number of sentences' : len(refs)}
 
@@ -204,7 +218,7 @@ for item in PDFtext:
     # #remove unnecessary list elements
     # for index in sorted(indices, reverse=True):
     #     del item[1][index]
-    item[1] = preprocess_text(item[1], stop_words)
+    item[1] = plmp.preprocess_text(item[1], stop_words)
     #item[1] = item[1].replace(' . ', ' . \n')
     #save out
     item_path = doctext_stemmed_dir / pathlib.PurePath(item[0]) #stemmed_doctext_dir / pathlib.PurePath(item[0])

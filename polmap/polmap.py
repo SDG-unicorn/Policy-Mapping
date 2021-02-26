@@ -23,6 +23,7 @@ import warnings
 from docx2python import docx2python
 import pdfminer.high_level as pdfhl
 from bs4 import BeautifulSoup
+#check https://textract.readthedocs.io/en/stable/
 
 #preprocess_text
 from whoosh.lang.porter import stem
@@ -35,38 +36,23 @@ import collections
 
 ####### Create output directory tree.
 
-def make_directories(input_directory, out_dir='current'):
+def make_dirtree(output_directory):
     """
-    Create an output directory tree.
-    The parent output directory is named after the input directory and the datetime of execution.
-    The output directory is created by default in the current working directory,
-    unless and output path is passed in the out_dir optional argument.
+    Define a dictionary representing output directory tree.
     """
 
-
-    current_date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
-
-    project_title = input_directory.name + '_' + current_date
-
-    if out_dir=='current':
-        out_dir = pathlib.Path.cwd() / 'output' / project_title
-    elif not isinstance(out_dir, pathlib.Path): #test if out dir is of type path, should test also for its existence.
-        raise TypeError(f'{out_dir} is not pathlib.Path object') #Try to convert out dir into path, test if exist, try to make it.
+    output_directory = pathlib.Path(output_directory)
 
     directory_dict = {
-        'out_dir' : out_dir ,
-        'log_dir' : out_dir / 'logs' ,
-        'results_dir' : out_dir / 'results' ,
-        'processed_keywords_dir' : out_dir / '1-processed_keywords' ,
-        'doctext_dir' : out_dir / '2-doctext' ,
-        'references_dir' : out_dir / '3-references',
-        'doctext_stemmed_dir' : out_dir / '4-doctext_stemmed' ,        
-        'keyword_count_dir' : out_dir / '5-keyword_count'
+        'out_dir' : output_directory ,
+        'log_dir' : output_directory / 'logs' ,
+        'results_dir' : output_directory / 'results' ,
+        'processed_keywords_dir' : output_directory / '1-processed_keywords' ,
+        'doctext_dir' : output_directory / '2-doctext' ,
+        'references_dir' : output_directory / '3-references',
+        'doctext_stemmed_dir' : output_directory / '4-doctext_stemmed' ,        
+        'keyword_count_dir' : output_directory / '5-keyword_count'
     }
-
-    
-    for directory in directory_dict.values():
-        directory.mkdir(mode=0o777, parents=True, exist_ok=True)
 
     return directory_dict
 
