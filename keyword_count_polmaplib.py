@@ -19,6 +19,7 @@ The results are provided for both the whole run and for each documents, together
 parser.add_argument('-i', '--input', help='Input directory')
 parser.add_argument('-o', '--output', help='Output directory')
 parser.add_argument('-k', '--keywords', help='Keywords file')
+#parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory')
 
 args = parser.parse_args()
 
@@ -94,7 +95,6 @@ keywords_excel = pathlib.Path(args.keywords) if args.keywords != None else pathl
 keys = pd.read_excel(keywords_excel, sheet_name= 'Target_keys' ) 
 goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' )
 dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' )
-
 
 #remove all from stop_words to keep in keywords
 stop_words = set(stopwords.words('english'))
