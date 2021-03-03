@@ -13,11 +13,8 @@
 """
 
 #Imports
-#make_directories
-import datetime as dt
-import pathlib
-from typing import Container
-import warnings
+#Built-in
+import re, collections, pathlib
 
 #doc2txt
 from docx2python import docx2python
@@ -27,10 +24,8 @@ from bs4 import BeautifulSoup
 
 #preprocess_text
 from whoosh.lang.porter import stem
-import re
 import nltk as nltk
-import collections
-
+from nltk.corpus import stopwords
 #get_ref_to_SDGs
 
 
@@ -93,20 +88,22 @@ def doc2text(a_document_path):
 
 ####### Preprocess and stem text.
 
+std_stopwords = stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
+
 def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     """
     Prepare text for mapping.
     """
     text_string = a_string
 
-    if text_string==None: #this should be moved to the prepare keywords wrapper function
+    if text_string is None: #this should be moved to the prepare keywords wrapper function
         return None
     # if text_string is not str:
     #     raise TypeError('text_string is not a string') 
     #     #How to return the name of the variable passed by user with format?
     # Get error when using it with apply and lambda in pandas
     
-    if exception_dict==None:
+    if exception_dict is None:
         exception_dict = {"aids": "ai&ds&",
                           "productivity": "pro&ductivity&",
                           "remittances" : "remit&tance&"                 
@@ -115,7 +112,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
         raise TypeError(f'{exception_dict} is not of type dict')
     
 
-    if regex_dict == None:
+    if regex_dict is None:
         regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9. -]+', ''), (r'([\w-]+)', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
@@ -174,19 +171,21 @@ def SDGrefs_mapper(document_text, refs_keywords=None):
     #tokenise string by sentence
     document_sentences = nltk.tokenize.sent_tokenize(document_text.lower())
 
-    if refs_keywords == None:
-        phrases = ["SDG", "Sustainable Development Goals", "Sustainable Development principles", "Agenda 2030", "2030 Agenda", "UN Agenda for sustainable development"]
+    if refs_keywords is None:
+        refs_keywords = ["SDG", "Sustainable Development Goals", "Sustainable Development principles", "Agenda 2030", "2030 Agenda", "UN Agenda for sustainable development"]
+    
     elif not isinstance(refs_keywords, (collections.Iterable,collections.Container)):
         raise TypeError(f'{refs_keywords} is not an iterable and a container')
+    
     elif len(refs_keywords)==0:
         raise ValueError(f'{refs_keywords} is empty')
     
-    refs_keywords = [ele.lower() for ele in phrases]
+    refs_keywords = [ref_keyword.lower() for ref_keyword in refs_keywords]
 
     #compare lists and get matches
     refs_sentences = {}
     for sentence in document_sentences:
-        if any(keyword in sentence for keyword in refs_keywords):
-            refs_sentences[sentence.capitalize()] = ', '.join([keyword.capitalize() for keyword in refs_keywords if keyword in sentence])        
+        if any(ref_keyword in sentence for ref_keyword in refs_keywords):
+            refs_sentences[sentence.capitalize()] = ', '.join([ref_keyword.capitalize() for ref_keyword in refs_keywords if ref_keyword in sentence])        
     
     return refs_sentences

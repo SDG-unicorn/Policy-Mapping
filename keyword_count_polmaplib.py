@@ -2,10 +2,8 @@ import re, json, pathlib, logging, time, argparse
 import datetime as dt
 from nltk.corpus import stopwords
 import pandas as pd
-import numpy as np
-from nltk.tokenize import word_tokenize
+#from nltk.tokenize import word_tokenize
 from whoosh.lang.porter import stem
-from itertools import chain
 
 ##MM imports
 import polmap.polmap as plmp
@@ -16,10 +14,10 @@ import polmap.polmap as plmp
 parser = argparse.ArgumentParser(description="""Keyword counting program.
 Given a set of keywords, and a set of pdf, docx and html documents in a directory, it counts in each documents how many times a certain keyword is found.
 The results are provided for both the whole run and for each documents, together with the raw and stemmed text of the documents and keywords.""")
-parser.add_argument('-i', '--input', help='Input directory')
-parser.add_argument('-o', '--output', help='Output directory')
-parser.add_argument('-k', '--keywords', help='Keywords file')
-#parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory')
+parser.add_argument('-i', '--input', help='Input directory', default='input')
+parser.add_argument('-o', '--output', help='Output directory', default='output')
+parser.add_argument('-k', '--keywords', help='Keywords file', default='keywords/keywords.xlsx')
+parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
 
 args = parser.parse_args()
 
@@ -27,7 +25,7 @@ args = parser.parse_args()
 print("\nBegin text mapping.\n")
 start_time = time.time()
 
-input_dir = pathlib.Path(args.input) if args.input != None else pathlib.Path('input')
+input_dir = pathlib.Path(args.input) #if args.input is not None else pathlib.Path('input')
 print(f"Input folder is: \n{input_dir}\n")
 
 step = 1
@@ -36,7 +34,12 @@ step = 1
 
 timestamp = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
 
-output_directory = pathlib.Path(args.output) if args.output != None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
+if args.output == 'output' and args.add_timestamp:
+    output_directory = pathlib.Path(args.output) / f'{input_dir.name}_{timestamp}' #if args.output is not None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
+elif args.output != 'output' and args.add_timestamp:
+    output_directory = pathlib.Path(args.output+f'_{timestamp}')
+else:
+    output_directory = pathlib.Path(args.output)
 
 outdirtree_dict = plmp.make_dirtree(output_directory) #Set exist_ok=False later on
 
@@ -88,7 +91,7 @@ step += 1
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keywords_excel = pathlib.Path(args.keywords) if args.keywords != None else pathlib.Path('keywords/keywords.xlsx')
+keywords_excel = pathlib.Path(args.keywords) # if args.keywords is not None else pathlib.Path('keywords/keywords.xlsx')
 
 #keywords_sheets= [Targ]
 
@@ -97,7 +100,7 @@ goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' )
 dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' )
 
 #remove all from stop_words to keep in keywords
-stop_words = set(stopwords.words('english'))
+stop_words = set(stopwords.words('english'))-set(['no','not','nor'])
 stop_words.remove('all')
 
 keys['Keys']=keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))

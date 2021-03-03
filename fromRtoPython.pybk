@@ -1,5 +1,5 @@
 import pandas as pd
-import os, time, pathlib , json
+import time, pathlib , json
 from tkinter import filedialog
 from tkinter import *
 from nltk import tokenize
@@ -20,7 +20,6 @@ date = time.strftime("%H%M_%d%m%Y")
 #for testing/checking df outputs
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
-
 
 
 #print all columns
@@ -529,12 +528,12 @@ def create_policy_coherence_data(df, goal_df): #  filename=None, output_path=Non
     #remame tar_1, column
     target_combinations.rename(columns={'tar_1':'Target'}, inplace=True)
     target_combinations = goal_df.join(target_combinations.set_index('Target'), on='Target', how="inner")
-    target_combinations = target_texts.join(target_combinations.set_index('Target'), on='Target', how="inner")
-    target_combinations.drop(columns='goal', inplace=True) # del target_combinations['goal'] # del target_combinations['goal'] # target_combinations.drop(columns='goal', inplace=True)
-    target_combinations.drop(columns='Target_ID', inplace=True) # del target_combinations['Target_ID'] # del target_combinations['Target_ID'] # 
+    target_combinations = target_texts.merge(target_combinations.set_index('Target'), on='Target', how="inner")
+    del target_combinations['Goal'] #target_combinations.drop(columns='goal', inplace=True) #del target_combinations['goal']
+    del target_combinations['Target_ID'] #target_combinations.drop(columns='Target_ID', inplace=True) #del target_combinations['Target_ID']
     target_combinations.rename(columns={'Target':'tar_1','tar_2':'Target', 'description':'Target_Description', 'Goal':'Goal_tar_1'}, inplace=True)
     target_combinations = goal_df.join(target_combinations.set_index('Target'), on='Target', how="inner")
-    target_combinations.drop(columns='Target_ID', inplace=True) # del target_combinations['Target_ID'] # del target_combinations['Target_ID'] # 
+    del target_combinations['Target_ID'] #target_combinations.drop(columns='Target_ID', inplace=True) #del target_combinations['Target_ID']
     target_combinations.rename(columns={'Target':'tar_2', 'Goal':'Goal_tar_2'}, inplace=True)
     target_combinations['Sdg_description'] = target_combinations['Goal_tar_2'].map(goal_dict)
     target_combinations = target_combinations[["tar_1", "tar_2", "number_policies","Policies","Goal_tar_1", "Goal_tar_2","Sdg_description", "Target_Description"]]
