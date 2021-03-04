@@ -55,7 +55,7 @@ if all(directory.is_dir() for directory in outdirtree_dict.values()):
     
 project_title=outdirtree_dict['out_dir'].name
 
-out_dir, log_dir, results_dir, processed_keywords_dir, doctext_dir, refs_dir ,doctext_stemmed_dir, keyword_count_dir = outdirtree_dict.values()
+out_dir, log_dir, results_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir = outdirtree_dict.values()
 
 print(f"Output folder is: \n{out_dir}\n")
 
