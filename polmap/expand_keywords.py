@@ -29,6 +29,7 @@ if args.add_timestamp is not None:
 
 output = pathlib.Path(args.output) / filename
 log_file = pathlib.Path(args.output) / f'{filename}_{timestamp}.log'
+print_file = pathlib.Path(args.output) / f'{filename}_{timestamp}.out' 
 log_file.touch(mode=0o666)
 logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
 
@@ -77,26 +78,32 @@ sdg_dictionaries = {'target' : target_dict, 'goal' : goal_dict, 'devco' : devco_
 #                 print(f'{sheet_name}, {id}, {count}, {key}, {translated_key}', exception)
 #                 logging.exception(f'{sheet_name}, {id}, {count}, {key} raised exception: \n{exception} \n\n')
 
+consolle_out = []
+
 for sheet_name, sdg_dict in sdg_dictionaries.items():
     for id, target in sdg_dict.items():
         #sdg_dict[id] = [translator.translate(key, dest='it').text for key in target]
         sdg_dict[id] = []
         for count, key in enumerate(target):
             try:
-                translated_key = translator.translate(key, dest='it').text
+                translated_key = translator.translate(key, src='en', dest='it').text
+                translated_key = re.sub('[ .]+$', '', translated_key)
                 sdg_dict[id].append(translated_key)
-                print(f'{sheet_name}, {id}, {count} -\n{key} :\t {translated_key}')
+                consolle_out.append(f'\n{sheet_name}, {id}, {count} -\n{key} :\t {translated_key}')
             except Exception as exception:
                 translated_key = 'WARNING! : Translation Failed'
                 sdg_dict[id].append('ERRORE: Traduzione fallita')
-                print(f'{sheet_name}, {id}, {count}, {key}, {translated_key}', exception)
+                consolle_out.append(f'\n{sheet_name}, {id}, {count}, {key}, {translated_key}')
                 logging.exception(f'{sheet_name}, {id}, {count}, {key} raised exception: \n{exception} \n\n')
             # print(f'\n\n{count}\t{key}:\n{translator.translate(key, dest='it').text}')
         #sdg_dict[id] = [translator.translate(key, dest='it').text for key in target]
 
-for sheet_name, sdg_dict in sdg_dictionaries.items():
-    for id, target in sdg_dict.items():
-        sdg_dict[id] = ';'.join(target)
+with open(print_file, 'w') as _file:
+    _file.writelines(consolle_out)
+
+# for sheet_name, sdg_dict in sdg_dictionaries.items():
+#     for id, target in sdg_dict.items():
+#         sdg_dict[id] = ';'.join(target)
 
 target_df = pd.DataFrame.from_dict(target_dict, orient ='index') 
 goal_df = pd.DataFrame.from_dict(goal_dict, orient ='index')

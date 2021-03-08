@@ -1,5 +1,6 @@
 import pandas as pd
-import os, time, pathlib , json
+import pathlib , json
+import datetime as dt
 from tkinter import filedialog
 from tkinter import *
 from nltk import tokenize
@@ -15,7 +16,7 @@ from nltk import tokenize
 
 
 #get current time
-date = time.strftime("%H%M_%d%m%Y")
+date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
 
 #for testing/checking df outputs
 pd.set_option('display.max_rows', 500)
@@ -29,17 +30,17 @@ pd.set_option('display.max_columns', 500)
 
 
 #read python output
-dat_raw = pd.read_excel("output/test_priorities/results/mapping_test_priorities.xlsx", sheet_name="Target_raw_count")
+dat_raw = pd.read_excel("output/RRP_it-english_translation_2021-03-04_T161911/results/mapping_RRP_it-english_translation_2021-03-04_T161911.xlsx", sheet_name="Target_raw_count")
 #developing countries rows not needed for DEVCO tool
 #uncomment lines below if you need results from dev_countries count
 # dat_dev_countries = pd.read_excel("results/raw/mapping_EC_Models_docs_2021-01-27_T102743.xlsx", sheet_name="Dev_countries_raw_count")
 # #merge both df's
 # dat_raw = dat_raw.append(dat_dev_countries).reset_index()
 
-out_dir='output/test_priorities/results/'
+out_dir='output/RRP_it-english_translation_2021-03-04_T161911/results/'
 
 #read in results from goal count
-goal_counts = pd.read_excel("output/test_priorities/results/mapping_test_priorities.xlsx", sheet_name="Goal_raw_count")
+goal_counts = pd.read_excel("output/RRP_it-english_translation_2021-03-04_T161911/results/mapping_RRP_it-english_translation_2021-03-04_T161911.xlsx", sheet_name="Goal_raw_count")
 #as keyword detection does not work yet on detecting goal 1,2,3,etc. detected Keyword " goal " needs to be removed from the results
 goal_counts = goal_counts.loc[goal_counts['Keyword'] != ' goal ']
 
@@ -575,27 +576,29 @@ def create_policy_coherence_data(df, goal_df): #  filename=None, output_path=Non
 ####################################
 
 
-def export_dataframes(target_df, filtered_df, target_overview_df, undetected_targets_df, goal_overview_df,pol_per_goal_df, goal_df, filename=None, output_path=None):
-  if filename == None:
-    filename = f"processed_results_{date}.xlsx"
-  if output_path == None:
-      # root = Tk()
-      # output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-    full_path = pathlib.Path(output_path) / filename
-  else:
-    full_path = pathlib.Path.cwd() / filename
-
-  writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
-  # export final output
-  target_df.to_excel(writer, sheet_name='aggregated_target_level')
-  filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
-  target_overview_df.to_excel(writer, sheet_name='target_overview')
-  undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
-  goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
-  goal_overview_df.to_excel(writer, sheet_name='goal_overview')
-  pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
-  writer.save()
-  return f"All dataframes were exported as:  {full_path}"
+def export_dataframes(target_df, filtered_df, target_overview_df, undetected_targets_df, goal_overview_df,pol_per_goal_df, goal_df, filename=None, output_path=out_dir):
+  
+#   filename = f"processed_results_{date}.xlsx" if filename is None else filename
+  
+#   if output_path == None:
+#       # root = Tk()
+#       # output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+#     full_path = pathlib.Path(output_path) / filename
+#   else:
+#     full_path = pathlib.Path.cwd() / filename
+    full_path = pathlib.Path(output_path) / f"processed_results_{date}.xlsx"
+    writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
+    # export final output
+    target_df.to_excel(writer, sheet_name='aggregated_target_level')
+    filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
+    target_overview_df.to_excel(writer, sheet_name='target_overview')
+    undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
+    goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
+    goal_overview_df.to_excel(writer, sheet_name='goal_overview')
+    pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
+    writer.save()
+    print(f"All dataframes were exported as:  {full_path}")
+    return f"All dataframes were exported as:  {full_path}"
 
 
 #####################################
