@@ -21,15 +21,15 @@ args = parser.parse_args()
 
 #def func
 keywords = pd.ExcelFile(args.input) # 'keywords/keywords.xlsx'
-filename = pathlib.Path(args.input).name
+filename = pathlib.Path(args.input).stem
 timestamp =  dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
 
 if args.add_timestamp is not None:
-    filename = filename.replace('.xl', f'_{timestamp}.xl')
+    filename += f'_{timestamp}'
 
-output = pathlib.Path(args.output) / filename
-log_file = pathlib.Path(args.output) / f'{filename}_{timestamp}.log'
-print_file = pathlib.Path(args.output) / f'{filename}_{timestamp}.out' 
+output = pathlib.Path(args.output) / f'{filename}.xlsx'
+log_file = pathlib.Path(args.output) / f'{filename}.log'
+print_file = pathlib.Path(args.output) / f'{filename}_out.txt' 
 log_file.touch(mode=0o666)
 logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
 
