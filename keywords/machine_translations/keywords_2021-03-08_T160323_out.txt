@@ -1,0 +1,487 @@
+
+target, 1.1, 0 -
+international poverty line :	 Linea di povertà internazionale
+target, 1.1, 1 -
+extreme poverty :	 Povertà estrema
+target, 1.1, 2 -
+abject poverty :	 Abellare la povertà
+target, 1.1, 3 -
+absolute poverty :	 Povertà assoluta
+target, 1.1, 4 -
+destitution :	 miseria
+target, 1.1, 5 -
+penury :	 penuria
+target, 1.1, 6 -
+severe deprivation :	 grave privazione
+target, 1.1, 7 -
+help people suffering from food and material deprivation :	 aiutare le persone che soffrono di cibo e privazione del materiale
+target, 1.1, 8 -
+extremely poor :	 estremamente povero
+target, 1.1, 9 -
+incidence of poverty :	 incidenza della povertà
+target, 1.1, 10 -
+Households in poverty :	 Famiglie nella povertà
+target, 1.2, 0 -
+severely materially deprived people :	 persone gravemente svantaggianti
+target, 1.2, 1 -
+low work intensity :	 bassa intensità del lavoro
+target, 1.2, 2 -
+national poverty line :	 Linea di povertà nazionale
+target, 1.2, 3 -
+social exclusion :	 esclusione sociale
+target, 1.2, 4 -
+income poverty :	 Povertà del reddito
+target, 1.2, 5 -
+combatting child poverty :	 Combattere la povertà del bambino
+target, 1.2, 6 -
+children out of poverty :	 Bambini fuori dalla povertà
+target, 1.2, 7 -
+addressing child poverty :	 Affrontare la povertà infantile
+target, 1.2, 8 -
+at risk of poverty :	 a rischio di povertà
+target, 1.2, 9 -
+fight child poverty :	 combattere la povertà del bambino
+target, 1.2, 10 -
+poverty rate :	 tasso di povertà
+target, 1.2, 11 -
+living in poverty :	 Vivere in povertà
+target, 1.3, 0 -
+social risk :	 Rischio sociale
+target, 1.3, 1 -
+social protection :	 protezione sociale
+target, 1.3, 2 -
+rights of persons with disabilities :	 Diritti delle persone con disabilità
+target, 1.3, 3 -
+rights of unemployed persons :	 Diritti dei disoccupati
+target, 1.3, 4 -
+rights of older persons :	 Diritti delle persone anziane
+target, 1.3, 5 -
+rights of pregnant women :	 Diritti delle donne incinte
+target, 1.3, 6 -
+rights of work-injury victims :	 Diritti delle vittime del danno da lavoro
+target, 1.3, 7 -
+rights of the poor :	 Diritti dei poveri
+target, 1.3, 8 -
+rights of the vulnerable :	 Diritti dei vulnerabili
+target, 1.3, 9 -
+hiring subsidies :	 assumendo sussidi
+target, 1.3, 10 -
+social security :	 previdenza sociale
+target, 1.3, 11 -
+child benefits :	 Benefici per bambini
+target, 1.3, 12 -
+maternity benefits :	 Benefici maternità
+target, 1.3, 13 -
+support for unemployment :	 Supporto per la disoccupazione
+target, 1.3, 14 -
+support for people without a job :	 Supporto per le persone senza lavoro
+target, 1.3, 15 -
+benefits for persons with disabilities :	 Benefici per le persone con disabilità
+target, 1.3, 16 -
+benefits for victims of work injuries :	 Benefici per vittime di ferite del lavoro
+target, 1.3, 17 -
+benefits for older persons :	 Benefici per le persone anziane
+target, 1.3, 18 -
+family benefits :	 Vantaggi familiari
+target, 1.3, 19 -
+maternity protection :	 Protezione maternità
+target, 1.3, 20 -
+unemployment support :	 Supporto di disoccupazione
+target, 1.3, 21 -
+employment injury benefits :	 Benefici per lesioni occupazionali
+target, 1.3, 22 -
+sickness benefits :	 Benefici per malattia
+target, 1.3, 23 -
+disability pensions :	 pensioni di invalidità
+target, 1.3, 24 -
+old-age pensions :	 Pensioni di vecchiaia
+target, 1.4, 0 -
+basic services :	 Servizi di base
+target, 1.4, 1 -
+tenure rights :	 Diritti di tenuto
+target, 1.4, 2 -
+equal rights to economic resources :	 uguali diritti alle risorse economiche
+target, 1.4, 3 -
+control over land :	 Controllo sulla terra
+target, 1.4, 4 -
+access to inheritance :	 Accesso all'ereditarietà
+target, 1.4, 5 -
+rights to land :	 Diritti per terra
+target, 1.4, 6 -
+access to property :	 Accesso alla proprietà
+target, 1.4, 7 -
+access to natural resources :	 Accesso a risorse naturali
+target, 1.4, 8 -
+access to new technology :	 Accesso alla nuova tecnologia
+target, 1.4, 9 -
+access to financial services :	 Accesso ai servizi finanziari
+target, 1.4, 10 -
+access to microfinance :	 Accesso alla microfinanza
+target, 1.4, 11 -
+access to goods :	 Accesso alle merci
+target, 1.4, 12 -
+access to services :	 Accesso ai servizi
+target, 1.4, 13 -
+property rights :	 diritti di proprietà
+target, 1.4, 14 -
+access to basic goods :	 Accesso ai beni di base
+target, 1.4, 15 -
+basic goods for all :	 Beni di base per tutti
+target, 1.5, 0 -
+disaster risk reduction :	 riduzione del rischio di disastro
+target, 1.5, 1 -
+vulnerability in disaster :	 Vulnerabilità in disastro
+target, 1.5, 2 -
+affected by extreme events :	 influenzato da eventi estremi
+target, 1.5, 3 -
+resilience of the poor :	 Resilienza dei poveri
+target, 1.5, 4 -
+resilience of vulnerable people :	 Resilienza delle persone vulnerabili
+target, 1.5, 5 -
+reduce vulnerability :	 Ridurre la vulnerabilità
+target, 1.5, 6 -
+resilience to disaster :	 Resilienza al disastro
+target, 1.5, 7 -
+disaster resilience :	 capacità di riduzione del disastro
+target, 1.5, 8 -
+vulnerable people :	 persone vulnerabili
+target, 1.5, 9 -
+protect livelihoods :	 Proteggi i mezzi di sostentamento
+target, 1.5, 10 -
+build resilience to future shocks :	 Costruisci la resilienza agli urti futuri
+target, 1.5, 11 -
+build resilience to shocks :	 Costruisci la resilienza agli urti
+target, 1.5, 12 -
+vulnerability to climate event :	 Vulnerabilità all'evento climatico
+target, 1.5, 13 -
+vulnerability to climate extreme event :	 Vulnerabilità al clima evento estremo
+target, 1.5, 14 -
+vulnerability to economic shock :	 Vulnerabilità allo shock economico
+target, 1.5, 15 -
+vulnerability to natural disaster :	 Vulnerabilità al disastro naturale
+target, 1.5, 16 -
+resilience to catastrophic events :	 Resilienza agli eventi catastrofici
+target, 1.5, 17 -
+vulnerability to catastrophic events :	 Vulnerabilità agli eventi catastrofici
+target, 1.5, 18 -
+economic loss attributed to disasters :	 Perdita economica attribuita ai disastri
+target, 1.5, 19 -
+economic loss due to disasters :	 Perdita economica dovuta ai disastri
+target, 1.5, 20 -
+strengthen economic resilience :	 Rafforzare la resilienza economica
+target, 1.5, 21 -
+strengthen social resilience :	 Rafforzare la resilienza sociale
+target, 1.5, 22 -
+preventing disaster risk :	 prevenire il rischio di disastro
+goal, SDG 1, 0 -
+SDG 1 :	 SDG 1
+goal, SDG 1, 1 -
+goal 1 :	 Obiettivo 1
+goal, SDG 1, 2 -
+end poverty :	 fine povertà
+goal, SDG 1, 3 -
+no poverty :	 Nessuna povertà
+goal, SDG 1, 4 -
+reduce poverty :	 Ridurre la povertà
+goal, SDG 1, 5 -
+fight against poverty :	 combattere contro la povertà
+goal, SDG 1, 6 -
+end global poverty :	 fine povertà globale
+goal, SDG 1, 7 -
+poverty reduction :	 riduzione della povertà
+goal, SDG 1, 8 -
+poverty and deprivation :	 povertà e privazione
+goal, SDG 1, 9 -
+combact poverty :	 combattere la povertà
+goal, SDG 1, 10 -
+eradicate poverty :	 sradicare la povertà
+goal, SDG 1, 11 -
+tackle poverty :	 Affronta la povertà
+goal, SDG 1, 12 -
+poverty alleviation :	 la riduzione della povertà
+goal, SDG 1, 13 -
+alleviate poverty :	 alleviare la povertà
+goal, SDG 2, 0 -
+SDG 2 :	 SDG 2
+goal, SDG 2, 1 -
+goal 2 :	 Obiettivo 2
+goal, SDG 2, 2 -
+improve nutrition :	 migliorare la nutrizione
+goal, SDG 2, 3 -
+lack food :	 manca di cibo
+goal, SDG 3, 0 -
+SDG 3 :	 SDG 3
+goal, SDG 3, 1 -
+goal 3 :	 Obiettivo 3
+goal, SDG 3, 2 -
+ensure healthy lives :	 garantire vite sane
+goal, SDG 3, 3 -
+promote well-being :	 Promuovere il benessere
+goal, SDG 3, 4 -
+promote wellbeing :	 Promuovi benessere
+goal, SDG 3, 5 -
+good health :	 buona salute
+goal, SDG 3, 6 -
+support for the health challenges :	 Supporto per le sfide sanitarie
+goal, SDG 3, 7 -
+health research and innovation :	 Ricerca e innovazione sanitaria
+goal, SDG 3, 8 -
+preventive healthcare :	 assistenza sanitaria preventiva
+goal, SDG 3, 9 -
+child health :	 Salute del bambino
+goal, SDG 3, 10 -
+child wellbeing :	 Bambini benessere
+goal, SDG 3, 11 -
+child well-being :	 Benessere del bambino
+goal, SDG 3, 12 -
+children health :	 Salute dei bambini
+goal, SDG 3, 13 -
+children wellbeing :	 Bambini benessere
+goal, SDG 3, 14 -
+children well-being :	 Benessere dei bambini
+goal, SDG 3, 15 -
+elderly health :	 Salute anziana
+goal, SDG 3, 16 -
+elderly wellbeing :	 Benessere anziano
+goal, SDG 3, 17 -
+elderly well-being :	 Benessere anziano
+goal, SDG 3, 18 -
+safeguard health :	 Salvaguardia Salute
+goal, SDG 3, 19 -
+protect health :	 Proteggi la salute
+goal, SDG 3, 20 -
+protect human health :	 Proteggi la salute umana
+goal, SDG 3, 21 -
+protect citizens’ health :	 Proteggi la salute dei cittadini
+goal, SDG 3, 22 -
+protect health of our citizens :	 Proteggi la salute dei nostri cittadini
+goal, SDG 4, 0 -
+SDG 4 :	 SDG 4
+goal, SDG 4, 1 -
+goal 4 :	 Obiettivo 4
+goal, SDG 4, 2 -
+quality education :	 educazione di qualità
+goal, SDG 4, 3 -
+education and training :	 istruzione e formazione
+goal, SDG 4, 4 -
+training and education :	 formazione e istruzione
+goal, SDG 4, 5 -
+education and skills :	 educazione e abilità
+goal, SDG 4, 6 -
+skills and education :	 abilità e istruzione
+goal, SDG 4, 7 -
+quality services in education :	 Servizi di qualità nell'istruzione
+goal, SDG 4, 8 -
+increase access to education :	 Aumentare l'accesso all'istruzione
+goal, SDG 4, 9 -
+increase school enrollment rates :	 Aumentare le tariffe di iscrizione scolastica
+goal, SDG 4, 10 -
+improving global education :	 migliorare l'educazione globale
+goal, SDG 4, 11 -
+improving education :	 migliorare l'educazione
+goal, SDG 4, 12 -
+Facilitate the return of students to school :	 Facilitare il ritorno degli studenti a scuola
+goal, SDG 4, 13 -
+promote learning :	 Promuovere l'apprendimento
+goal, SDG 4, 14 -
+education quality :	 Qualità dell'istruzione
+goal, SDG 4, 15 -
+growth in enrolment rates :	 Crescita dei tassi di iscrizione
+goal, SDG 4, 16 -
+education as a priority :	 educazione come priorità
+goal, SDG 4, 17 -
+equitable education :	 Educazione equi
+goal, SDG 4, 18 -
+progress on education :	 progresso sull'educazione
+goal, SDG 5, 0 -
+SDG 5 :	 SDG 5
+goal, SDG 5, 1 -
+goal 5 :	 Obiettivo 5
+goal, SDG 5, 2 -
+empower women :	 potenziare le donne
+goal, SDG 5, 3 -
+Inequalities based on sex :	 Disuguaglianze basate sul sesso
+goal, SDG 5, 4 -
+empower girls :	 potenziare le ragazze
+goal, SDG 5, 5 -
+Women’s empowerment :	 Empowerment delle donne
+goal, SDG 5, 6 -
+Woman’s empowerment :	 Empowerment delle donne
+goal, SDG 5, 7 -
+girls’ empowerment :	 Empowerment delle ragazze
+goal, SDG 5, 8 -
+empower female :	 Emporizzare femmina
+goal, SDG 5, 9 -
+female rights :	 Diritti femminili
+goal, SDG 5, 10 -
+women’s rights :	 diritti delle donne
+goal, SDG 5, 11 -
+woman’s rights :	 diritti delle donne
+goal, SDG 5, 12 -
+equal opportunity for women :	 pari opportunità per le donne
+goal, SDG 5, 13 -
+equal opportunity for woman :	 pari opportunità per la donna
+goal, SDG 5, 14 -
+equal opportunity for girls :	 pari opportunità per le ragazze
+goal, SDG 5, 15 -
+women equality :	 uguaglianza delle donne
+goal, SDG 5, 16 -
+woman equality :	 uguaglianza della donna
+goal, SDG 5, 17 -
+gender equality :	 parità dei sessi
+goal, SDG 5, 18 -
+equality between men and women :	 uguaglianza tra uomini e donne
+goal, SDG 5, 19 -
+equality between man and woman :	 uguaglianza tra uomo e donna
+goal, SDG 5, 20 -
+equality between boys and girls :	 uguaglianza tra ragazzi e ragazze
+goal, SDG 5, 21 -
+equality between girls and boy :	 uguaglianza tra ragazze e ragazzo
+goal, SDG 5, 22 -
+equality between women and men :	 uguaglianza tra donne e uomini
+goal, SDG 5, 23 -
+equality between woman and man :	 uguaglianza tra donna e uomo
+goal, SDG 5, 24 -
+inequalities for women :	 disuguaglianze per le donne
+goal, SDG 5, 25 -
+inequalities for woman :	 disuguaglianze per donna
+goal, SDG 5, 26 -
+inequalities for girls :	 disuguaglianze per le ragazze
+goal, SDG 5, 27 -
+gender inequality :	 disparità di genere
+goal, SDG 5, 28 -
+Inequalities faced by girls :	 Disuguaglianze affrontate dalle ragazze
+goal, SDG 5, 29 -
+Inequalities faced by women :	 Disuguaglianze affrontate dalle donne
+goal, SDG 5, 30 -
+Inequalities faced by woman :	 Disuguaglianze affrontate dalla donna
+goal, SDG 5, 31 -
+gender parity :	 Parità di genere
+goal, SDG 5, 32 -
+parity between men and women :	 Parità tra uomini e donne
+goal, SDG 5, 33 -
+parity between man and woman :	 Parità tra uomo e donna
+goal, SDG 5, 34 -
+parity between boys and girls :	 Parità tra ragazzi e ragazze
+goal, SDG 5, 35 -
+parity between girls and boy :	 Parità tra ragazze e ragazzo
+goal, SDG 5, 36 -
+parity between women and men :	 Parità tra donne e uomini
+goal, SDG 5, 37 -
+parity between woman and man :	 Parità tra donna e uomo
+goal, SDG 5, 38 -
+same rights as men :	 Stessi diritti degli uomini
+goal, SDG 5, 39 -
+women and men have equal rights :	 Le donne e gli uomini hanno uguali diritti
+goal, SDG 5, 40 -
+woman and man have equal rights :	 La donna e l'uomo hanno uguali diritti
+goal, SDG 5, 41 -
+women and men have the same rights :	 Le donne e gli uomini hanno gli stessi diritti
+goal, SDG 5, 42 -
+woman and man have the same rights :	 La donna e l'uomo hanno gli stessi diritti
+goal, SDG 5, 43 -
+same rights for woman and man :	 Stessi diritti per la donna e l'uomo
+goal, SDG 5, 44 -
+same rights for women and men :	 Stessi diritti per le donne e gli uomini
+goal, SDG 5, 45 -
+same rights for girls and boys :	 Stessi diritti per ragazze e ragazzi
+goal, SDG 5, 46 -
+same rights for man and woman :	 Stessi diritti per l'uomo e la donna
+goal, SDG 5, 47 -
+same rights for men and women :	 Stessi diritti per uomini e donne
+goal, SDG 5, 48 -
+same rights for boys and girls :	 Stessi diritti per ragazzi e ragazze
+goal, SDG 5, 49 -
+gender pay gap :	 Genere Pay Gap
+goal, SDG 5, 50 -
+gender discrepancy :	 discrepanza di genere
+goal, SDG 5, 51 -
+Gender Action Plan :	 Piano d'azione di genere
+goal, SDG 5, 52 -
+sharing of responsibilities between women and men :	 Condivisione di responsabilità tra donne e uomini
+goal, SDG 5, 53 -
+sharing of responsibilities between men and women :	 Condivisione di responsabilità tra uomini e donne
+devco, 1.a, 0 -
+poverty reduction :	 riduzione della povertà
+devco, 1.a, 1 -
+reduce poverty :	 Ridurre la povertà
+devco, 1.a, 2 -
+end poverty :	 fine povertà
+devco, 1.a, 3 -
+eradicate poverty :	 sradicare la povertà
+devco, 1.a, 4 -
+poverty eradication :	 Eradicazione della povertà
+devco, 1.a, 5 -
+poverty alleviation :	 la riduzione della povertà
+devco, 1.a, 6 -
+alleviate poverty :	 alleviare la povertà
+devco, 3.c, 0 -
+health financing :	 Finanziamento della salute
+devco, 3.c, 1 -
+health worker :	 operatore sanitario
+devco, 3.c, 2 -
+health workforce :	 forza lavoro della salute
+devco, 3.c, 3 -
+skilled health personnel :	 Personale sanitario qualificato
+devco, 3.c, 4 -
+health workforce in developing countries :	 forza lavoro sanitaria nei paesi in via di sviluppo
+devco, 3.c, 5 -
+health service in developing countries :	 Servizio sanitario nei paesi in via di sviluppo
+devco, 3.c, 6 -
+health financing developing countries :	 Finanziamento della salute Paesi in via di sviluppo
+devco, 3.c, 7 -
+health financing small island :	 Finanziamento della salute Piccola isola
+devco, 3.c, 8 -
+health service small island :	 Servizio sanitario Piccola isola
+devco, 3.c, 9 -
+health workforce small island :	 Health Workforce Piccola isola
+devco, 3.c, 10 -
+training programmes for medical and healthcare staff :	 Programmi di formazione per il personale medico e sanitario
+devco, 3.c, 11 -
+training programmes for medical staff :	 Programmi di formazione per personale medico
+devco, 6.a, 0 -
+water oda :	 Acqua ODA
+devco, 6.a, 1 -
+water-related oda :	 ODA correlata all'acqua
+devco, 6.a, 2 -
+water-related official development assistance :	 Assistenza allo sviluppo ufficiale relativa all'acqua
+devco, 6.a, 3 -
+sanitation-related oda :	 ODA relativa a sanitarie
+devco, 6.a, 4 -
+sanitation-related official development assistance :	 Assistenza per lo sviluppo ufficiale relativa ai servizi igienico-sanitari
+devco, 6.a, 5 -
+water programmes :	 Programmi d'acqua
+devco, 6.a, 6 -
+sanitation :	 igiene
+devco, 6.a, 7 -
+water harvesting :	 Raccolta dell'acqua
+devco, 6.a, 8 -
+water efficiency :	 efficienza dell'acqua
+devco, 7.b, 0 -
+sustainable energy :	 energia sostenibile
+devco, 7.b, 1 -
+Investments in energy efficiency :	 Investimenti nell'efficienza energetica
+devco, 7.b, 2 -
+clean energy :	 energia pulita
+devco, 7.b, 3 -
+energy services :	 Servizi energetici
+devco, 7.b, 4 -
+electricity access :	 Accesso elettrico
+devco, 7.b, 5 -
+energy access :	 Accesso all'energia
+devco, 9.a, 0 -
+development assistance to infrastructure :	 Assistenza allo sviluppo alle infrastrutture
+devco, 9.a, 1 -
+infrastructure development assistance :	 Assistenza per lo sviluppo dell'infrastruttura
+devco, 9.a, 2 -
+infrastructure development :	 Sviluppo dell'infrastruttura
+devco, 9.a, 3 -
+development infrastructure :	 Infrastruttura di sviluppo
+devco, 9.a, 4 -
+rehabilitated infrastructure :	 infrastruttura riabilitata
+devco, 9.a, 5 -
+risk-reduction investments in infrastructure :	 Investimenti di riduzione del rischio in infrastruttura
+devco, 9.a, 6 -
+retrofitted infrastructure :	 Infrastruttura retrofittata
+devco, 9.a, 7 -
+resilient infrastructure network :	 Rete di infrastrutture resilienti

@@ -1,6 +1,10 @@
 *.xlsx
-!keywords/*.xlsx
+!keywords/keywords.xlsx
+!keywords/validated_translation/*.xlsx
+!keywords/mapping_keysets/*.xlsx
+keywords/machine_translation/*.*
 !Reproducible_example_EUR-Lex.xlsx
 input/
 output/
 */__pycache__/
+.vscode/

@@ -1,0 +1,1720 @@
+
+target, 1.1, 0 -
+international poverty line :	 Linea di povertà internazionale
+target, 1.1, 1 -
+extreme poverty :	 Povertà estrema
+target, 1.1, 2 -
+abject poverty :	 Abellare la povertà
+target, 1.1, 3 -
+absolute poverty :	 Povertà assoluta
+target, 1.1, 4 -
+destitution :	 miseria
+target, 1.1, 5 -
+penury :	 penuria
+target, 1.1, 6 -
+severe deprivation :	 grave privazione
+target, 1.1, 7 -
+help people suffering from food and material deprivation :	 aiutare le persone che soffrono di cibo e privazione del materiale
+target, 1.1, 8 -
+extremely poor :	 estremamente povero
+target, 1.1, 9 -
+incidence of poverty :	 incidenza della povertà
+target, 1.1, 10 -
+Households in poverty :	 Famiglie nella povertà
+target, 1.2, 0 -
+severely materially deprived people :	 persone gravemente svantaggianti
+target, 1.2, 1 -
+low work intensity :	 bassa intensità del lavoro
+target, 1.2, 2 -
+national poverty line :	 Linea di povertà nazionale
+target, 1.2, 3 -
+social exclusion :	 esclusione sociale
+target, 1.2, 4 -
+income poverty :	 Povertà del reddito
+target, 1.2, 5 -
+combatting child poverty :	 Combattere la povertà del bambino
+target, 1.2, 6 -
+children out of poverty :	 Bambini fuori dalla povertà
+target, 1.2, 7 -
+addressing child poverty :	 Affrontare la povertà infantile
+target, 1.2, 8 -
+at risk of poverty :	 a rischio di povertà
+target, 1.2, 9 -
+fight child poverty :	 combattere la povertà del bambino
+target, 1.2, 10 -
+poverty rate :	 tasso di povertà
+target, 1.2, 11 -
+living in poverty :	 Vivere in povertà
+target, 1.3, 0 -
+social risk :	 Rischio sociale
+target, 1.3, 1 -
+social protection :	 protezione sociale
+target, 1.3, 2 -
+rights of persons with disabilities :	 Diritti delle persone con disabilità
+target, 1.3, 3 -
+rights of unemployed persons :	 Diritti dei disoccupati
+target, 1.3, 4 -
+rights of older persons :	 Diritti delle persone anziane
+target, 1.3, 5 -
+rights of pregnant women :	 Diritti delle donne incinte
+target, 1.3, 6 -
+rights of work-injury victims :	 Diritti delle vittime del danno da lavoro
+target, 1.3, 7 -
+rights of the poor :	 Diritti dei poveri
+target, 1.3, 8 -
+rights of the vulnerable :	 Diritti dei vulnerabili
+target, 1.3, 9 -
+hiring subsidies :	 assumendo sussidi
+target, 1.3, 10 -
+social security :	 previdenza sociale
+target, 1.3, 11 -
+child benefits :	 Benefici per bambini
+target, 1.3, 12 -
+maternity benefits :	 Benefici maternità
+target, 1.3, 13 -
+support for unemployment :	 Supporto per la disoccupazione
+target, 1.3, 14 -
+support for people without a job :	 Supporto per le persone senza lavoro
+target, 1.3, 15 -
+benefits for persons with disabilities :	 Benefici per le persone con disabilità
+target, 1.3, 16 -
+benefits for victims of work injuries :	 Benefici per vittime di ferite del lavoro
+target, 1.3, 17 -
+benefits for older persons :	 Benefici per le persone anziane
+target, 1.3, 18 -
+family benefits :	 Vantaggi familiari
+target, 1.3, 19 -
+maternity protection :	 Protezione maternità
+target, 1.3, 20 -
+unemployment support :	 Supporto di disoccupazione
+target, 1.3, 21 -
+employment injury benefits :	 Benefici per lesioni occupazionali
+target, 1.3, 22 -
+sickness benefits :	 Benefici per malattia
+target, 1.3, 23 -
+disability pensions :	 pensioni di invalidità
+target, 1.3, 24 -
+old-age pensions :	 Pensioni di vecchiaia
+target, 1.4, 0 -
+basic services :	 Servizi di base
+target, 1.4, 1 -
+tenure rights :	 Diritti di tenuto
+target, 1.4, 2 -
+equal rights to economic resources :	 uguali diritti alle risorse economiche
+target, 1.4, 3 -
+control over land :	 Controllo sulla terra
+target, 1.4, 4 -
+access to inheritance :	 Accesso all'ereditarietà
+target, 1.4, 5 -
+rights to land :	 Diritti per terra
+target, 1.4, 6 -
+access to property :	 Accesso alla proprietà
+target, 1.4, 7 -
+access to natural resources :	 Accesso a risorse naturali
+target, 1.4, 8 -
+access to new technology :	 Accesso alla nuova tecnologia
+target, 1.4, 9 -
+access to financial services :	 Accesso ai servizi finanziari
+target, 1.4, 10 -
+access to microfinance :	 Accesso alla microfinanza
+target, 1.4, 11 -
+access to goods :	 Accesso alle merci
+target, 1.4, 12 -
+access to services :	 Accesso ai servizi
+target, 1.4, 13 -
+property rights :	 diritti di proprietà
+target, 1.4, 14 -
+access to basic goods :	 Accesso ai beni di base
+target, 1.4, 15 -
+basic goods for all :	 Beni di base per tutti
+target, 1.5, 0 -
+disaster risk reduction :	 riduzione del rischio di disastro
+target, 1.5, 1 -
+vulnerability in disaster :	 Vulnerabilità in disastro
+target, 1.5, 2 -
+affected by extreme events :	 influenzato da eventi estremi
+target, 1.5, 3 -
+resilience of the poor :	 Resilienza dei poveri
+target, 1.5, 4 -
+resilience of vulnerable people :	 Resilienza delle persone vulnerabili
+target, 1.5, 5 -
+reduce vulnerability :	 Ridurre la vulnerabilità
+target, 1.5, 6 -
+resilience to disaster :	 Resilienza al disastro
+target, 1.5, 7 -
+disaster resilience :	 capacità di riduzione del disastro
+target, 1.5, 8 -
+vulnerable people :	 persone vulnerabili
+target, 1.5, 9 -
+protect livelihoods :	 Proteggi i mezzi di sostentamento
+target, 1.5, 10 -
+build resilience to future shocks :	 Costruisci la resilienza agli urti futuri
+target, 1.5, 11 -
+build resilience to shocks :	 Costruisci la resilienza agli urti
+target, 1.5, 12 -
+vulnerability to climate event :	 Vulnerabilità all'evento climatico
+target, 1.5, 13 -
+vulnerability to climate extreme event :	 Vulnerabilità al clima evento estremo
+target, 1.5, 14 -
+vulnerability to economic shock :	 Vulnerabilità allo shock economico
+target, 1.5, 15 -
+vulnerability to natural disaster :	 Vulnerabilità al disastro naturale
+target, 1.5, 16 -
+resilience to catastrophic events :	 Resilienza agli eventi catastrofici
+target, 1.5, 17 -
+vulnerability to catastrophic events :	 Vulnerabilità agli eventi catastrofici
+target, 1.5, 18 -
+economic loss attributed to disasters :	 Perdita economica attribuita ai disastri
+target, 1.5, 19 -
+economic loss due to disasters :	 Perdita economica dovuta ai disastri
+target, 1.5, 20 -
+strengthen economic resilience :	 Rafforzare la resilienza economica
+target, 1.5, 21 -
+strengthen social resilience :	 Rafforzare la resilienza sociale
+target, 1.5, 22 -
+preventing disaster risk :	 prevenire il rischio di disastro
+target, 1.a, 0 -
+poverty reduction programmes :	 Programmi di riduzione della povertà
+target, 1.a, 1 -
+means for developing countries :	 mezzi per i paesi in via di sviluppo
+target, 1.a, 2 -
+reduce poverty in developing countries :	 Ridurre la povertà nei paesi in via di sviluppo
+target, 1.a, 3 -
+reduce poverty LDCs :	 Riduci la povertà LDCS
+target, 1.a, 4 -
+development assistance grants from all donors that focus on poverty reduction :	 Assistenza allo sviluppo concede da tutti i donatori che si concentrano sulla riduzione della povertà
+target, 1.a, 5 -
+development assistance for poverty reduction :	 Assistenza allo sviluppo per la riduzione della povertà
+target, 1.b, 0 -
+sensitive development strategies :	 Strategie di sviluppo sensibili
+target, 1.b, 1 -
+poverty eradication actions :	 Azioni di sradicazione della povertà
+target, 1.b, 2 -
+vulnerable groups :	 gruppi vulnerabili
+target, 1.b, 3 -
+poverty reduction strategies :	 Strategie di riduzione della povertà
+target, 1.b, 4 -
+investments in poverty eradication :	 Investimenti nell'eradicazione della povertà
+target, 1.b, 5 -
+development strategies for poverty :	 Strategie di sviluppo per la povertà
+target, 1.b, 6 -
+vulnerable social groups :	 Gruppi sociali vulnerabili
+target, 1.b, 7 -
+Pro-poor public social spending :	 Spesa sociale pubblica povera
+target, 1.b, 8 -
+Pro-poor spending :	 Spesa pro-povera
+target, 1.b, 9 -
+Pro-poor investment :	 Investimento pro-povero
+target, 2.1, 0 -
+severe food insecurity :	 grave insicurezza alimentare
+target, 2.1, 1 -
+sufficient food :	 Cibo sufficiente
+target, 2.1, 2 -
+undernourishment :	 Undernuming
+target, 2.1, 3 -
+end hunger :	 fine della fame
+target, 2.1, 4 -
+necessary nourishment :	 Nutrizione necessaria
+target, 2.1, 5 -
+moderate food insecurity :	 insicurezza del cibo moderato
+target, 2.1, 6 -
+access to food :	 Accesso al cibo
+target, 2.1, 7 -
+food access :	 Accesso alimentario
+target, 2.1, 8 -
+food insecurity :	 insicurezza alimentare
+target, 2.1, 9 -
+food for all :	 Cibo per tutti
+target, 2.1, 10 -
+food for the poor :	 cibo per i poveri
+target, 2.1, 11 -
+food for people in vulnerable situations :	 Cibo per le persone in situazioni vulnerabili
+target, 2.1, 12 -
+food for vulnerable people :	 Cibo per persone vulnerabili
+target, 2.1, 13 -
+safe food :	 Cibo sicuro
+target, 2.1, 14 -
+wholesome food :	 Cibo sano
+target, 2.1, 15 -
+food safety :	 la sicurezza alimentare
+target, 2.1, 16 -
+safety of food :	 sicurezza del cibo
+target, 2.1, 17 -
+food nutritional value :	 Valore nutrizionale alimentare
+target, 2.1, 18 -
+food security :	 sicurezza del cibo
+target, 2.1, 19 -
+zero hunger :	 Zero Hunger
+target, 2.1, 20 -
+severe LEVELS of food insecurity :	 gravi livelli di insicurezza alimentare
+target, 2.1, 21 -
+acute hunger :	 fame acuta
+target, 2.1, 22 -
+people affected by hunger :	 Le persone colpite dalla fame
+target, 2.1, 23 -
+starvation :	 fame
+target, 2.1, 24 -
+acute undernutrition :	 Undernutrizione acuta
+target, 2.1, 25 -
+famine :	 carestia
+target, 2.1, 26 -
+food needs :	 bisogni alimentari
+target, 2.1, 27 -
+extreme hunger :	 Famiglia estrema
+target, 2.1, 28 -
+food shortage :	 scarsità di cibo
+target, 2.2, 0 -
+child growth standards :	 Standard di crescita dei bambini
+target, 2.2, 1 -
+obesity rate :	 tasso di obesità
+target, 2.2, 2 -
+nutritional needs :	 Need nutrizionali
+target, 2.2, 3 -
+nutritious food :	 cibo nutriente
+target, 2.2, 4 -
+stunting :	 stordito
+target, 2.2, 5 -
+malnutrition :	 malnutrizione
+target, 2.2, 6 -
+malnourishment :	 Malnoutivo
+target, 2.2, 7 -
+obesity prevalence :	 prevalenza dell'obesità
+target, 2.2, 8 -
+childhood obesity :	 obesità infantile
+target, 2.2, 9 -
+childhood nutrition :	 nutrizione infantile
+target, 2.2, 10 -
+child nutrition :	 nutrizione del bambino
+target, 2.2, 11 -
+Prevalence of anaemia :	 Prevalenza dell'anemia
+target, 2.2, 12 -
+wasting in children :	 sprecando nei bambini
+target, 2.2, 13 -
+children affected by wasting :	 I bambini colpiti dalla destazione
+target, 2.2, 14 -
+underweight children :	 Bambini sottopeso
+target, 2.3, 0 -
+small scale food producers :	 Produttori alimentari su piccola scala
+target, 2.3, 1 -
+farm employment :	 lavoro agricole
+target, 2.3, 2 -
+family farmers :	 Agricoltori di famiglia
+target, 2.3, 3 -
+agricultural productivity :	 Produttività agricola
+target, 2.3, 4, pastoralists, WARNING! : Translation Failed
+target, 2.3, 5 -
+Agricultural Fund for Rural Development :	 Fondo agricolo per lo sviluppo rurale
+target, 2.3, 6 -
+help farmers :	 Aiuta gli agricoltori
+target, 2.3, 7 -
+support farmers :	 Supporta gli agricoltori
+target, 2.3, 8 -
+smallholder farmers ability :	 capacità degli agricoltori di piccoli gruppi
+target, 2.3, 9 -
+small scale farmers :	 Agricoltori di piccole dimensioni
+target, 2.4, 0 -
+sustainable food production systems :	 Sistemi di produzione alimentare sostenibile
+target, 2.4, 1 -
+resilient agricultural practices :	 Pratiche agricole resilienti
+target, 2.4, 2 -
+sustainable agriculture :	 agricoltura sostenibile
+target, 2.4, 3 -
+soil quality :	 Qualità del suolo
+target, 2.4, 4 -
+organic farming :	 coltivazione biologica
+target, 2.4, 5 -
+make the agricultural system more resilient to climate change :	 rendere il sistema agricolo più resiliente ai cambiamenti climatici
+target, 2.4, 6 -
+environmentally-friendly food system :	 Sistema alimentare rispettoso dell'ambiente
+target, 2.4, 7 -
+sustainable food supply chains :	 Catene di approvvigionamento alimentare sostenibile
+target, 2.4, 8 -
+sustainable agri-food systems :	 Sistemi agroalimentari sostenibili
+target, 2.4, 9 -
+risk of non-sustainable agriculture :	 Rischio di agricoltura non sostenibile
+target, 2.4, 10 -
+eco-agricultural models :	 Modelli eco-agricoli
+target, 2.4, 11 -
+sustainable livelihoods Initiative :	 Iniziativa sostenibile di sussistenza
+target, 2.5, 0 -
+animal genetic resources :	 Risorse genetiche animali
+target, 2.5, 1 -
+cultivated plants :	 piante coltivate
+target, 2.5, 2 -
+seed banks :	 banche dei semi
+target, 2.5, 3 -
+GMO :	 GMO
+target, 2.5, 4 -
+domesticated animals :	 Animali addomesticati
+target, 2.5, 5 -
+plant banks :	 banche vegetali
+target, 2.5, 6 -
+plant genetic resources :	 Piantare risorse genetiche
+target, 2.5, 7 -
+genetic diversity of seeds :	 diversità genetica dei semi
+target, 2.5, 8 -
+plant gene banks :	 Banche geni vegetali
+target, 2.5, 9 -
+livestock gene banks :	 Banche geni di bestiame
+target, 2.5, 10 -
+breeds classified as being at risk of extinction :	 Razze classificate come a rischio di estinzione
+target, 2.5, 11 -
+breeds at risk of extinction :	 razze a rischio di estinzione
+target, 2.5, 12 -
+silvopastoral and agroforestry production modes :	 Modalità di produzione Silvopastoral e Agroforestry
+target, 2.a, 0 -
+agricultural investment :	 Investimenti agricoli
+target, 2.a, 1 -
+agriculture orientation index :	 Indice di orientamento dell'agricoltura
+target, 2.a, 2 -
+agricultural research :	 Ricerca agricola
+target, 2.a, 3 -
+finance agriculture :	 Agricoltura finanza
+target, 2.a, 4 -
+stimulate research and development within the agri-food industry :	 Stimolare la ricerca e lo sviluppo all'interno dell'industria agroalimentare
+target, 2.a, 5 -
+research in the agri-food industry :	 Ricerca nell'industria agroalimentare
+target, 2.a, 6 -
+stimulate development within the agri-food industry :	 Stimolare lo sviluppo all'interno dell'industria agro-alimentare
+target, 2.a, 7 -
+research within the agri-food industry :	 Ricerca all'interno dell'industria agroalimentare
+target, 2.a, 8 -
+investment in agriculture :	 Investimento in agricoltura
+target, 2.b, 0 -
+agricultural export subsidies :	 Sovvenzioni di esportazione agricola
+target, 2.b, 1 -
+world agricultural markets :	 Mercati agricoli mondiali
+target, 2.b, 2 -
+agricultural exports :	 Esportazioni agricole
+target, 2.b, 3 -
+agricultural market :	 mercato agricolo
+target, 2.b, 4 -
+agricultural trade :	 Trade agricolo
+target, 2.b, 5 -
+agricultural goods market :	 Mercato dei beni agricoli
+target, 2.c, 0 -
+food price volatility :	 Volatilità del prezzo del cibo
+target, 2.c, 1 -
+food price anomalies :	 Anomalie del prezzo del cibo
+target, 2.c, 2 -
+food commodity markets :	 Mercati di prodotti alimentari
+target, 2.c, 3 -
+food reserves :	 Riserve alimentari
+target, 2.c, 4 -
+food price changes :	 Modifiche al prezzo del cibo
+target, 2.c, 5 -
+changes food price :	 cambia il prezzo alimentare
+target, 2.c, 6 -
+volatility food price :	 Volatilità prezzo alimentare
+target, 2.c, 7 -
+volatility prices of food :	 prezzi di volatilità del cibo
+target, 2.c, 8 -
+anomalies food price :	 Anomalies prezzo alimentare
+target, 2.c, 9 -
+anomalies prices of food :	 Anomalies prezzi del cibo
+target, 2.c, 10 -
+food mispricing :	 cibo sbagliato
+target, 3.1, 0 -
+maternal mortality :	 mortalità materna
+target, 3.1, 1 -
+death in pregnancy :	 morte in gravidanza
+target, 3.1, 2 -
+death in childbirth :	 morte nel parto
+target, 3.1, 3 -
+maternal deaths :	 Decessi materni
+target, 3.1, 4 -
+deaths which occur during pregnancy :	 Decessi che si verificano durante la gravidanza
+target, 3.1, 5 -
+obstetric deaths :	 Decessi ostetrici
+target, 3.1, 6 -
+death occurring in childbirth :	 Morte che si verifica nel parto
+target, 3.1, 7 -
+pregnancy related deaths :	 Decessi correlati alla gravidanza
+target, 3.1, 8 -
+pregnancy deaths :	 Decessi di gravidanza
+target, 3.1, 9 -
+deaths related to pregnancy :	 Decessi legati alla gravidanza
+target, 3.1, 10 -
+deaths related to childbirth :	 Decessi correlati al parto
+target, 3.1, 11 -
+MMR :	 Mmr
+target, 3.1, 12 -
+MMRate :	 Mmrate
+target, 3.1, 13 -
+maternal health :	 salute materna
+target, 3.2, 0 -
+child mortality :	 mortalità infantile
+target, 3.2, 1 -
+neonatal mortality :	 mortalità neonatale
+target, 3.2, 2 -
+infant mortality :	 mortalità infantile
+target, 3.2, 3 -
+children mortality :	 Mortalità dei bambini
+target, 3.2, 4 -
+U5MR :	 U5mr
+target, 3.2, 5 -
+Mortality rates among young children :	 Tassi di mortalità tra i bambini piccoli
+target, 3.2, 6 -
+Mortality rates among children :	 Tassi di mortalità tra i bambini
+target, 3.2, 7 -
+Mortality rates of children :	 Tassi di mortalità dei bambini
+target, 3.2, 8 -
+under-5 mortality :	 Mortalità inferiore a 5
+target, 3.2, 9 -
+NMR :	 Nmr
+target, 3.3, 0 -
+hepatitis :	 epatite
+target, 3.3, 1 -
+malaria :	 malaria
+target, 3.3, 2 -
+neglected tropical diseases :	 malattie tropicali trascurate
+target, 3.3, 3 -
+communicable diseases :	 malattie trasmissibili
+target, 3.3, 4 -
+water-borne diseases :	 malattie portate dall'acqua
+target, 3.3, 5 -
+AIDS :	 Aids
+target, 3.3, 6 -
+end epidemics :	 End Epidemics
+target, 3.3, 7 -
+HIV :	 HIV
+target, 3.3, 8 -
+tuberculosis :	 tubercolosi
+target, 3.3, 9 -
+cope with epidemic :	 far fronte all'epidemia
+target, 3.3, 10 -
+combat pandemic :	 Combattimento pandemia
+target, 3.3, 11 -
+combat epidemic :	 Combattere l'epidemia
+target, 3.3, 12 -
+combat COVID-19 :	 Combattimento Covid-19
+target, 3.3, 13 -
+stem COVID transmission :	 TRASMISSIONE COVID STEM
+target, 3.4, 0 -
+premature mortality :	 mortalità prematura
+target, 3.4, 1 -
+suicide mortality rate :	 Tasso di mortalità di suicidio
+target, 3.4, 2 -
+mental health :	 salute mentale
+target, 3.4, 3 -
+chronic respiratory disease :	 malattia respiratoria cronica
+target, 3.4, 4 -
+cardiovascular disease :	 malattia cardiovascolare
+target, 3.4, 5 -
+diabetes :	 diabete
+target, 3.4, 6 -
+fight cancer :	 combattere il cancro
+target, 3.4, 7 -
+improving cancer control :	 migliorare il controllo del cancro
+target, 3.4, 8 -
+improving cancer care :	 Migliorare la cura del cancro
+target, 3.4, 9 -
+cancer incidence :	 incidenza del cancro
+target, 3.4, 10 -
+non-communicable diseases :	 malattie non trasmissibili
+target, 3.4, 11 -
+ncd :	 ncd
+target, 3.4, 12 -
+carcinogens :	 carcinogeni
+target, 3.4, 13 -
+suicide deaths :	 Morti di suicidio
+target, 3.4, 14 -
+promote mental health :	 promuovere la salute mentale
+target, 3.5, 0 -
+drug abuse :	 abuso di droghe
+target, 3.5, 1 -
+alcohol per capita consumption :	 Consumo all'alcool pro capite
+target, 3.5, 2 -
+substance abuse :	 abuso di sostanze
+target, 3.5, 3 -
+cocaine :	 cocaina
+target, 3.5, 4 -
+alcohol consumption :	 consumo di alcool
+target, 3.5, 5 -
+cannabis :	 cannabis
+target, 3.5, 6 -
+illegal substances :	 sostanze illegali
+target, 3.5, 7 -
+drug addiction :	 tossicodipendenza
+target, 3.5, 8 -
+use of alcohol :	 uso di alcol
+target, 3.5, 9 -
+use of drugs :	 Uso di droghe
+target, 3.5, 10 -
+alcohol abuse :	 abuso di alcool
+target, 3.5, 11 -
+substance use disorders :	 disturbi dell'uso della sostanza
+target, 3.5, 12 -
+alcohol consumed :	 alcol consumato
+target, 3.5, 13 -
+alcohol exposure :	 Esposizione alcolica
+target, 3.5, 14 -
+drug exposure :	 Esposizione alla droga
+target, 3.6, 0 -
+road traffic injuries :	 Infortuni sul traffico stradale
+target, 3.6, 1 -
+road traffic fatality :	 Fatalità del traffico stradale
+target, 3.6, 2 -
+injuries from road traffic crashes :	 Lesioni da incidenti stradali
+target, 3.6, 3 -
+injuries from road traffic accidents :	 Lesioni da incidenti stradali
+target, 3.6, 4 -
+injuries from road accidents :	 Infortuni da incidenti stradali
+target, 3.6, 5 -
+injuries from traffic accident :	 Lesioni da incidenti stradali
+target, 3.6, 6 -
+injuries from accidents road :	 Lesioni da Strada incidenti
+target, 3.6, 7 -
+injuries from accident traffic :	 Lesioni dal traffico degli incidenti
+target, 3.6, 8 -
+deaths from road traffic crashes :	 Decessi dal traffico stradale incidenti
+target, 3.6, 9 -
+deaths from road traffic accidents :	 Decessi da incidenti stradali
+target, 3.6, 10 -
+deaths from road accidents :	 Decessi da incidenti stradali
+target, 3.6, 11 -
+deaths from traffic accident :	 Decessi dall'incidente del traffico
+target, 3.6, 12 -
+deaths from accidents road :	 Decessi dalla strada degli incidenti
+target, 3.6, 13 -
+deaths from accident traffic :	 Decessi dal traffico degli incidenti
+target, 3.7, 0 -
+reproductive health :	 salute riproduttiva
+target, 3.7, 1 -
+family planning :	 pianificazione famigliare
+target, 3.7, 2 -
+sexual health :	 Salute sessuale
+target, 3.7, 3 -
+sexual education :	 Educazione sessuale
+target, 3.7, 4 -
+sexual information :	 Informazioni sessuali
+target, 3.7, 5 -
+adolescent birth :	 nascita adolescente
+target, 3.7, 6 -
+reproductive education :	 Istruzione riproduttiva
+target, 3.7, 7 -
+reproductive information :	 Informazioni riproduttive
+target, 3.7, 8 -
+access to contraceptive :	 Accesso a contraccettivi
+target, 3.7, 9 -
+access to means to prevent pregnancy :	 Accesso ai mezzi per prevenire la gravidanza
+target, 3.7, 10 -
+use of means to prevent pregnancy :	 Uso dei mezzi per prevenire la gravidanza
+target, 3.7, 11 -
+preventing unintended pregnancies :	 prevenire le gravidanze involontarie
+target, 3.7, 12 -
+reproductive services :	 Servizi riproduttivi
+target, 3.7, 13 -
+adolescent pregnancies :	 gravidanze adolescenti
+target, 3.7, 14 -
+Adolescent childbearing :	 Adolescente Childbearing
+target, 3.7, 15 -
+safe abortions :	 Aborti sicuri
+target, 3.8, 0 -
+affordable essential medicines :	 medicinali essenziali a prezzi accessibili
+target, 3.8, 1 -
+essential health services :	 Servizi sanitari essenziali
+target, 3.8, 2 -
+care services :	 Servizi di cura
+target, 3.8, 3 -
+access to medicines :	 Accesso alle medicine
+target, 3.8, 4 -
+health coverage :	 Copertura sanitaria
+target, 3.8, 5 -
+health service :	 servizio sanitario
+target, 3.8, 6 -
+medicine access :	 Accesso alla medicina
+target, 3.8, 7 -
+health protection :	 Protezione della salute
+target, 3.8, 8 -
+protect public health :	 Proteggi la salute pubblica
+target, 3.8, 9 -
+support to health care systems :	 Supporto ai sistemi di assistenza sanitaria
+target, 3.8, 10 -
+health security :	 sicurezza della salute
+target, 3.8, 11 -
+inclusive health systems :	 Sistemi sanitari inclusivi
+target, 3.8, 12 -
+efficient health systems :	 Sistemi di salute efficienti
+target, 3.8, 13 -
+reinforce health care systems :	 Rafforzare i sistemi di assistenza sanitaria
+target, 3.8, 14 -
+resilience of health systems :	 Resilienza dei sistemi sanitari
+target, 3.8, 15 -
+access to healthcare :	 Accesso alla sanità
+target, 3.8, 16 -
+access to health care :	 Accesso all'assistenza sanitaria
+target, 3.8, 17 -
+access to the most basic of rights like healthcare :	 accesso al più basico dei diritti come l'assistenza sanitaria
+target, 3.8, 18 -
+universal healthcare :	 assistenza sanitaria universale
+target, 3.8, 19 -
+affordable vaccines :	 Vaccini accessibili
+target, 3.8, 20 -
+access to vaccines :	 Accesso ai vaccini
+target, 3.8, 21 -
+vaccine access :	 Accesso al vaccino
+target, 3.9, 0 -
+respiratory disease :	 malattia respiratoria
+target, 3.9, 1 -
+health effects of soil pollution :	 Effetti sulla salute dell'inquinamento del suolo
+target, 3.9, 2 -
+health impacts of soil pollution :	 Impatti sulla salute dell'inquinamento del suolo
+target, 3.9, 3 -
+effects of unsafe water :	 effetti dell'acqua non sicura
+target, 3.9, 4 -
+harmful effects of chemicals :	 Effetti nocivi delle sostanze chimiche
+target, 3.9, 5 -
+deaths related to hazardous chemical :	 Decessi legati alla sostanza chimica pericolosa
+target, 3.9, 6 -
+unintentional poisoning :	 avvelenamento involontario
+target, 3.9, 7 -
+deaths related to unsafe water :	 Decessi legati all'acqua non sicura
+target, 3.9, 8 -
+deaths related to unsafe sanitation :	 Decessi legati a sanitari non sicuri
+target, 3.9, 9 -
+illnesses from pollution :	 malattie dall'inquinamento
+target, 3.9, 10 -
+illnesses from contamination :	 malattie dalla contaminazione
+target, 3.9, 11 -
+mortality attributed to unsafe water :	 mortalità attribuita a acqua non sicura
+target, 3.9, 12 -
+mortality attributed to sanitation :	 mortalità attribuita al igiene
+target, 3.9, 13 -
+mortality for lack of hygiene :	 mortalità per mancanza di igiene
+target, 3.9, 14 -
+health effects of air pollution :	 Effetti sulla salute dell'inquinamento atmosferico
+target, 3.9, 15 -
+health impacts of air pollution :	 Impatti sanitari dell'inquinamento atmosferico
+target, 3.9, 16 -
+deaths related to air pollution :	 Decessi legati all'inquinamento atmosferico
+target, 3.9, 17 -
+deaths from hazardous chemicals :	 Decessi da prodotti chimici pericolosi
+target, 3.9, 18 -
+deaths from air pollution :	 Decessi dall'inquinamento atmosferico
+target, 3.9, 19 -
+deaths from water pollution :	 Decessi dall'inquinamento idrico
+target, 3.9, 20 -
+deaths from water contamination :	 Decessi dalla contaminazione dell'acqua
+target, 3.9, 21 -
+deaths from soil pollution :	 Decessi dall'inquinamento del suolo
+target, 3.9, 22 -
+deaths from soil contamination :	 Decessi dalla contaminazione del suolo
+target, 3.9, 23 -
+illness related to air pollution :	 malattia correlata all'inquinamento atmosferico
+target, 3.9, 24 -
+illness from hazardous chemicals :	 malattia da prodotti chimici pericolosi
+target, 3.9, 25 -
+illness from air pollution :	 malattia dall'inquinamento atmosferico
+target, 3.9, 26 -
+illness from water pollution :	 malattia dall'inquinamento idrico
+target, 3.9, 27 -
+illness from water contamination :	 malattia dalla contaminazione dell'acqua
+target, 3.9, 28 -
+illness from soil pollution :	 malattia dall'inquinamento del suolo
+target, 3.9, 29 -
+illness from soil contamination :	 malattia dalla contaminazione del suolo
+target, 3.9, 30 -
+health effects of water contamination :	 Effetti sanitari della contaminazione dell'acqua
+target, 3.9, 31 -
+health impacts of water contamination :	 Impatti sanitari della contaminazione dell'acqua
+target, 3.9, 32 -
+Mortality rate attributed to air pollution :	 Tasso di mortalità attribuito all'inquinamento atmosferico
+target, 3.9, 33 -
+Mortality rate for air pollution :	 Tasso di mortalità per l'inquinamento atmosferico
+target, 3.9, 34 -
+Mortality for air pollution :	 Mortalità per l'inquinamento atmosferico
+target, 3.9, 35 -
+Mortality attributed to air pollution :	 Mortalità attribuita all'inquinamento atmosferico
+target, 3.9, 36 -
+deaths from hazardous air pollution :	 Decessi da inquinamento atmosferico pericoloso
+target, 3.9, 37 -
+illness from hazardous air pollution :	 malattia da inquinamento atmosferico pericoloso
+target, 3.9, 38 -
+deaths associated with air pollution :	 Decessi associati all'inquinamento atmosferico
+target, 3.9, 39 -
+illness associated with air pollution :	 malattia associata all'inquinamento atmosferico
+target, 3.9, 40 -
+deaths associated with hazardous chemicals :	 Decessi associati a prodotti chimici pericolosi
+target, 3.9, 41 -
+illness associated with hazardous chemicals :	 malattia associata a prodotti chimici pericolosi
+target, 3.9, 42 -
+deaths associated with water contamination :	 Decessi associati alla contaminazione dell'acqua
+target, 3.9, 43 -
+illness associated with water contamination :	 malattia associata alla contaminazione dell'acqua
+target, 3.9, 44 -
+deaths associated with soil contamination :	 Decessi associati alla contaminazione del suolo
+target, 3.9, 45 -
+illness associated with soil contamination :	 malattia associata alla contaminazione del suolo
+target, 3.9, 46 -
+air pollution associated diseases :	 Malattie associate all'inquinamento atmosferico
+target, 3.9, 47 -
+water contamination associated diseases :	 Malattie associate alla contaminazione dell'acqua
+target, 3.9, 48 -
+soil contamination associated diseases :	 Malattie associate alla contaminazione del suolo
+target, 3.9, 49 -
+soil pollution associated diseases :	 malattie associate al suolo inquinamento del suolo
+target, 3.9, 50 -
+water pollution associated diseases :	 Malattie associate inquinamento idrico
+target, 3.9, 51 -
+deaths from unsafe water :	 Decessi da acqua non sicura
+target, 3.9, 52 -
+deaths from unsafe sanitation :	 Decessi da sanitari non sicuri
+target, 3.9, 53 -
+deaths from lack of hygiene :	 Decessi dalla mancanza di igiene
+target, 3.9, 54 -
+Deaths attributable to unsafe water :	 Decessi attribuibili all'acqua non sicura
+target, 3.9, 55 -
+Deaths attributable to unsafe sanitation :	 Decessi attribuibili a sanitari non sicuri
+target, 3.9, 56 -
+Deaths attributable to unsafe hygiene :	 Decessi attribuibili all'igiene non sicuro
+target, 3.a, 0 -
+tobacco control :	 Controllo del tabacco
+target, 3.a, 1 -
+decrease smoking prevalence :	 diminuire la prevalenza del fumo
+target, 3.a, 2 -
+reduce tobacco use :	 Riduci l'uso del tabacco
+target, 3.a, 3 -
+reduce cigarette consumption :	 Ridurre il consumo di sigarette
+target, 3.a, 4 -
+lower tobacco use :	 Uso inferiore del tabacco
+target, 3.a, 5 -
+lower cigarette consumption :	 minore consumo di sigaretta
+goal, SDG 1, 0 -
+SDG 1 :	 SDG 1
+goal, SDG 1, 1 -
+goal 1 :	 Obiettivo 1
+goal, SDG 1, 2 -
+end poverty :	 fine povertà
+goal, SDG 1, 3 -
+no poverty :	 Nessuna povertà
+goal, SDG 1, 4 -
+reduce poverty :	 Ridurre la povertà
+goal, SDG 1, 5 -
+fight against poverty :	 combattere contro la povertà
+goal, SDG 1, 6 -
+end global poverty :	 fine povertà globale
+goal, SDG 1, 7 -
+poverty reduction :	 riduzione della povertà
+goal, SDG 1, 8 -
+poverty and deprivation :	 povertà e privazione
+goal, SDG 1, 9 -
+combact poverty :	 combattere la povertà
+goal, SDG 1, 10 -
+eradicate poverty :	 sradicare la povertà
+goal, SDG 1, 11 -
+tackle poverty :	 Affronta la povertà
+goal, SDG 1, 12 -
+poverty alleviation :	 la riduzione della povertà
+goal, SDG 1, 13 -
+alleviate poverty :	 alleviare la povertà
+goal, SDG 2, 0 -
+SDG 2 :	 SDG 2
+goal, SDG 2, 1 -
+goal 2 :	 Obiettivo 2
+goal, SDG 2, 2 -
+improve nutrition :	 migliorare la nutrizione
+goal, SDG 2, 3 -
+lack food :	 manca di cibo
+goal, SDG 3, 0 -
+SDG 3 :	 SDG 3
+goal, SDG 3, 1 -
+goal 3 :	 Obiettivo 3
+goal, SDG 3, 2 -
+ensure healthy lives :	 garantire vite sane
+goal, SDG 3, 3 -
+promote well-being :	 Promuovere il benessere
+goal, SDG 3, 4 -
+promote wellbeing :	 Promuovi benessere
+goal, SDG 3, 5 -
+good health :	 buona salute
+goal, SDG 3, 6 -
+support for the health challenges :	 Supporto per le sfide sanitarie
+goal, SDG 3, 7 -
+health research and innovation :	 Ricerca e innovazione sanitaria
+goal, SDG 3, 8 -
+preventive healthcare :	 assistenza sanitaria preventiva
+goal, SDG 3, 9 -
+child health :	 Salute del bambino
+goal, SDG 3, 10 -
+child wellbeing :	 Bambini benessere
+goal, SDG 3, 11 -
+child well-being :	 Benessere del bambino
+goal, SDG 3, 12 -
+children health :	 Salute dei bambini
+goal, SDG 3, 13 -
+children wellbeing :	 Bambini benessere
+goal, SDG 3, 14 -
+children well-being :	 Benessere dei bambini
+goal, SDG 3, 15 -
+elderly health :	 Salute anziana
+goal, SDG 3, 16 -
+elderly wellbeing :	 Benessere anziano
+goal, SDG 3, 17 -
+elderly well-being :	 Benessere anziano
+goal, SDG 3, 18 -
+safeguard health :	 Salvaguardia Salute
+goal, SDG 3, 19 -
+protect health :	 Proteggi la salute
+goal, SDG 3, 20 -
+protect human health :	 Proteggi la salute umana
+goal, SDG 3, 21 -
+protect citizens’ health :	 Proteggi la salute dei cittadini
+goal, SDG 3, 22 -
+protect health of our citizens :	 Proteggi la salute dei nostri cittadini
+goal, SDG 4, 0 -
+SDG 4 :	 SDG 4
+goal, SDG 4, 1 -
+goal 4 :	 Obiettivo 4
+goal, SDG 4, 2 -
+quality education :	 educazione di qualità
+goal, SDG 4, 3 -
+education and training :	 istruzione e formazione
+goal, SDG 4, 4 -
+training and education :	 formazione e istruzione
+goal, SDG 4, 5 -
+education and skills :	 educazione e abilità
+goal, SDG 4, 6 -
+skills and education :	 abilità e istruzione
+goal, SDG 4, 7 -
+quality services in education :	 Servizi di qualità nell'istruzione
+goal, SDG 4, 8 -
+increase access to education :	 Aumentare l'accesso all'istruzione
+goal, SDG 4, 9 -
+increase school enrollment rates :	 Aumentare le tariffe di iscrizione scolastica
+goal, SDG 4, 10 -
+improving global education :	 migliorare l'educazione globale
+goal, SDG 4, 11 -
+improving education :	 migliorare l'educazione
+goal, SDG 4, 12 -
+Facilitate the return of students to school :	 Facilitare il ritorno degli studenti a scuola
+goal, SDG 4, 13 -
+promote learning :	 Promuovere l'apprendimento
+goal, SDG 4, 14 -
+education quality :	 Qualità dell'istruzione
+goal, SDG 4, 15 -
+growth in enrolment rates :	 Crescita dei tassi di iscrizione
+goal, SDG 4, 16 -
+education as a priority :	 educazione come priorità
+goal, SDG 4, 17 -
+equitable education :	 Educazione equi
+goal, SDG 4, 18 -
+progress on education :	 progresso sull'educazione
+goal, SDG 5, 0 -
+SDG 5 :	 SDG 5
+goal, SDG 5, 1 -
+goal 5 :	 Obiettivo 5
+goal, SDG 5, 2 -
+empower women :	 potenziare le donne
+goal, SDG 5, 3 -
+Inequalities based on sex :	 Disuguaglianze basate sul sesso
+goal, SDG 5, 4 -
+empower girls :	 potenziare le ragazze
+goal, SDG 5, 5 -
+Women’s empowerment :	 Empowerment delle donne
+goal, SDG 5, 6 -
+Woman’s empowerment :	 Empowerment delle donne
+goal, SDG 5, 7 -
+girls’ empowerment :	 Empowerment delle ragazze
+goal, SDG 5, 8 -
+empower female :	 Emporizzare femmina
+goal, SDG 5, 9 -
+female rights :	 Diritti femminili
+goal, SDG 5, 10 -
+women’s rights :	 diritti delle donne
+goal, SDG 5, 11 -
+woman’s rights :	 diritti delle donne
+goal, SDG 5, 12 -
+equal opportunity for women :	 pari opportunità per le donne
+goal, SDG 5, 13 -
+equal opportunity for woman :	 pari opportunità per la donna
+goal, SDG 5, 14 -
+equal opportunity for girls :	 pari opportunità per le ragazze
+goal, SDG 5, 15 -
+women equality :	 uguaglianza delle donne
+goal, SDG 5, 16 -
+woman equality :	 uguaglianza della donna
+goal, SDG 5, 17 -
+gender equality :	 parità dei sessi
+goal, SDG 5, 18 -
+equality between men and women :	 uguaglianza tra uomini e donne
+goal, SDG 5, 19 -
+equality between man and woman :	 uguaglianza tra uomo e donna
+goal, SDG 5, 20 -
+equality between boys and girls :	 uguaglianza tra ragazzi e ragazze
+goal, SDG 5, 21 -
+equality between girls and boy :	 uguaglianza tra ragazze e ragazzo
+goal, SDG 5, 22 -
+equality between women and men :	 uguaglianza tra donne e uomini
+goal, SDG 5, 23 -
+equality between woman and man :	 uguaglianza tra donna e uomo
+goal, SDG 5, 24 -
+inequalities for women :	 disuguaglianze per le donne
+goal, SDG 5, 25 -
+inequalities for woman :	 disuguaglianze per donna
+goal, SDG 5, 26 -
+inequalities for girls :	 disuguaglianze per le ragazze
+goal, SDG 5, 27 -
+gender inequality :	 disparità di genere
+goal, SDG 5, 28 -
+Inequalities faced by girls :	 Disuguaglianze affrontate dalle ragazze
+goal, SDG 5, 29 -
+Inequalities faced by women :	 Disuguaglianze affrontate dalle donne
+goal, SDG 5, 30 -
+Inequalities faced by woman :	 Disuguaglianze affrontate dalla donna
+goal, SDG 5, 31 -
+gender parity :	 Parità di genere
+goal, SDG 5, 32 -
+parity between men and women :	 Parità tra uomini e donne
+goal, SDG 5, 33 -
+parity between man and woman :	 Parità tra uomo e donna
+goal, SDG 5, 34 -
+parity between boys and girls :	 Parità tra ragazzi e ragazze
+goal, SDG 5, 35 -
+parity between girls and boy :	 Parità tra ragazze e ragazzo
+goal, SDG 5, 36 -
+parity between women and men :	 Parità tra donne e uomini
+goal, SDG 5, 37 -
+parity between woman and man :	 Parità tra donna e uomo
+goal, SDG 5, 38 -
+same rights as men :	 Stessi diritti degli uomini
+goal, SDG 5, 39 -
+women and men have equal rights :	 Le donne e gli uomini hanno uguali diritti
+goal, SDG 5, 40 -
+woman and man have equal rights :	 La donna e l'uomo hanno uguali diritti
+goal, SDG 5, 41 -
+women and men have the same rights :	 Le donne e gli uomini hanno gli stessi diritti
+goal, SDG 5, 42 -
+woman and man have the same rights :	 La donna e l'uomo hanno gli stessi diritti
+goal, SDG 5, 43 -
+same rights for woman and man :	 Stessi diritti per la donna e l'uomo
+goal, SDG 5, 44 -
+same rights for women and men :	 Stessi diritti per le donne e gli uomini
+goal, SDG 5, 45 -
+same rights for girls and boys :	 Stessi diritti per ragazze e ragazzi
+goal, SDG 5, 46 -
+same rights for man and woman :	 Stessi diritti per l'uomo e la donna
+goal, SDG 5, 47 -
+same rights for men and women :	 Stessi diritti per uomini e donne
+goal, SDG 5, 48 -
+same rights for boys and girls :	 Stessi diritti per ragazzi e ragazze
+goal, SDG 5, 49 -
+gender pay gap :	 Genere Pay Gap
+goal, SDG 5, 50 -
+gender discrepancy :	 discrepanza di genere
+goal, SDG 5, 51 -
+Gender Action Plan :	 Piano d'azione di genere
+goal, SDG 5, 52 -
+sharing of responsibilities between women and men :	 Condivisione di responsabilità tra donne e uomini
+goal, SDG 5, 53 -
+sharing of responsibilities between men and women :	 Condivisione di responsabilità tra uomini e donne
+goal, SDG 6, 0 -
+SDG 6 :	 SDG 6
+goal, SDG 6, 1 -
+goal 6 :	 Obiettivo 6
+goal, SDG 6, 2 -
+ensure water availability :	 garantire la disponibilità di acqua
+goal, SDG 6, 3 -
+ensure availability of water :	 Assicurarsi di disponibilità di acqua
+goal, SDG 6, 4 -
+drinking water and sanitation :	 Acqua potabile e servizi igienico-sanitari
+goal, SDG 6, 5 -
+water and sanitation :	 acqua e servizi igienico-sanitari
+goal, SDG 6, 6 -
+sustainable management of sanitation :	 Gestione sostenibile dei servizi igienico-sanitari
+goal, SDG 7, 0 -
+SDG 7 :	 SDG 7
+goal, SDG 7, 1 -
+goal 7 :	 Obiettivo 7
+goal, SDG 7, 2 -
+sustainable energy :	 energia sostenibile
+goal, SDG 8, 0 -
+SDG 8 :	 SDG 8
+goal, SDG 8, 1 -
+goal 8 :	 Obiettivo 8
+goal, SDG 8, 2 -
+sustainable economic growth :	 crescita economica sostenibile
+goal, SDG 8, 3 -
+inclusive economic growth :	 crescita economica inclusiva
+goal, SDG 8, 4 -
+repair labour markets :	 riparare i mercati del lavoro
+goal, SDG 8, 5 -
+boost jobs and growth :	 Aumenta i lavori e la crescita
+goal, SDG 8, 6 -
+protect workers and jobs :	 Proteggi i lavoratori e i lavori
+goal, SDG 8, 7 -
+labout rights :	 Diritti del lavoro
+goal, SDG 9, 0 -
+SDG 9 :	 SDG 9
+goal, SDG 9, 1 -
+goal 9 :	 Obiettivo 9
+goal, SDG 9, 2 -
+inclusive industrialization :	 Industrializzazione inclusiva
+goal, SDG 10, 0 -
+SDG 10 :	 SDG 10
+goal, SDG 10, 1 -
+goal 10 :	 Obiettivo 10
+goal, SDG 10, 2 -
+reduce inequalities :	 Riduci le disuguaglianze
+goal, SDG 10, 3 -
+Inequality within countries :	 Disuguaglianza all'interno dei paesi
+goal, SDG 10, 4 -
+Inequality among countries :	 Disuguaglianza tra i paesi
+goal, SDG 10, 5 -
+equality within countries :	 uguaglianza all'interno dei paesi
+goal, SDG 10, 6 -
+equality among countries :	 uguaglianza tra i paesi
+goal, SDG 10, 7 -
+Inequalities for vulnerable :	 Disuguaglianze per vulnerabili
+goal, SDG 10, 8 -
+equalities for vulnerable :	 Equalità per vulnerabili
+goal, SDG 10, 9 -
+equality for everyone :	 uguaglianza per tutti
+goal, SDG 10, 10 -
+global equality :	 uguaglianza globale
+goal, SDG 10, 11 -
+achieve greater equality :	 ottenere una maggiore uguaglianza
+goal, SDG 10, 12 -
+achieve equality :	 raggiungere l'uguaglianza
+goal, SDG 10, 13 -
+reducing poverty and inequality :	 Ridurre la povertà e la disuguaglianza
+goal, SDG 10, 14 -
+social fairness :	 equità sociale
+goal, SDG 10, 15 -
+equality for all :	 uguaglianza per tutti
+goal, SDG 11, 0 -
+SDG 11 :	 SDG 11
+goal, SDG 11, 1 -
+goal 11 :	 obiettivo 11
+goal, SDG 11, 2 -
+resilient cities :	 Città resilienti
+goal, SDG 11, 3 -
+resilient communities :	 Comunità resilienti
+goal, SDG 11, 4 -
+inclusive human settlement :	 Inclusive insediamento umano
+goal, SDG 11, 5 -
+safe human settlement :	 Insediamento umano sicuro
+goal, SDG 11, 6 -
+resilient human settlement :	 Insediamento umano resiliente
+goal, SDG 11, 7 -
+world heritage :	 Patrimonio mondiale
+goal, SDG 12, 0 -
+SDG 12 :	 SDG 12
+goal, SDG 12, 1 -
+goal 12 :	 Obiettivo 12
+goal, SDG 12, 2 -
+change our consumption and production patterns :	 Cambia i nostri modelli di consumo e produzione
+goal, SDG 12, 3 -
+sustainable consumption :	 consumo sostenibile
+goal, SDG 12, 4 -
+sustainable production :	 Produzione sostenibile
+goal, SDG 12, 5 -
+responsible consumption :	 Consumo responsabile
+goal, SDG 12, 6 -
+responsible production :	 Produzione responsabile
+goal, SDG 12, 7 -
+shift our consumption and production patterns to more sustainable :	 Sposta il nostro consumo e i modelli di produzione per più sostenibili
+goal, SDG 12, 8 -
+change the way we produce :	 cambia il modo in cui produciamo
+goal, SDG 12, 9 -
+change the way we consume :	 cambia il modo in cui consumiamo
+goal, SDG 12, 10 -
+reduce our ecological footprint :	 Riduci la nostra impronta ecologica
+goal, SDG 12, 11 -
+sustainable patterns of consumption :	 Modelli sostenibili di consumo
+goal, SDG 12, 12 -
+sustainable patterns of production :	 Modelli di produzione sostenibili
+goal, SDG 13, 0 -
+SDG 13 :	 SDG 13
+goal, SDG 13, 1 -
+goal 13 :	 obiettivo 13
+goal, SDG 13, 2 -
+climate change :	 cambiamento climatico
+goal, SDG 13, 3 -
+climate action :	 Azione del clima
+goal, SDG 13, 4 -
+climate-neutral :	 clima neutrale
+goal, SDG 13, 5 -
+climate neutrality :	 neutralità climatica
+goal, SDG 13, 6 -
+climate research and innovation :	 Ricerca e innovazione climatica
+goal, SDG 13, 7 -
+green transition :	 transizione verde
+goal, SDG 13, 8 -
+decarbonization :	 decarbonizzazione
+goal, SDG 13, 9 -
+fossil fuel subsidies end :	 I sussidi del combustibile fossili finiscono
+goal, SDG 13, 10 -
+end fossil fuel subsidies :	 END FOSSIL FOSSIL SOWSSIDES
+goal, SDG 13, 11 -
+Paris Agreement :	 Accordo di Parigi
+goal, SDG 13, 12 -
+climate crisis :	 crisi climatica
+goal, SDG 13, 13 -
+net zero emissions :	 Net Zero Emissioni
+goal, SDG 13, 14 -
+climate finance :	 Finanza del clima
+goal, SDG 13, 15 -
+climate investment :	 Investimento climatico
+goal, SDG 14, 0 -
+SDG 14 :	 SDG 14
+goal, SDG 14, 1 -
+goal 14 :	 obiettivo 14
+goal, SDG 14, 2 -
+sustainable use of seas :	 Uso sostenibile dei mari
+goal, SDG 14, 3 -
+sustainable use of marine resources :	 Uso sostenibile delle risorse marine
+goal, SDG 14, 4 -
+conserve seas :	 conservare i mari
+goal, SDG 14, 5 -
+conserve marine resources :	 Conservare le risorse marine
+goal, SDG 14, 6 -
+protect oceans :	 Proteggi gli oceani
+goal, SDG 14, 7 -
+protect seas :	 proteggere i mari
+goal, SDG 14, 8 -
+protect marine resources :	 Proteggi le risorse marine
+goal, SDG 14, 9 -
+life below water :	 Vita al di sotto dell'acqua
+goal, SDG 14, 10 -
+sustainable development of water ecosystems :	 Sviluppo sostenibile degli ecosistemi idrici
+goal, SDG 14, 11 -
+protection of water and marine resources :	 Protezione delle risorse idriche e marine
+goal, SDG 14, 12 -
+marine and water resources :	 Risorse marine e idriche
+goal, SDG 15, 0 -
+SDG 15 :	 SDG 15
+goal, SDG 15, 1 -
+goal 15 :	 Obiettivo 15
+goal, SDG 15, 2 -
+conserve land resources :	 Conserva risorse della terra
+goal, SDG 15, 3 -
+protect land resources :	 Proteggi le risorse della terra
+goal, SDG 15, 4 -
+life on land :	 Vita sulla terra
+goal, SDG 15, 5 -
+environmental protection :	 protezione ambientale
+goal, SDG 15, 6 -
+land restoration and decontamination :	 Restauro e decontaminazione del terreno
+goal, SDG 15, 7 -
+restore and protect nature :	 Ripristina e proteggi la natura
+goal, SDG 15, 8 -
+sustainable use of terrestrial ecosystems :	 Uso sostenibile degli ecosistemi terrestri
+goal, SDG 16, 0 -
+SDG 16 :	 SDG 16
+goal, SDG 16, 1 -
+goal 16 :	 Obiettivo 16
+goal, SDG 16, 2 -
+peaceful societies :	 Società pacifiche
+goal, SDG 16, 3 -
+societies for sustainable development :	 Società per lo sviluppo sostenibile
+goal, SDG 16, 4 -
+inclusive societies :	 Società inclusive
+goal, SDG 16, 5 -
+promote peace :	 Promuovere la pace
+goal, SDG 16, 6 -
+fundamental freedom :	 libertà fondamentale
+goal, SDG 16, 7 -
+protect individual freedom :	 Proteggi la libertà individuale
+goal, SDG 16, 8 -
+ensure democracy :	 garantire la democrazia
+goal, SDG 16, 9 -
+defend democracy :	 difendere la democrazia
+goal, SDG 16, 10 -
+defense of democracy :	 Difesa della democrazia
+goal, SDG 16, 11 -
+defend democractic processes :	 difendere i processi democratici
+goal, SDG 16, 12 -
+human rights abuse :	 abuso dei diritti umani
+goal, SDG 16, 13 -
+abuse human rights :	 Abuso i diritti umani
+goal, SDG 16, 14 -
+Peace, justice and strong institutions :	 Pace, giustizia e istituzioni forti
+goal, SDG 16, 15 -
+Protection of Human Rights :	 Protezione dei diritti umani
+goal, SDG 16, 16 -
+international human rights :	 Diritti umani internazionali
+goal, SDG 16, 17 -
+compliance with fundamental rights :	 Conformità ai diritti fondamentali
+goal, SDG 16, 18 -
+respects the fundamental rights :	 rispetta i diritti fondamentali
+goal, SDG 16, 19 -
+defend human rights :	 difendere i diritti umani
+goal, SDG 16, 20 -
+human rights defend :	 Difensore dei diritti umani
+goal, SDG 16, 21 -
+Promote human rights :	 Promuovere i diritti umani
+goal, SDG 16, 22 -
+human rights violations :	 Violazioni dei diritti umani
+goal, SDG 16, 23 -
+global peace and security :	 Pace e sicurezza globali
+goal, SDG 17, 0 -
+SDG 17 :	 SDG 17
+goal, SDG 17, 1 -
+goal 17 :	 Obiettivo 17
+goal, SDG 17, 2 -
+global partnership :	 Partnership globale
+goal, SDG 17, 3 -
+collaboration for sustainable development :	 Collaborazione per lo sviluppo sostenibile
+goal, SDG 17, 4 -
+global partners :	 Partner globali
+goal, SDG 17, 5 -
+resources mobilization for sustainable development :	 Mobilitazione delle risorse per lo sviluppo sostenibile
+devco, 1.a, 0 -
+poverty reduction :	 riduzione della povertà
+devco, 1.a, 1 -
+reduce poverty :	 Ridurre la povertà
+devco, 1.a, 2 -
+end poverty :	 fine povertà
+devco, 1.a, 3 -
+eradicate poverty :	 sradicare la povertà
+devco, 1.a, 4 -
+poverty eradication :	 Eradicazione della povertà
+devco, 1.a, 5 -
+poverty alleviation :	 la riduzione della povertà
+devco, 1.a, 6 -
+alleviate poverty :	 alleviare la povertà
+devco, 3.c, 0 -
+health financing :	 Finanziamento della salute
+devco, 3.c, 1 -
+health worker :	 operatore sanitario
+devco, 3.c, 2 -
+health workforce :	 forza lavoro della salute
+devco, 3.c, 3 -
+skilled health personnel :	 Personale sanitario qualificato
+devco, 3.c, 4 -
+health workforce in developing countries :	 forza lavoro sanitaria nei paesi in via di sviluppo
+devco, 3.c, 5 -
+health service in developing countries :	 Servizio sanitario nei paesi in via di sviluppo
+devco, 3.c, 6 -
+health financing developing countries :	 Finanziamento della salute Paesi in via di sviluppo
+devco, 3.c, 7 -
+health financing small island :	 Finanziamento della salute Piccola isola
+devco, 3.c, 8 -
+health service small island :	 Servizio sanitario Piccola isola
+devco, 3.c, 9 -
+health workforce small island :	 Health Workforce Piccola isola
+devco, 3.c, 10 -
+training programmes for medical and healthcare staff :	 Programmi di formazione per il personale medico e sanitario
+devco, 3.c, 11 -
+training programmes for medical staff :	 Programmi di formazione per personale medico
+devco, 6.a, 0 -
+water oda :	 Acqua ODA
+devco, 6.a, 1 -
+water-related oda :	 ODA correlata all'acqua
+devco, 6.a, 2 -
+water-related official development assistance :	 Assistenza allo sviluppo ufficiale relativa all'acqua
+devco, 6.a, 3 -
+sanitation-related oda :	 ODA relativa a sanitarie
+devco, 6.a, 4 -
+sanitation-related official development assistance :	 Assistenza per lo sviluppo ufficiale relativa ai servizi igienico-sanitari
+devco, 6.a, 5 -
+water programmes :	 Programmi d'acqua
+devco, 6.a, 6 -
+sanitation :	 igiene
+devco, 6.a, 7 -
+water harvesting :	 Raccolta dell'acqua
+devco, 6.a, 8 -
+water efficiency :	 efficienza dell'acqua
+devco, 7.b, 0 -
+sustainable energy :	 energia sostenibile
+devco, 7.b, 1 -
+Investments in energy efficiency :	 Investimenti nell'efficienza energetica
+devco, 7.b, 2 -
+clean energy :	 energia pulita
+devco, 7.b, 3 -
+energy services :	 Servizi energetici
+devco, 7.b, 4 -
+electricity access :	 Accesso elettrico
+devco, 7.b, 5 -
+energy access :	 Accesso all'energia
+devco, 9.a, 0 -
+development assistance to infrastructure :	 Assistenza allo sviluppo alle infrastrutture
+devco, 9.a, 1 -
+infrastructure development assistance :	 Assistenza per lo sviluppo dell'infrastruttura
+devco, 9.a, 2 -
+infrastructure development :	 Sviluppo dell'infrastruttura
+devco, 9.a, 3 -
+development infrastructure :	 Infrastruttura di sviluppo
+devco, 9.a, 4 -
+rehabilitated infrastructure :	 infrastruttura riabilitata
+devco, 9.a, 5 -
+risk-reduction investments in infrastructure :	 Investimenti di riduzione del rischio in infrastruttura
+devco, 9.a, 6 -
+retrofitted infrastructure :	 Infrastruttura retrofittata
+devco, 9.a, 7 -
+resilient infrastructure network :	 Rete di infrastrutture resilienti
+devco, 9.b, 0 -
+research :	 ricerca
+devco, 9.b, 1 -
+innovation :	 innovazione
+devco, 9.b, 2 -
+technology development :	 sviluppo tecnologico
+devco, 9.b, 3 -
+technologies :	 tecnologie
+devco, 9.b, 4 -
+industry :	 industria
+devco, 9.b, 5 -
+industrial diversification :	 Diversificazione industriale
+devco, 9.b, 6 -
+research and development :	 ricerca e sviluppo
+devco, 10.6, 0 -
+decision power :	 Potenza decisionale
+devco, 10.6, 1 -
+voting rights :	 diritti di voto
+devco, 10.6, 2 -
+participation :	 partecipazione
+devco, 10.6, 3 -
+decision-making :	 il processo decisionale
+devco, 10.6, 4 -
+participatory decision :	 Decisione partecipativa
+devco, 10.a, 0 -
+special treatment :	 trattamento speciale
+devco, 10.a, 1 -
+treated special :	 Trattato speciale
+devco, 10.a, 2 -
+differential treatment :	 Trattamento differenziale
+devco, 10.a, 3 -
+special and differential treatment :	 Trattamento speciale e differenziale
+devco, 10.a, 4 -
+special rights :	 Diritti speciali
+devco, 10.b, 0 -
+development aid :	 aiuto per lo sviluppo
+devco, 10.b, 1 -
+ODA :	 ODA
+devco, 10.b, 2 -
+foreign direct investment :	 investimenti diretti esteri
+devco, 10.b, 3 -
+fdi :	 FDI
+devco, 10.b, 4 -
+development assistance :	 Assistenza allo sviluppo
+devco, 10.b, 5 -
+development support :	 Supporto per lo sviluppo
+devco, 10.b, 6 -
+support development :	 Sviluppo del supporto
+devco, 11.c, 0 -
+local building materials :	 Materiali da costruzione locali
+devco, 11.c, 1 -
+sustainable buildings :	 edifici sostenibili
+devco, 11.c, 2 -
+resilient buildings :	 edifici resilienti
+devco, 11.c, 3 -
+local materials build :	 Build di materiali locali
+devco, 11.c, 4 -
+build local materials :	 Costruisci materiali locali
+devco, 11.c, 5 -
+retrofit buildings :	 edifici di retrofit
+devco, 11.c, 6 -
+sustainable construction :	 Costruzione sostenibile
+devco, 11.c, 7 -
+resource efficient buildings :	 Edifici ad efficienza delle risorse
+devco, 11.c, 8 -
+energy efficient buildings :	 Edifici a basso consumo energetico
+devco, 12.a, 0 -
+support sustainable development :	 Supporta lo sviluppo sostenibile
+devco, 12.a, 1 -
+promote sustainability :	 Promuovere la sostenibilità
+devco, 12.a, 2 -
+sustainable consumption :	 consumo sostenibile
+devco, 12.a, 3 -
+sustainable lifestyle :	 stile di vita sostenibile
+devco, 12.a, 4 -
+sustainable production :	 Produzione sostenibile
+devco, 12.a, 5 -
+promote sustainable development :	 Promuovere lo sviluppo sostenibile
+devco, 13.a, 0 -
+Climate Change Fund :	 Fondo dei cambiamenti climatici
+devco, 13.a, 1 -
+Climate Loan :	 Prestito climatico
+devco, 13.a, 2 -
+climate change investments :	 Investimenti dei cambiamenti climatici
+devco, 13.a, 3 -
+Climate Finance :	 Finanza del clima
+devco, 13.a, 4 -
+investments for combating climate change :	 Investimenti per combattere il cambiamento climatico
+devco, 13.b, 0 -
+climate change related planning :	 Pianificazione relativa ai cambiamenti climatici
+devco, 13.b, 1 -
+'addressing climate change :	 Affrontare il cambiamento climatico
+devco, 13.b, 2 -
+capacity climate change :	 Capacità dei cambiamenti climatici
+devco, 13.b, 3 -
+climate change capacity :	 Capacità del cambiamento climatico
+devco, 13.b, 4 -
+climate change planning :	 Pianificazione dei cambiamenti climatici
+devco, 13.b, 5 -
+climate change management :	 Gestione dei cambiamenti climatici
+devco, 13.b, 6 -
+climate change strategy :	 Strategia del cambiamento climatico
+devco, 13.b, 7 -
+climate change adaptation strategy :	 Strategia di adattamento dei cambiamenti climatici
+devco, 13.b, 8 -
+decarbonization strategy :	 Strategia di decarbonizzazione
+devco, 13.b, 9 -
+Plan to tackle climate change :	 Pianifica di affrontare i cambiamenti climatici
+devco, 13.b, 10 -
+effective plan for climate change :	 Piano efficace per i cambiamenti climatici
+devco, 13.b, 11 -
+capacity to address climate change :	 Capacità di affrontare il cambiamento climatico
+devco, 13.b, 12 -
+support for climate change plans :	 Supporto per i piani dei cambiamenti climatici
+devco, 13.b, 13 -
+finance for climate change plans :	 Finanza per i piani dei cambiamenti climatici
+devco, 13.b, 14 -
+technology for climate change plan :	 Tecnologia per il piano dei cambiamenti climatici
+devco, 13.b, 15 -
+capacity for climate change :	 Capacità di cambiamenti climatici
+devco, 13.b, 16 -
+initiatives addressing climate change :	 Iniziative che affrontano i cambiamenti climatici
+devco, 13.b, 17 -
+addressing the negative impacts of climate change :	 Affrontare gli impatti negativi dei cambiamenti climatici
+devco, 13.b, 18 -
+control of climate change impacts :	 Controllo degli impatti dei cambiamenti climatici
+devco, 13.b, 19 -
+support to climate change adaptation and mitigation projects :	 Supporto per i progetti di adattamento e mitigazione dei cambiamenti climatici
+devco, 13.b, 20 -
+support to climate change projects :	 Supporto ai progetti di cambiamenti climatici
+devco, 13.b, 21 -
+management climate change adaptation policies at local level :	 Gestione dei cambiamenti climatici Politiche di adattamento a livello locale
+devco, 13.b, 22 -
+climate change and disaster resilient communities :	 Cambiamenti climatici e comunità resistenti al disastro
+devco, 13.b, 23 -
+climate change resilient communities :	 Comunità resilienti dei cambiamenti climatici
+devco, 13.b, 24 -
+supports the implementation of national environmental and climate change policies at local level :	 Supporta l'attuazione delle politiche nazionali di cambiamenti ambientali e climatici a livello locale
+devco, 13.b, 25 -
+climate change adaptation policies at local level :	 Politiche di adattamento dei cambiamenti climatici a livello locale
+devco, 13.b, 26 -
+support climate change adaptation activities :	 Supporta le attività di adattamento dei cambiamenti climatici
+devco, 13.b, 27 -
+support climate change adaptation policies :	 Supporta le politiche di adattamento dei cambiamenti climatici
+devco, 17.3, 0 -
+foreign direct investment :	 investimenti diretti esteri
+devco, 17.3, 1 -
+fdi :	 FDI
+devco, 17.3, 2 -
+financial assistance :	 assistenza finanziaria
+devco, 17.3, 3 -
+financial support :	 sostegno finanziario
+devco, 17.3, 4 -
+remittances :	 rimesse
+devco, 17.3, 5 -
+mobilize resource :	 Mobilize risorse
+devco, 17.3, 6 -
+mobilize financial resource :	 mobilitare risorse finanziarie
+devco, 17.3, 7 -
+resource mobilization :	 Mobilitizzazione delle risorse
+devco, 17.3, 8 -
+oda :	 ODA
+devco, 17.3, 9 -
+official development assistance :	 Assistenza ufficiale allo sviluppo
+devco, 17.4, 0 -
+debt sustainability :	 Sostenibilità del debito
+devco, 17.4, 1 -
+debt policies :	 Politiche del debito
+devco, 17.4, 2 -
+debt service :	 Servizio di debito
+devco, 17.4, 3 -
+sustainable debt :	 debito sostenibile
+devco, 17.4, 4 -
+coordinated debt :	 debito coordinato
+devco, 17.4, 5 -
+debt financing :	 finanziamento del debito
+devco, 17.4, 6 -
+debt restructuring :	 Ristrutturazione del debito
+devco, 17.4, 7 -
+debt relief :	 riduzione del debito
+devco, 17.4, 8 -
+debt distress :	 angoscia del debito
+devco, 17.4, 9 -
+debt reduction :	 riduzione del debito
+devco, 17.4, 10 -
+restructure debt :	 ristrutturare il debito
+devco, 17.4, 11 -
+finance debt :	 Debito finanziario
+devco, 17.4, 12 -
+relief debt :	 debito del rilievo
+devco, 17.4, 13 -
+reduce debt :	 ridurre il debito
+devco, 17.4, 14 -
+reduce external debt :	 Ridurre il debito esterno
+devco, 17.4, 15 -
+unsustainable debt levels :	 Livelli del debito insostenibili
+devco, 17.4, 16 -
+overall debt level reduction :	 riduzione del livello del debito complessivo
+devco, 17.4, 17 -
+debt moratorium :	 Moratorio del debito
+devco, 17.4, 18 -
+debt burden :	 Bonde del debito
+devco, 17.5, 0 -
+investment promotion regime :	 Regime di promozione degli investimenti
+devco, 17.5, 1 -
+foreign direct investment :	 investimenti diretti esteri
+devco, 17.5, 2 -
+finance investment :	 Investimento finanziario
+devco, 17.5, 3 -
+sustainable investment :	 investimenti sostenibili
+devco, 17.5, 4 -
+private investment :	 Investimento privato
+devco, 17.5, 5 -
+supporting investment projects :	 Supportando progetti di investimento
+devco, 17.5, 6 -
+investment facilitation :	 facilitazione degli investimenti
+devco, 17.5, 7 -
+investment attraction :	 Attrazione di investimento
+devco, 17.5, 8 -
+mitigate investment risks :	 mitigare rischi di investimento
+devco, 17.7, 0 -
+knowledge transfer :	 trasferimento di conoscenza
+devco, 17.7, 1 -
+knowledge exchange :	 Scambio della conoscenza
+devco, 17.7, 2 -
+technology transfer :	 trasferimento tecnologico
+devco, 17.7, 3 -
+technology dissemination :	 Disseminazione della tecnologia
+devco, 17.7, 4 -
+technology diffusion :	 diffusione della tecnologia
+devco, 17.7, 5 -
+diffusion of technology :	 diffusione della tecnologia
+devco, 17.7, 6 -
+environmentally sound technologies :	 Tecnologie audio dell'ambiente
+devco, 17.7, 7 -
+clean technology :	 Tecnologia pulita
+devco, 17.7, 8 -
+environmental equipment :	 Attrezzature ambientali
+devco, 17.7, 9 -
+fostering new methodologies for technology development :	 Promuovere nuove metodologie per lo sviluppo della tecnologia
+devco, 17.8, 0 -
+capacity building innovation :	 capacità edificabile innovazione
+devco, 17.8, 1 -
+innovation capacity building :	 Edificio della capacità di innovazione
+devco, 17.8, 2 -
+technology capacity building :	 Costruzione della capacità tecnologica
+devco, 17.8, 3 -
+capacity building technology :	 Capacity Building Technology
+devco, 17.8, 4 -
+internet :	 Internet
+devco, 17.8, 5 -
+technological development :	 sviluppo tecnologico
+devco, 17.8, 6 -
+ict :	 ICT
+devco, 17.8, 7 -
+innovation :	 innovazione
+devco, 17.8, 8 -
+international collaboration on technology :	 Collaborazione internazionale sulla tecnologia
+devco, 17.8, 9 -
+cooperation on information and communications technology :	 Cooperazione sulla tecnologia dell'informazione e delle comunicazioni
+devco, 17.8, 10 -
+cooperation in ICT :	 cooperazione in TIC
+devco, 17.8, 11 -
+collaboration information and communications technology :	 Informazioni sulla collaborazione e tecnologia di comunicazione
+devco, 17.8, 12 -
+collaboration ICT :	 Collaborazione ICT
+devco, 17.8, 13 -
+ICT cooperation :	 Cooperazione ICT
+devco, 17.8, 14 -
+international information and communications technology :	 Informazioni internazionali e tecnologia di comunicazione
+devco, 17.8, 15 -
+technology bank :	 Banca tecnologica
+devco, 17.8, 16 -
+digital capacity building :	 Costruzione di capacità digitale
+devco, 17.8, 17 -
+technology science :	 Scienze tecnologiche
+devco, 17.9, 0 -
+financial assistance :	 assistenza finanziaria
+devco, 17.9, 1 -
+technical assistance :	 assistenza tecnica
+devco, 17.9, 2 -
+north south cooperation :	 Cooperazione a sud del Nord
+devco, 17.9, 3 -
+south south cooperation :	 Cooperazione sud sud
+devco, 17.9, 4 -
+triangular cooperation :	 Cooperazione triangolare
+devco, 17.9, 5 -
+capacity-building :	 Capacità-edificio
+devco, 17.9, 6 -
+national plans to implement the Sustainable Development Goals :	 piani nazionali per attuare gli obiettivi di sviluppo sostenibile
+devco, 17.9, 7 -
+national plans to implement the SDGs :	 piani nazionali per attuare gli SDGS
+devco, 17.9, 8 -
+national plans to implement Sustainable Development :	 piani nazionali per attuare lo sviluppo sostenibile
+devco, 17.9, 9 -
+cooperation on sustainable development :	 Cooperazione sullo sviluppo sostenibile
+devco, 17.9, 10 -
+national sustainable development plan :	 Piano di sviluppo sostenibile nazionale
+devco, 17.9, 11 -
+national sustainable development strategy :	 Strategia nazionale di sviluppo sostenibile
+devco, 17.9, 12 -
+national sustainability plan :	 Piano di sostenibilità nazionale
+devco, 17.9, 13 -
+national sustainability strategy :	 Strategia nazionale di sostenibilità
+devco, 17.11, 0 -
+global export :	 Esportazione globale
+devco, 17.11, 1 -
+increase the exports :	 Aumentare le esportazioni
+devco, 17.11, 2 -
+export increase :	 Aumento dell'esportazione
+devco, 17.11, 3 -
+increase share of exports :	 Aumentare la quota delle esportazioni
+devco, 17.11, 4 -
+boost exports :	 aumenta le esportazioni
+devco, 17.11, 5 -
+improvement in the balance of goods :	 miglioramento nel saldo delle merci
+devco, 17.11, 6 -
+improve trade balance :	 migliorare il bilanciamento del commercio
+devco, 17.12, 0 -
+tariffs faced :	 Le tariffe affrontate
+devco, 17.12, 1 -
+market access :	 accesso al mercato
+devco, 17.12, 2 -
+duty-free market :	 mercato senza duty
+devco, 17.12, 3 -
+quota-free market :	 mercato senza quota
+devco, 17.12, 4 -
+trade agreements :	 trattati commerciali
+devco, 17.12, 5 -
+Aid for Trade Strategy :	 Aiuti per la strategia commerciale
+devco, 17.12, 6 -
+transparent trade rules :	 Regole commerciali trasparenti
+devco, 17.12, 7 -
+duty free coverage :	 copertura libera
+devco, 17.12, 8 -
+quota-free coverage :	 copertura senza quota
+devco, 17.12, 9 -
+greater market access :	 Maggiore accesso al mercato
+devco, 17.12, 10 -
+dfqf market access :	 Accesso al mercato DFQF
+devco, 17.18, 0 -
+capacity building :	 Edificio di capacità
+devco, 17.19, 0 -
+statistical capacity :	 Capacità statistica
+devco, 17.19, 1 -
+birth registration :	 Registrazione della nascita
+devco, 17.19, 2 -
+death registration :	 registrazione della morte
+devco, 17.19, 3 -
+population census :	 censimento della popolazione
+devco, 17.19, 4 -
+income census :	 censimento del reddito
+devco, 17.19, 5 -
+measure progress SDG :	 Misura il progresso SDG
+devco, 17.19, 6 -
+sdg progress measure :	 Misura di progresso SDG
+devco, 17.19, 7 -
+measurement of progress on sustainable development :	 Misurazione dei progressi sullo sviluppo sostenibile
+devco, 17.19, 8 -
+data on sustainable development :	 dati sullo sviluppo sostenibile
+devco, 17.19, 9 -
+measure sustainable development :	 misurare lo sviluppo sostenibile
+devco, 17.19, 10 -
+international cooperation on data collection :	 Cooperazione internazionale sulla raccolta dei dati
+devco, 17.19, 11 -
+Monitoring sustainable development :	 Monitoraggio dello sviluppo sostenibile
+devco, 17.19, 12 -
+evaluating sustainable development :	 Valutare lo sviluppo sostenibile
+devco, 17.19, 13 -
+assess sustainable development :	 valutare lo sviluppo sostenibile
+devco, 17.19, 14 -
+capacity building in statistics :	 Capacità Building in Statistics
+devco, 17.19, 15 -
+housing census :	 censimento abitativo
