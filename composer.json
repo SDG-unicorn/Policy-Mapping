@@ -1,0 +1,14 @@
+{
+    "name": "michelemaroni/policy-mapping",
+    "description": "Python program for SDG mapping processing.",
+    "authors": [
+        {
+            "name": "Michele Maroni",
+            "email": "michele.maroni@ext.ec.europa.eu"
+        },
+        {
+            "name": "Steve Borchardt",
+            "email": "steve.borchardt@ext.ec.europa.eu"
+        }
+    ]
+}
