@@ -11,48 +11,48 @@ import pandas as pd
 #######################################################
 #######################################################
 
-parser = argparse.ArgumentParser(description="""Aggregate mapping results.""")
-parser.add_argument('-i', '--input', help='Input file')
-parser.add_argument('-o', '--output', help='Output directory', default='cwd')
-parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
+# parser = argparse.ArgumentParser(description="""Aggregate mapping results.""")
+# parser.add_argument('-i', '--input', help='Input file')
+# parser.add_argument('-o', '--output', help='Output directory', default='cwd')
+# parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
 
-args = parser.parse_args()
+# args = parser.parse_args()
 
-#get current time
-date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
+# #get current time
+# date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
 
-#for testing/checking df outputs
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
+# #for testing/checking df outputs
+# pd.set_option('display.max_rows', 500)
+# pd.set_option('display.max_columns', 500)
 
-#print all columns
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
+# #print all columns
+# # pd.set_option('display.max_columns', None)
+# # pd.set_option('display.max_rows', None)
 
-input_dir=pathlib.Path(args.input)
+# input_dir=pathlib.Path(args.input)
 
-#read python output
-dat_raw = pd.read_excel(input_dir, sheet_name="Target_raw_count")
-#developing countries rows not needed for DEVCO tool
-#uncomment lines below if you need results from dev_countries count
-# dat_dev_countries = pd.read_excel("results/raw/mapping_EC_Models_docs_2021-01-27_T102743.xlsx", sheet_name="Dev_countries_raw_count")
-# #merge both df's
-# dat_raw = dat_raw.append(dat_dev_countries).reset_index()
-if args.output == 'cwd':
-    out_dir = input_dir.parent / 'aggregated_and_filtered'
-else:
-    out_dir = pathlib.Path(args.output) / f'{input_dir.parent}_aggregated_and_filtered'
+# #read python output
+# dat_raw = pd.read_excel(input_dir, sheet_name="Target_raw_count")
+# #developing countries rows not needed for DEVCO tool
+# #uncomment lines below if you need results from dev_countries count
+# # dat_dev_countries = pd.read_excel("results/raw/mapping_EC_Models_docs_2021-01-27_T102743.xlsx", sheet_name="Dev_countries_raw_count")
+# # #merge both df's
+# # dat_raw = dat_raw.append(dat_dev_countries).reset_index()
+# if args.output == 'cwd':
+#     out_dir = input_dir.parent / 'aggregated_and_filtered'
+# else:
+#     out_dir = pathlib.Path(args.output) / f'{input_dir.parent}_aggregated_and_filtered'
 
-out_dir.mkdir(mode=0o777, parents=True, exist_ok=True)
+# out_dir.mkdir(mode=0o777, parents=True, exist_ok=True)
 
-#read in results from goal count
-goal_counts = pd.read_excel(input_dir, sheet_name="Goal_raw_count")
-# #as keyword detection does not work yet on detecting goal 1,2,3,etc. detected Keyword " goal " needs to be removed from the results
-# goal_counts = goal_counts.loc[goal_counts['Keyword'] != ' goal ']
+# #read in results from goal count
+# goal_counts = pd.read_excel(input_dir, sheet_name="Goal_raw_count")
+# # #as keyword detection does not work yet on detecting goal 1,2,3,etc. detected Keyword " goal " needs to be removed from the results
+# # goal_counts = goal_counts.loc[goal_counts['Keyword'] != ' goal ']
 
-# read in table with list of SDG targets and Goals labels
-# pay attention as goal_df is called in several functions without being used as input argument. 
-# MM Please never do something like this, even if you document it. 
+# # read in table with list of SDG targets and Goals labels
+# # pay attention as goal_df is called in several functions without being used as input argument. 
+# # MM Please never do something like this, even if you document it. 
 goal_df = pd.read_excel("goal_target_list.xlsx", sheet_name="Sheet1")
 #read in descriptions of sdgs
 target_texts = pd.read_csv('SDG-targets.csv')
@@ -340,7 +340,7 @@ def create_json_files_for_bubbleplots(target_df, goal_df): #filename=None ,outpu
 ###################################################
 
 #use this to create a simple df with all SDGs and corresponding Hex colors, needed for creating input files for knowSDGs visualisations
-def create_color_code_table(goal_df):
+def create_color_code_table(goal_df, goal_ls):
     #create list with hex codes for visualisation
     hex_ls = ["#e5243b", "#dda63a", "#4c9f38", "#c5192d", "#ff3a21", "#26bde2", "#fcc30b", "#a21942", "#fd6925", "#dd1367",
               "#fd9d24", "#bf8b2e", "#37e440", "#0a97d9", "#56c02b", "#00689d", "#19486a"]
@@ -456,7 +456,7 @@ def create_json_files_for_sankey_charts(df): # output_path=None
 ##make policy list ready for platform, use output from add_further_info_to_df as input df
 ##functions exports csv table with list of policies
 
-def export_csv_for_policy_list(df, goal_df): # filename=None, output_path=None
+def export_csv_for_policy_list(df, goal_df, goal_ls): # filename=None, output_path=None
     #create unique policy names list
     pol_ls = list(df.Policy.unique())
     goal_ls = list(goal_df.Goal.unique())
@@ -512,7 +512,7 @@ def export_csv_for_policy_list(df, goal_df): # filename=None, output_path=None
 ##function checks which policies addressed the same targets
 
 
-def create_policy_coherence_data(df, goal_df): #  filename=None, output_path=None
+def create_policy_coherence_data(df, goal_df, goal_dict): #  filename=None, output_path=None
     #create df with 2 columns showing all possible combinations of targets
     target_list = goal_df['Target'].tolist()
     target_combinations = pd.DataFrame(columns=['tar_1', 'tar_2'])
@@ -585,29 +585,29 @@ def create_policy_coherence_data(df, goal_df): #  filename=None, output_path=Non
 ####################################
 
 
-def export_dataframes(target_df, filtered_df, target_overview_df, undetected_targets_df, goal_overview_df,pol_per_goal_df, goal_df, filename=None, output_path=out_dir):
+# def export_dataframes(target_df, filtered_df, target_overview_df, undetected_targets_df, goal_overview_df,pol_per_goal_df, goal_df, filename=None, output_path=out_dir):
   
-#   filename = f"processed_results_{date}.xlsx" if filename is None else filename
+# #   filename = f"processed_results_{date}.xlsx" if filename is None else filename
   
-#   if output_path == None:
-#       # root = Tk()
-#       # output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
-#     full_path = pathlib.Path(output_path) / filename
-#   else:
-#     full_path = pathlib.Path.cwd() / filename
-    full_path = pathlib.Path(output_path) / f"processed_results_{date}.xlsx"
-    writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
-    # export final output
-    target_df.to_excel(writer, sheet_name='aggregated_target_level')
-    filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
-    target_overview_df.to_excel(writer, sheet_name='target_overview')
-    undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
-    goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
-    goal_overview_df.to_excel(writer, sheet_name='goal_overview')
-    pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
-    writer.save()
-    print(f"All dataframes were exported as:  {full_path}")
-    return f"All dataframes were exported as:  {full_path}"
+# #   if output_path == None:
+# #       # root = Tk()
+# #       # output_path = filedialog.askdirectory(parent=root, initialdir="/", title='Please select output folder')
+# #     full_path = pathlib.Path(output_path) / filename
+# #   else:
+# #     full_path = pathlib.Path.cwd() / filename
+#     full_path = pathlib.Path(output_path) / f"processed_results_{date}.xlsx"
+#     writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
+#     # export final output
+#     target_df.to_excel(writer, sheet_name='aggregated_target_level')
+#     filtered_df.to_excel(writer, sheet_name='filtered_target_dat')
+#     target_overview_df.to_excel(writer, sheet_name='target_overview')
+#     undetected_targets_df.to_excel(writer, sheet_name='undetected_targets')
+#     goal_df.to_excel(writer, sheet_name='aggregated_goal_level')
+#     goal_overview_df.to_excel(writer, sheet_name='goal_overview')
+#     pol_per_goal_df.to_excel(writer, sheet_name="pol_per_goal")
+#     writer.save()
+#     print(f"All dataframes were exported as:  {full_path}")
+#     return f"All dataframes were exported as:  {full_path}"
 
 
 #####################################
@@ -623,54 +623,54 @@ def export_dataframes(target_df, filtered_df, target_overview_df, undetected_tar
 #######################################################
 #######################################################
 
-# 0.) Coerce Target columns to string
+# # 0.) Coerce Target columns to string
 
-dat_raw['Target'] = stringify_id(dat_raw['Target'])
+# dat_raw['Target'] = stringify_id(dat_raw['Target'])
 
-# 1.) aggregate to target-level --> export this to final results workbook
-target_dat = aggregate_to_targets(dat_raw, goal_df)
+# # 1.) aggregate to target-level --> export this to final results workbook
+# target_dat = aggregate_to_targets(dat_raw, goal_df)
 
-# 2.) filter data according to specififed criteria --> export this to final results workbook
-dat_filtered = filter_data(target_dat)
+# # 2.) filter data according to specififed criteria --> export this to final results workbook
+# dat_filtered = filter_data(target_dat)
 
-# 3.) get overview on target-level --> export this to final results workbook
-target_overview_df = get_target_overview(target_dat, goal_df)
+# # 3.) get overview on target-level --> export this to final results workbook
+# target_overview_df = get_target_overview(target_dat, goal_df)
 
-# 4.) get undetected targets --> export this to final results workbook
-undetected_targets = find_undetected_targets(dat_filtered, goal_df)
+# # 4.) get undetected targets --> export this to final results workbook
+# undetected_targets = find_undetected_targets(dat_filtered, goal_df)
 
-# 5.)  aggregate goal counts to goal-level --> export this to final results workbook
-goal_dat = aggregate_to_goals(goal_counts) #MM What if no goals are detected? We need to handle this scenario
+# # 5.)  aggregate goal counts to goal-level --> export this to final results workbook
+# goal_dat = aggregate_to_goals(goal_counts) #MM What if no goals are detected? We need to handle this scenario
 
-# 6.) get goal_overview from target counts and goal counts --> export this to final results workbook
-goal_overview = get_goal_overview(target_dat, goal_dat, goal_df)
+# # 6.) get goal_overview from target counts and goal counts --> export this to final results workbook
+# goal_overview = get_goal_overview(target_dat, goal_dat, goal_df)
 
-# 7.) get goal overview but not with aggregated counts but with number of policies relating to a goal
-policies_per_goal = get_number_of_policies_per_goal(target_dat, goal_dat, goal_df)
+# # 7.) get goal overview but not with aggregated counts but with number of policies relating to a goal
+# policies_per_goal = get_number_of_policies_per_goal(target_dat, goal_dat, goal_df)
 
-# 8.) create and export json files for bubblecharts on knowSDGs platform ## Fix this
-#create_json_files_for_bubbleplots(target_overview_df, goal_overview)
+# # 8.) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+# #create_json_files_for_bubbleplots(target_overview_df, goal_overview)
 
-# 9.) create df containing SDG labels and corresponding color hex codes
-color_df = create_color_code_table(goal_df)
+# # 9.) create df containing SDG labels and corresponding color hex codes
+# color_df = create_color_code_table(goal_df)
 
-#MM 11,12,13 for the moment not needed
+# #MM 11,12,13 for the moment not needed
 
-# 10.) add more info to policies, make sure to create color df first
-#info_added_df = add_further_info_to_df(dat_filtered)
+# # 10.) add more info to policies, make sure to create color df first
+# #info_added_df = add_further_info_to_df(dat_filtered)
 
-# 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
-#create_json_files_for_sankey_charts(info_added_df)
+# # 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
+# #create_json_files_for_sankey_charts(info_added_df)
 
-# 12.) export csv table with list of policies (second viz on knowSDGs platform = List of Policies)
-#policy_df = export_csv_for_policy_list(info_added_df)
+# # 12.) export csv table with list of policies (second viz on knowSDGs platform = List of Policies)
+# #policy_df = export_csv_for_policy_list(info_added_df)
 
-# 13.) create and export policy coherence df (third viz knowSDGs platform)
-# pol_coher_df=create_policy_coherence_data(dat_filtered, goal_df)#output_path=out_dir
-# pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
+# # 13.) create and export policy coherence df (third viz knowSDGs platform)
+# # pol_coher_df=create_policy_coherence_data(dat_filtered, goal_df)#output_path=out_dir
+# # pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
-# 14.) exoport all df's on results to one Excel workbook
-export_dataframes(target_dat, dat_filtered, target_overview_df, undetected_targets, goal_dat, goal_overview, policies_per_goal, output_path=out_dir)
+# # 14.) exoport all df's on results to one Excel workbook
+# export_dataframes(target_dat, dat_filtered, target_overview_df, undetected_targets, goal_dat, goal_overview, policies_per_goal, output_path=out_dir)
 
 
 #######################################################

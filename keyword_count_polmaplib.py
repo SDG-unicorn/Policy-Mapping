@@ -7,6 +7,7 @@ from whoosh.lang.porter import stem
 
 ##MM imports
 import polmap.polmap as plmp
+import polmap.postprocess as pspr
 
 
 ######################################
@@ -107,20 +108,6 @@ for sheet in keywords_sheets:
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
 
-# keys = pd.read_excel(keywords_excel, sheet_name= 'Target_keys' ) 
-# goal_keys = pd.read_excel(keywords_excel, sheet_name= 'Goal_keys' )
-# dev_count_keys = pd.read_excel(keywords_excel, sheet_name= 'MOI' )
-
-# keys['Keys']=keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
-# goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
-# dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
-
-# keys['Keys']=keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
-# goal_keys['Keys']=goal_keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
-# dev_count_keys['Keys']=dev_count_keys['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
-
-##Country names
-#countries_in = pd.read_excel(keywords_excel, sheet_name= 'developing_countries') #MM 'keys_from_RAKE-GBV_DB_SB_v3.xlsx', sheet_name= 'developing_countries'
 countries = keywords['developing_countries']['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -136,11 +123,6 @@ with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
     for sheetname in keywords_sheets:
         keywords[sheetname].to_excel(_destfile, sheet_name=sheetname)
     pd.DataFrame(country_ls,columns=['Name']).to_excel(_destfile, sheet_name='dev_countries_kwrds')
-
-# keys.to_excel(keywords_filename, sheet_name='Targets_kwrds')
-# goal_keys.to_excel(keywords_filename, sheet_name='Goal_kwrds')
-# dev_count_keys.to_excel(keywords_filename, sheet_name='MOI_kwrds')
-# keywords_filename.save()
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -221,33 +203,17 @@ step += 1
 start_time = time.time()
 
 for policy, text in doc_texts.items():
-    #detect soft hyphen that separates words
-    stemmed_text = text.replace('. ', ' . ') # item[1] = re.sub(r'([a-z])([-:,;])(\s)', r'\1 \2\3', item[1])
+    stemmed_text = text.replace('. ', ' . ')
     stemmed_text = re.sub(r'-\n', '', stemmed_text)
-    #item[1] = re.sub(r'(\w+)\n(\w+)', r'\1 \2', item[1]) #remove line returns between words
-    # item[1] = [re.sub(r'-\n', '', t) for t in item[1].split()]
-    # #get indices of soft hyphens
-    # indices = [i for i, s in enumerate(item[1]) if '\xad' in s]
-    # #merge the separated words
-    # for index in indices:
-    #     item[1][index] = item[1][index].replace('\xad', '')
-    #     item[1][index+1] = item[1][index]+item[1][index+1]
-    # #remove unnecessary list elements
-    # for index in sorted(indices, reverse=True):
-    #     del item[1][index]
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
-    #item[1] = item[1].replace(' . ', ' . \n')
-    #save out
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_stemmed.txt')
-
     with open(item_path, 'w', encoding='utf-8') as stemdoctext:
-           stemdoctext.write(f'{stemmed_text}\n\nTextlenght: {len(stemmed_text)}')
-    #Append textlenght
-    doc_texts[policy] = { 'text' : text, 'stemmed_text': stemmed_text, 'textlenght' : len(stemmed_text)} #MM @
+           stemdoctext.write(f'{stemmed_text}\n\ntextlength: {len(stemmed_text)}')
+    #Append textlength
+    doc_texts[policy] = { 'text' : text, 'stemmed_text': stemmed_text, 'textlength' : len(stemmed_text)} #MM @
 
-#pprint.pprint(doc_texts)
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -280,7 +246,7 @@ for policy, item in doc_texts.items():
                 #write counter together with target, policy, keyword as new row in df
                 #first write output to list
                 if counter > 0:
-                    row=[policy, target, keyword, counter, item['textlenght']]
+                    row=[policy, target, keyword, counter, item['textlength']]
                     target_ls.append(row)
                     doc_target_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
@@ -328,7 +294,7 @@ for policy, item in doc_texts.items():
                 #write counter together with target, policy, keyword as new row in df
                 #first write output to list
                 if counter > 0:
-                    row=[policy, goal, keyword, counter, item['textlenght']]
+                    row=[policy, goal, keyword, counter, item['textlength']]
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
@@ -381,9 +347,9 @@ for policy, item in doc_texts.items():
         dfObj.to_excel(destfile, sheet_name='Dev_countries_raw_count')
         destfile.save()
 
-final_df = pd.DataFrame(moi_ls, columns=dev_countries_colnames)
 
-final_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+moi_df = pd.DataFrame(moi_ls, columns=dev_countries_colnames)
+moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -391,7 +357,7 @@ with open(log_file, 'a') as f:
     )
 
 #policies for which no keys were detected
-detected_pol = final_df['Policy'].tolist()
+detected_pol = moi_df['Policy'].tolist()
 
 writer.save()
 
@@ -401,4 +367,82 @@ with open(log_file, 'a') as f:
         f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.'
         )
 
-print(f'Step {step}: Counted keywords in texts.')
+print(f'Step {step}: Counted keywords in texts.\n')
+step += 1
+
+
+######################################
+########### 7) Postprocessing of keyword count
+
+start_time = time.time()
+
+target_df['Target'] = pspr.stringify_id(target_df['Target'])
+
+results_dict = {}
+
+sdg_df=pspr.goal_df #MM We need to think of a better naming for that DF.
+
+## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
+results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)
+
+## 7.2) Filter out target counts based on number of counts, number of keywords and textlenght --> export this to final results workbook
+results_dict['dat_filtered'] = pspr.filter_data(results_dict['target_dat'])
+
+## 7.3) get overview on target-level --> export this to final results workbook
+results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['target_dat'], sdg_df)
+
+## 7.4) get undetected targets --> export this to final results workbook
+results_dict['undetected_targets'] = pspr.find_undetected_targets(results_dict['dat_filtered'], sdg_df)
+
+## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
+results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df) #MM What if no goals are detected? We need to handle this scenario
+
+# 7.6) get goal_overview from target counts and goal counts --> export this to final results workbook
+results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+
+# 7.7) get goal overview but not with aggregated counts but with number of policies relating to a goal
+policies_per_goal = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+
+sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)']
+
+sheetnames = { df : sheetname for df, sheetname in zip(results_dict.keys(), sheetnames_list)}
+
+mappingresults_destfile = results_dir / f'results_{project_title}.xlsx'
+
+with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as destfile:
+    for df, sheetname in zip(results_dict.values(), sheetnames.values()):
+        df.to_excel(destfile, sheet_name=sheetname)
+
+
+with open(log_file, 'a') as f:
+    f.write( 
+        f'- Analyzing results and preparing summary tables: {time.time()-start_count_time:.3e} seconds.'
+        )
+
+print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}')
+step += 1
+
+######################################
+########### 8) Create JSON files for visualization
+
+# # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+# #create_json_files_for_bubbleplots(target_overview_df, goal_overview)
+
+# # 8.2) create df containing SDG labels and corresponding color hex codes8
+# color_df = create_color_code_table(sdg_df)
+
+# #MM 11,12,13 for the moment not needed
+
+# # 10.) add more info to policies, make sure to create color df first
+# #info_added_df = add_further_info_to_df(dat_filtered)
+
+# # 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
+# #create_json_files_for_sankey_charts(info_added_df)
+
+# # 12.) export csv table with list of policies (second viz on knowSDGs platform = List of Policies)
+# #policy_df = export_csv_for_policy_list(info_added_df)
+
+# # 13.) create and export policy coherence df (third viz knowSDGs platform)
+# # pol_coher_df=create_policy_coherence_data(dat_filtered, sdg_df)#output_path=out_dir
+# # pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
+
