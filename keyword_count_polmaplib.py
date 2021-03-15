@@ -204,7 +204,8 @@ start_time = time.time()
 
 for policy, text in doc_texts.items():
     stemmed_text = text.replace('. ', ' . ')
-    stemmed_text = re.sub(r'-\n', '', stemmed_text)
+    stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
+    stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
