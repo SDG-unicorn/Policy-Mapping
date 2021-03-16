@@ -107,6 +107,7 @@ stop_words.remove('all')
 for sheet in keywords_sheets:
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+    #keywords[sheet]=keywords[sheet].applymap(lambda keyword: plmp.preprocess_text(keyword, stop_words))
 
 countries = keywords['developing_countries']['Name'].values.tolist()
 country_ls = []
