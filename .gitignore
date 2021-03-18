@@ -1,3 +1,4 @@
+#
 *.xlsx
 !keywords/keywords.xlsx
 !keywords/validated_translation/*.xlsx
