@@ -18,7 +18,7 @@ The results are provided for both the whole run and for each documents, together
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='output')
 parser.add_argument('-k', '--keywords', help='Keywords file', default='keywords/keywords.xlsx')
-parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
+parser.add_argument('-lo', '--label_output', help='Label parent output directory and outputfiles with {input dir name}_{timestamp}', type=bool, default=False)
 
 args = parser.parse_args()
 
@@ -32,13 +32,13 @@ print(f"Input folder is: \n{input_dir}\n")
 step = 1
 
 ## 1.a) Create output folder structure based on input name, date and time of exectution
+if args.label_output:
+    timestamp = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
+else:
+    timestamp = ''
 
-timestamp = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
-
-if args.output == 'output' and args.add_timestamp:
+if args.output == 'output':
     output_directory = pathlib.Path(args.output) / f'{input_dir.name}_{timestamp}' #if args.output is not None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
-elif args.output != 'output' and args.add_timestamp:
-    output_directory = pathlib.Path(args.output+f'_{timestamp}')
 else:
     output_directory = pathlib.Path(args.output)
 
@@ -53,10 +53,13 @@ for directory in outdirtree_dict.values():
 
 if all(directory.is_dir() for directory in outdirtree_dict.values()):
     print('Output directories succesfully created.\n')
-    
-project_title=outdirtree_dict['out_dir'].name
 
-out_dir, log_dir, results_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir = outdirtree_dict.values()
+if args.label_output:
+    project_title=f'{input_dir.name}_{timestamp}'
+else:
+    project_title=''
+
+out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir, results_dir, = outdirtree_dict.values()
 
 print(f"Output folder is: \n{out_dir}\n")
 
@@ -170,7 +173,7 @@ step += 1
 ########### 4) Check for and extract references to SDG agenda in text
 start_time = time.time()
 
-with open(results_dir / f'{project_title}_Agenda2030_references.json','a') as refs_file:
+with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as refs_file:
 
     references_dict = {}
 
