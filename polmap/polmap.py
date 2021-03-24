@@ -36,17 +36,17 @@ def make_dirtree(output_directory):
     Define a dictionary representing output directory tree.
     """
 
-    output_directory = pathlib.Path(output_directory)
+    output_directory = pathlib.Path(output_directory) / 'output'
 
     directory_dict = {
         'out_dir' : output_directory ,
-        'log_dir' : output_directory / 'logs' ,
-        'results_dir' : output_directory / 'results' ,
+        'log_dir' : output_directory / '0-logs' ,
         'processed_keywords_dir' : output_directory / '1-processed_keywords' ,
         'doctext_dir' : output_directory / '2-doctext' ,
         'references_dir' : output_directory / '3-references',
         'doctext_stemmed_dir' : output_directory / '4-doctext_stemmed' ,        
-        'keyword_count_dir' : output_directory / '5-keyword_count'
+        'keyword_count_dir' : output_directory / '5-keyword_count',
+        'results_dir' : output_directory / '6-results' 
     }
 
     return directory_dict
