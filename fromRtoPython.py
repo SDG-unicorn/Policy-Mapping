@@ -1,11 +1,9 @@
-import pandas as pd
-import pathlib , json
+import pathlib , argparse, json
 import datetime as dt
-from tkinter import filedialog
-from tkinter import *
-from nltk import tokenize
-
-
+import pandas as pd
+# from tkinter import filedialog
+# from tkinter import *
+# from nltk import tokenize
 
 #######################################################
 #######################################################
@@ -13,7 +11,12 @@ from nltk import tokenize
 #######################################################
 #######################################################
 
+parser = argparse.ArgumentParser(description="""Aggregate mapping results.""")
+parser.add_argument('-i', '--input', help='Input file')
+parser.add_argument('-o', '--output', help='Output directory', default='cwd')
+parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
 
+args = parser.parse_args()
 
 #get current time
 date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
@@ -22,27 +25,30 @@ date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-
-
 #print all columns
 # pd.set_option('display.max_columns', None)
 # pd.set_option('display.max_rows', None)
 
+input_dir=pathlib.Path(args.input)
 
 #read python output
-dat_raw = pd.read_excel("output/RRP_it-english_translation_2021-03-04_T161911/results/mapping_RRP_it-english_translation_2021-03-04_T161911.xlsx", sheet_name="Target_raw_count")
+dat_raw = pd.read_excel(input_dir, sheet_name="Target_raw_count")
 #developing countries rows not needed for DEVCO tool
 #uncomment lines below if you need results from dev_countries count
 # dat_dev_countries = pd.read_excel("results/raw/mapping_EC_Models_docs_2021-01-27_T102743.xlsx", sheet_name="Dev_countries_raw_count")
 # #merge both df's
 # dat_raw = dat_raw.append(dat_dev_countries).reset_index()
+if args.output == 'cwd':
+    out_dir = input_dir.parent / 'aggregated_and_filtered'
+else:
+    out_dir = pathlib.Path(args.output) / f'{input_dir.parent}_aggregated_and_filtered'
 
-out_dir='output/RRP_it-english_translation_2021-03-04_T161911/results/'
+out_dir.mkdir(mode=0o777, parents=True, exist_ok=True)
 
 #read in results from goal count
-goal_counts = pd.read_excel("output/RRP_it-english_translation_2021-03-04_T161911/results/mapping_RRP_it-english_translation_2021-03-04_T161911.xlsx", sheet_name="Goal_raw_count")
-#as keyword detection does not work yet on detecting goal 1,2,3,etc. detected Keyword " goal " needs to be removed from the results
-goal_counts = goal_counts.loc[goal_counts['Keyword'] != ' goal ']
+goal_counts = pd.read_excel(input_dir, sheet_name="Goal_raw_count")
+# #as keyword detection does not work yet on detecting goal 1,2,3,etc. detected Keyword " goal " needs to be removed from the results
+# goal_counts = goal_counts.loc[goal_counts['Keyword'] != ' goal ']
 
 # read in table with list of SDG targets and Goals labels
 # pay attention as goal_df is called in several functions without being used as input argument. 
@@ -72,6 +78,9 @@ goal_dict = dict(zip(goal_ls, goal_texts))
 #######################################################
 #######################################################
 
+def stringify_id(pd_id_column, type=str):
+    pd_id_column = pd_id_column.astype(type)
+    return pd_id_column
 
 ######################
 ##############################
@@ -614,6 +623,10 @@ def export_dataframes(target_df, filtered_df, target_overview_df, undetected_tar
 #######################################################
 #######################################################
 
+# 0.) Coerce Target columns to string
+
+dat_raw['Target'] = stringify_id(dat_raw['Target'])
+
 # 1.) aggregate to target-level --> export this to final results workbook
 target_dat = aggregate_to_targets(dat_raw, goal_df)
 
@@ -627,7 +640,7 @@ target_overview_df = get_target_overview(target_dat, goal_df)
 undetected_targets = find_undetected_targets(dat_filtered, goal_df)
 
 # 5.)  aggregate goal counts to goal-level --> export this to final results workbook
-goal_dat = aggregate_to_goals(goal_counts)
+goal_dat = aggregate_to_goals(goal_counts) #MM What if no goals are detected? We need to handle this scenario
 
 # 6.) get goal_overview from target counts and goal counts --> export this to final results workbook
 goal_overview = get_goal_overview(target_dat, goal_dat, goal_df)
@@ -635,11 +648,13 @@ goal_overview = get_goal_overview(target_dat, goal_dat, goal_df)
 # 7.) get goal overview but not with aggregated counts but with number of policies relating to a goal
 policies_per_goal = get_number_of_policies_per_goal(target_dat, goal_dat, goal_df)
 
-# 8.) create and export json files for bubblecharts on knowSDGs platform
+# 8.) create and export json files for bubblecharts on knowSDGs platform ## Fix this
 #create_json_files_for_bubbleplots(target_overview_df, goal_overview)
 
 # 9.) create df containing SDG labels and corresponding color hex codes
 color_df = create_color_code_table(goal_df)
+
+#MM 11,12,13 for the moment not needed
 
 # 10.) add more info to policies, make sure to create color df first
 #info_added_df = add_further_info_to_df(dat_filtered)
@@ -651,8 +666,8 @@ color_df = create_color_code_table(goal_df)
 #policy_df = export_csv_for_policy_list(info_added_df)
 
 # 13.) create and export policy coherence df (third viz knowSDGs platform)
-pol_coher_df=create_policy_coherence_data(dat_filtered, goal_df)#output_path=out_dir
-pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
+# pol_coher_df=create_policy_coherence_data(dat_filtered, goal_df)#output_path=out_dir
+# pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
 # 14.) exoport all df's on results to one Excel workbook
 export_dataframes(target_dat, dat_filtered, target_overview_df, undetected_targets, goal_dat, goal_overview, policies_per_goal, output_path=out_dir)
