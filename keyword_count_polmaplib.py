@@ -385,7 +385,7 @@ target_df['Target'] = pspr.stringify_id(target_df['Target'])
 
 results_dict = {}
 
-sdg_df=pspr.goal_df #MM We need to think of a better naming for that DF.
+sdg_df=pspr.sdg_reference_df #MM We need to think of a better naming for that DF.
 
 ## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
 results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)
@@ -400,22 +400,31 @@ results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['targ
 results_dict['undetected_targets'] = pspr.find_undetected_targets(results_dict['dat_filtered'], sdg_df)
 
 ## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
-results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df) #MM What if no goals are detected? We need to handle this scenario
+results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if no goals are detected? We need to handle this scenario
 
 # 7.6) get goal_overview from target counts and goal counts --> export this to final results workbook
 results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
-# 7.7) get goal overview but not with aggregated counts but with number of policies relating to a goal
-policies_per_goal = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+# 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
+results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], pspr.sdg_reference_df)
 
-sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)']
+# 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
+results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
 
-sheetnames = { df : sheetname for df, sheetname in zip(results_dict.keys(), sheetnames_list)}
+
+# sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_by_document', 'total_count']
+
+# sheetnames = { df : sheetname for df, sheetname in zip(list(results_dict.keys()), sheetnames_list)}
+
+# pprint.pprint(sheetnames)
 
 mappingresults_destfile = results_dir / f'results_{project_title}.xlsx'
 
 with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as destfile:
-    for df, sheetname in zip(results_dict.values(), sheetnames.values()):
+    for sheetname, df in results_dict.items():#zip( sheetnames.values()):
+
+        #print(f'\n{} - {}')
+
         df.to_excel(destfile, sheet_name=sheetname)
 
 

@@ -1,5 +1,6 @@
 *.xlsx
 !keywords/*.xlsx
+!keywords/goal_target_list.xlsx
 !Reproducible_example_EUR-Lex.xlsx
 input/
 output/
