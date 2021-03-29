@@ -68,8 +68,14 @@ print(f"Output folder is: \n{out_dir}\n")
 
 allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] # ['.doc','.docx'] # 
 
-files = sorted(input_dir.glob('**/*.*'))
-files = [ file for file in files if file.suffix in allowed_filetypes]
+if input_dir.is_dir(): 
+    files = sorted(input_dir.glob('**/*.*'))
+    files = [ file for file in files if file.suffix in allowed_filetypes]
+elif input_dir.is_file():
+    files = [input_dir]
+
+if not (files or input_dir.exists()):
+    raise ValueError((f'{input_dir} yields an empty file list. Check if input exists or is not empty'))
 
 policy_documents = pd.DataFrame(files, columns=['Input_files'])
 policy_documents.index = policy_documents.index + 1
