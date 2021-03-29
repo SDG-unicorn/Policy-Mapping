@@ -1,4 +1,4 @@
-import re, json, pathlib, logging, time, argparse, pprint
+import argparse, json, logging, pathlib, pprint, re, time
 import datetime as dt
 from nltk.corpus import stopwords
 import pandas as pd
@@ -7,7 +7,7 @@ from whoosh.lang.porter import stem
 
 ##MM imports
 import polmap.polmap as plmp
-import polmap.postprocess as pspr
+import postprocess.postprocess as pspr
 
 
 ######################################
@@ -18,6 +18,7 @@ The results are provided for both the whole run and for each documents, together
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='output')
 parser.add_argument('-k', '--keywords', help='Keywords file', default='keywords/keywords.xlsx')
+parser.add_argument('-ref', '--sdg_reftable', help='SDG reference table file', default='postprocess/goal_target_list.xlsx')
 parser.add_argument('-lo', '--label_output', help='Label parent output directory and outputfiles with {input dir name}_{timestamp}', type=bool, default=False)
 
 args = parser.parse_args()
@@ -385,7 +386,8 @@ target_df['Target'] = pspr.stringify_id(target_df['Target'])
 
 results_dict = {}
 
-sdg_df=pspr.sdg_reference_df #MM We need to think of a better naming for that DF.
+#sdg_df=pspr.sdg_reference_df #MM we need to have that file available whenever running the script from other locations.
+sdg_df=pd.read_excel(args.sdg_reftable)
 
 ## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
 results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)
@@ -406,7 +408,7 @@ results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if 
 results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
-results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], pspr.sdg_reference_df)
+results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])

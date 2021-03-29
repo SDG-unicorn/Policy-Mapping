@@ -34,7 +34,7 @@ import os
 
 
 #reference table with all goals, targets, id's, descriptions, hexcolorcodes
-sdg_reference_df = pd.read_excel("polmap/goal_target_list.xlsx", sheet_name="Sheet1")
+#sdg_reference_df = pd.read_excel("polmap/goal_target_list.xlsx", sheet_name="Sheet1") #MM not the correct way to import files in a module?
 
 #######################################################
 #######################################################
