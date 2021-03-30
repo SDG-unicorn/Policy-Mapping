@@ -46,7 +46,8 @@ def make_dirtree(output_directory):
         'references_dir' : output_directory / '3-references',
         'doctext_stemmed_dir' : output_directory / '4-doctext_stemmed' ,        
         'keyword_count_dir' : output_directory / '5-keyword_count',
-        'results_dir' : output_directory / '6-results' 
+        'results_dir' : output_directory / '6-results',
+        'jsonfiles_dir' : output_directory / '7-json_results'
     }
 
     return directory_dict

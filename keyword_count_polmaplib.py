@@ -60,7 +60,7 @@ if args.label_output:
 else:
     project_title=''
 
-out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir, results_dir, = outdirtree_dict.values()
+out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir, results_dir, jsonfiles_dir = outdirtree_dict.values()
 
 print(f"Output folder is: \n{out_dir}\n")
 
@@ -447,19 +447,20 @@ step += 1
 ######################################
 ########### 8) Create JSON files for visualization
 
-# # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
-# #create_json_files_for_bubbleplots(target_overview_df, goal_overview)
+# 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'], results_dict['goal_overview'])
+bubble_path = jsonfiles_dir / 'bubblechart.json'
+print(bubble_path)
+with bubble_path.open(mode='w', encoding='utf-8') as f:
+    json.dump(bubbleplot_dict, f)
 
-# # 8.2) create df containing SDG labels and corresponding color hex codes8
-# color_df = create_color_code_table(sdg_df)
+#MM 11,12,13 for the moment not needed
 
-# #MM 11,12,13 for the moment not needed
-
-# # 10.) add more info to policies, make sure to create color df first
-# #info_added_df = add_further_info_to_df(dat_filtered)
-
-# # 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
-# #create_json_files_for_sankey_charts(info_added_df)
+# 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
+# sankeychart_dict=pspr.create_json_files_for_sankey_charts(results_dict['info_added_df'])
+# sankeychart_path = jsonfiles_dir / 'sankeychart.json'
+# with sankeychart_path.open(mode='w', encoding='utf-8') as f:
+#     json.dump(sankeychart_dict, f)
 
 # # 12.) export csv table with list of policies (second viz on knowSDGs platform = List of Policies)
 # #policy_df = export_csv_for_policy_list(info_added_df)
