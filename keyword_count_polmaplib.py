@@ -1,5 +1,6 @@
 import argparse, json, logging, pathlib, pprint, re, time
 import datetime as dt
+import importlib.resources as rsrc
 from nltk.corpus import stopwords
 import pandas as pd
 #from nltk.tokenize import word_tokenize
@@ -17,8 +18,8 @@ Given a set of keywords, and a set of pdf, docx and html documents in a director
 The results are provided for both the whole run and for each documents, together with the raw and stemmed text of the documents and keywords.""")
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='output')
-parser.add_argument('-k', '--keywords', help='Keywords file', default='keywords/keywords.xlsx')
-parser.add_argument('-ref', '--sdg_reftable', help='SDG reference table file', default='postprocess/goal_target_list.xlsx')
+parser.add_argument('-k', '--keywords', help='Path to keywords file', default=False)
+#parser.add_argument('-ref', '--sdg_reftable', help='SDG reference table file', default='postprocess/goal_target_list.xlsx')
 parser.add_argument('-lo', '--label_output', help='Label parent output directory and outputfiles with {input dir name}_{timestamp}', type=bool, default=False)
 
 args = parser.parse_args()
@@ -102,10 +103,19 @@ step += 1
 ########### 2) MM Read the list of keywords and apply the prepare_keyords text processing function from polmap
 start_time = time.time()
 
-keywords = pd.ExcelFile(args.keywords) # if args.keywords is not None else pathlib.Path('keywords/keywords.xlsx')
+if args.keywords:
+    keywords = pd.ExcelFile(args.keywords)
+    keywords_path = args.keywords
+else:    
+    with rsrc.path("polmap", "keywords.xlsx") as res_path:
+        keywords = pd.ExcelFile(res_path)
+        keywords_path = res_path
+
+    
+ # if args.keywords is not None else pathlib.Path('keywords/keywords.xlsx')
 
 sheets = keywords.sheet_names
-print(f"Reading keywords dataset in {args.keywords}.\nSheets: {', '.join(sheets)}")
+print(f"Reading keywords dataset in {keywords_path}.\nSheets: {', '.join(sheets)}")
 
 keywords = {sheet : keywords.parse(sheet) for sheet in sheets}
 keywords_sheets = ['Target_keys', 'Goal_keys', 'MOI']
@@ -128,7 +138,7 @@ for element in countries:
     element = ' '.join(element)
     country_ls.append(element)
 
-keywords_destfilename = processed_keywords_dir / f'{project_title}_processed_{pathlib.Path(args.keywords).name}'
+keywords_destfilename = processed_keywords_dir / f'{project_title}_processed_{pathlib.Path(keywords_path).name}'
 
 with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
     for sheetname in keywords_sheets:
@@ -137,10 +147,10 @@ with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
 
 with open(log_file, 'a') as f:
     f.write( 
-        f'{step}) Reading and preprocessing keywords in {args.keywords} file: {time.time()-start_time:.3e} seconds\n\n'
+        f'{step}) Reading and preprocessing keywords in {keywords_path} file: {time.time()-start_time:.3e} seconds\n\n'
     )
 
-print(f'Step {step}: Read and processed keywords in {args.keywords} file.\n')
+print(f'Step {step}: Read and processed keywords in {keywords_path} file.\n')
 step += 1
 
 ######################################
@@ -393,7 +403,8 @@ target_df['Target'] = pspr.stringify_id(target_df['Target'])
 results_dict = {}
 
 #sdg_df=pspr.sdg_reference_df #MM we need to have that file available whenever running the script from other locations.
-sdg_df=pd.read_excel(args.sdg_reftable)
+with rsrc.path("postprocess", "goal_target_list.xlsx") as res_path:
+    sdg_df = pd.read_excel(res_path)
 
 ## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
 results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)

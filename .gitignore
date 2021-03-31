@@ -1,7 +1,8 @@
 #
 *.xlsx
 !postprocess/goal_target_list.xlsx
-!keywords/keywords.xlsx
+!polmap/keywords.xlsx
+!polmap/keywords.xlsx
 !keywords/validated_translation/*.xlsx
 !keywords/mapping_keysets/*.xlsx
 keywords/machine_translation/*.*
