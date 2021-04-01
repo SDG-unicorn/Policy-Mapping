@@ -187,6 +187,9 @@ def SDGrefs_mapper(document_text, refs_keywords=None):
     refs_sentences = {}
     for sentence in document_sentences:
         if any(ref_keyword in sentence for ref_keyword in refs_keywords):
-            refs_sentences[sentence.capitalize()] = ', '.join([ref_keyword.capitalize() for ref_keyword in refs_keywords if ref_keyword in sentence])        
+            tagged_sentence = sentence
+            for ref_keyword in refs_keywords:
+                tagged_sentence=tagged_sentence.replace(ref_keyword, f'<span>{ref_keyword}</span>')
+            refs_sentences[tagged_sentence.capitalize()] = ', '.join([f'<span>{ref_keyword.capitalize()}</span>' for ref_keyword in refs_keywords if ref_keyword in sentence])        
     
     return refs_sentences
