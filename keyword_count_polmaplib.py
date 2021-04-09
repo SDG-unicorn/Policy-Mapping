@@ -392,6 +392,8 @@ with open(log_file, 'a') as f:
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
 
+# target_df.to_pickle("gd_target_df.pkl")
+# goal_df.to_pickle("gd_goal_df.pkl")
 
 ######################################
 ########### 7) Postprocessing of keyword count
@@ -459,7 +461,7 @@ step += 1
 ########### 8) Create JSON files for visualization
 
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
-bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'], results_dict['goal_overview'])
+bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_dat'], results_dict['goal_overview'])
 bubble_path = jsonfiles_dir / 'bubblechart.json'
 print(bubble_path)
 with bubble_path.open(mode='w', encoding='utf-8') as f:
