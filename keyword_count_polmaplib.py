@@ -392,6 +392,8 @@ with open(log_file, 'a') as f:
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
 
+# target_df.to_pickle("gd_target_df.pkl")
+# goal_df.to_pickle("gd_goal_df.pkl")
 
 ######################################
 ########### 7) Postprocessing of keyword count
