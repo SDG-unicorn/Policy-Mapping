@@ -432,6 +432,12 @@ results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goalovervi
 # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
 
+# 7.9) get list of priorities
+results_dict['priorities'] = pspr.map_pol_priorities(results_dict['target_dat'], sdg_df)
+
+
+sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
+
 
 # sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_by_document', 'total_count']
 
