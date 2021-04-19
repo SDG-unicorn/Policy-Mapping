@@ -115,7 +115,7 @@ else:
  # if args.keywords is not None else pathlib.Path('keywords/keywords.xlsx')
 
 sheets = keywords.sheet_names
-print(f"Reading keywords dataset in {keywords_path}.\nSheets: {', '.join(sheets)}")
+print(f"Reading keywords dataset in {keywords_path}.\nSheets: {', '.join(sheets)}\n")
 
 keywords = {sheet : keywords.parse(sheet) for sheet in sheets}
 keywords_sheets = ['Target_keys', 'Goal_keys', 'MOI']
@@ -432,7 +432,7 @@ results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goalovervi
 # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
 
-# 7.9) get list of priorities
+# # 7.9) get list of priorities
 results_dict['priorities'] = pspr.map_pol_priorities(results_dict['target_dat'], sdg_df)
 
 
@@ -467,11 +467,31 @@ step += 1
 ########### 8) Create JSON files for visualization
 
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
-bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'], results_dict['goal_overview'])
-bubble_path = jsonfiles_dir / 'bubblechart.json'
-print(bubble_path)
-with bubble_path.open(mode='w', encoding='utf-8') as f:
-    json.dump(bubbleplot_dict, f)
+sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'], results_dict['goal_overview'])
+sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
+with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
+    json.dump(sdg_bubbleplot_dict, f)
+
+
+#To be moved somewhere in modules
+pp_colors={'Human Development':'#F68D4A',
+'Growth Jobs':'#FABE13',
+'Green Deal':'#1A6835',
+'Governance':'#005C95',
+'Digitalisation':'#4D9CD5',
+'Migration':'#DE6189',
+'None':'#000000'
+}
+
+results_dict['priorities'].rename(columns = {'priority':'name', 'Count':'size'}, inplace = True)
+results_dict['priorities']['goal_color']=results_dict['priorities']['name'].map(pp_colors)
+pp_bubbleplot_dict= {'name': 'pp',
+'children': list(results_dict['priorities'].to_dict('index').values())}
+polprior_bubbles = jsonfiles_dir / 'polprior_bubbles.json'
+with polprior_bubbles.open(mode='w', encoding='utf-8') as f:
+    json.dump(pp_bubbleplot_dict, f)
+
+print(jsonfiles_dir)
 
 #MM 11,12,13 for the moment not needed
 
