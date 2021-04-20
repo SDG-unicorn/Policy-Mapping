@@ -579,6 +579,50 @@ def create_policy_coherence_data(df, sdg_references): #filename_policy_coherence
 ##################
 
 
+  
+#########################
+#############################
+################################
+####################################
+
+#########################
+#############################
+################################
+####################################
+
+
+def map_pol_priorities(target_df, sdg_references):
+    #merge references with target_df
+    merged_df = sdg_references.join(target_df.set_index('Target'), on='Target', how="inner", lsuffix='', rsuffix='_right')
+    #group by MAIN priority and sum count of detected keywords
+    main_prio = merged_df.groupby(['MAIN_priority'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+    #rename priority column for append
+    main_prio.rename(columns={'MAIN_priority': 'priority'}, inplace=True)
+    #group by SECONDARY priority and sum count of detected keywords
+    sec_prio = merged_df.groupby(['SEC_priority'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+    #since it is secondary priority multiply by factor 0.5
+    #sec_prio['Count'] = sec_prio['Count'].apply(lambda x: x*0.5)
+    sec_prio.rename(columns={'SEC_priority': 'priority'}, inplace=True)
+    #append both dataframes and regroup and reaggregate counts
+    priority_df = main_prio.append(sec_prio, ignore_index=True)
+    priority_df = priority_df.groupby(['priority'])['Count'].apply(lambda x : x.astype(float).sum()).reset_index()
+    #sort df by count
+    priority_df = priority_df.sort_values(by='Count', ascending=False)
+    return priority_df
+
+
+#####################################
+################################
+############################
+#########################
+
+#####################################
+################################
+############################
+#########################
+ 
+
+
 ##WHAT NEEDS TO BE DONE???
 
 ##in order to make code work with continuous updating of the policy mapping exercise
