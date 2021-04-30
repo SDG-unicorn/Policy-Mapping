@@ -411,6 +411,9 @@ with rsrc.path("keywords", "goal_target_list.xlsx") as res_path:
 ## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
 results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)
 
+results_dict['target_dat_pp'] = results_dict['target_dat'].copy()
+results_dict['target_dat'] = results_dict['target_dat'].drop(columns=['MAIN_priority', 'SEC_priority'])
+
 ## 7.2) Filter out target counts based on number of counts, number of keywords and textlenght --> export this to final results workbook
 results_dict['dat_filtered'] = pspr.filter_data(results_dict['target_dat'])
 
@@ -433,7 +436,7 @@ results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goalovervi
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
 
 # # 7.9) get list of priorities
-results_dict['priorities'] = pspr.map_pol_priorities(results_dict['target_dat'], sdg_df)
+results_dict['priorities'] = pspr.map_target_dat_to_priorities(results_dict['target_dat_pp'], sdg_df)
 
 
 sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
@@ -473,25 +476,31 @@ with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
 
 
+# 8.2) create and export json files for bubblecharts on political priorities
+priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['priorities'])
+priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
+with priority_bubbles.open(mode='w', encoding='utf-8') as f:
+    json.dump(priority_bubbleplot_dict, f)
+
 #To be moved somewhere in modules
-pp_colors={'Human Development':'#F68D4A',
-'Growth Jobs':'#FABE13',
-'Green Deal':'#1A6835',
-'Governance':'#005C95',
-'Digitalisation':'#4D9CD5',
-'Migration':'#DE6189',
-'None':'#000000'
-}
+# pp_colors={'Human Development':'#F68D4A',
+# 'Growth Jobs':'#FABE13',
+# 'Green Deal':'#1A6835',
+# 'Governance':'#005C95',
+# 'Digitalisation':'#4D9CD5',
+# 'Migration':'#DE6189',
+# 'None':'#000000'
+# }
 
-results_dict['priorities'].rename(columns = {'priority':'name', 'Count':'size'}, inplace = True)
-results_dict['priorities']['goal_color']=results_dict['priorities']['name'].map(pp_colors)
-pp_bubbleplot_dict= {'name': 'pp',
-'children': list(results_dict['priorities'].to_dict('index').values())}
-polprior_bubbles = jsonfiles_dir / 'polprior_bubbles.json'
-with polprior_bubbles.open(mode='w', encoding='utf-8') as f:
-    json.dump(pp_bubbleplot_dict, f)
-
-print(jsonfiles_dir)
+# results_dict['priorities'].rename(columns = {'priority':'name', 'Count':'size'}, inplace = True)
+# results_dict['priorities']['goal_color']=results_dict['priorities']['name'].map(pp_colors)
+# pp_bubbleplot_dict= {'name': 'pp',
+# 'children': list(results_dict['priorities'].to_dict('index').values())}
+# polprior_bubbles = jsonfiles_dir / 'polprior_bubbles.json'
+# with polprior_bubbles.open(mode='w', encoding='utf-8') as f:
+#     json.dump(pp_bubbleplot_dict, f)
+#
+# print(jsonfiles_dir)
 
 #MM 11,12,13 for the moment not needed
 

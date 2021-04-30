@@ -591,30 +591,70 @@ def create_policy_coherence_data(df, sdg_references): #filename_policy_coherence
 ####################################
 
 
-def map_pol_priorities(target_df, sdg_references):
-    #merge references with target_df
-    merged_df = sdg_references.join(target_df.set_index('Target'), on='Target', how="inner", lsuffix='', rsuffix='_right')
-    #group by MAIN priority and sum count of detected keywords
-    main_prio = merged_df.groupby(['MAIN_priority'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
-    #rename priority column for append
-    main_prio.rename(columns={'MAIN_priority': 'priority'}, inplace=True)
-    #group by SECONDARY priority and sum count of detected keywords
-    sec_prio = merged_df.groupby(['SEC_priority'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
-    #since it is secondary priority multiply by factor 0.5
-    #sec_prio['Count'] = sec_prio['Count'].apply(lambda x: x*0.5)
-    sec_prio.rename(columns={'SEC_priority': 'priority'}, inplace=True)
-    #append both dataframes and regroup and reaggregate counts
-    priority_df = main_prio.append(sec_prio, ignore_index=True)
-    priority_df = priority_df.groupby(['priority'])['Count'].apply(lambda x : x.astype(float).sum()).reset_index()
-    #sort df by count
-    priority_df = priority_df.sort_values(by='Count', ascending=False)
-    return priority_df
-
+## function for filtering target dat by priority
+def map_target_dat_to_priorities(target_df, sdg_references):
+    #group by first priority column + aggregate to goal, within the grouped priority
+    main_priority_df = target_df.groupby(['MAIN_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+    main_priority_df.rename(columns={'MAIN_priority': 'priority'}, inplace=True)
+    #group by second priority + aggregate to goal, within the grouped priority
+    sec_priority_df = target_df.groupby(['SEC_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+    sec_priority_df.rename(columns={'SEC_priority': 'priority'}, inplace=True)
+    #append both dataframes
+    priority_target_df = main_priority_df.append(sec_priority_df, ignore_index=True)
+    #drop multi-level column index coming from groupby functions
+    priority_target_df.columns = priority_target_df.columns.droplevel(1)
+    priority_target_df = priority_target_df.groupby(['priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+    priority_target_df.columns = priority_target_df.columns.droplevel(1)
+    #add goal information from sdg_references to final output
+    sdg_references = sdg_references.loc[:,['Goal', 'goal_id', 'goal_description', 'goal_color']]
+    #drop duplicates
+    sdg_references = sdg_references.drop_duplicates(ignore_index=True)
+    priority_target_df = sdg_references.join(priority_target_df.set_index('Goal'), on='Goal', how="inner", lsuffix='_left',rsuffix='_right')
+    #make goal_id int for sorting
+    priority_target_df.goal_id = priority_target_df.goal_id.astype(int)
+    priority_target_df = priority_target_df.sort_values(['priority', 'goal_id'],
+                   ascending=[True, True])
+    return priority_target_df
 
 #####################################
 ################################
 ############################
 #########################
+
+#########################
+#############################
+################################
+####################################
+
+
+#function that takes filtered target dat + priority df as input to create bubblecharts
+def create_json_for_priorities(filtered_targets):
+    children_2nd_level = []
+    for item in list(filtered_targets.priority.unique()):
+        #subset dataframe by priority
+        temp_df = filtered_targets.loc[filtered_targets['priority'] == item]
+        temp_df.reset_index(drop=True, inplace=True)
+        #rename columns for json export
+        temp_df = temp_df.rename(columns={'Goal': 'name', 'Count': 'size'})
+        #get sum of priority counts
+        priority_size = temp_df['size'].sum()
+        #make size and goal_id columns str for json export
+        temp_df.loc[:,'size'] = temp_df['size'].astype(str)
+        temp_df.loc[:,'goal_id'] = temp_df['goal_id'].astype(str)
+        #get label for priority
+        priority_name = temp_df.iloc[0]['priority']
+        children_3rd_level = []
+        #drop priority column from temp_df
+        temp_df = temp_df.drop('priority', axis='columns')
+        for i in range(0, len(temp_df['name'])):
+            dict_3rd_level = temp_df.loc[i].to_dict()
+            children_3rd_level.append(dict_3rd_level)
+        dict_2nd_level = {'name':priority_name, 'size': str(priority_size), 'children':children_3rd_level}
+        children_2nd_level.append(dict_2nd_level)
+    final_dict = {"name": 'sdgs', "children": children_2nd_level}
+    return final_dict
+
+
 
 #####################################
 ################################
