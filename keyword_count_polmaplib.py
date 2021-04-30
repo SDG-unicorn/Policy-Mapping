@@ -9,6 +9,7 @@ from whoosh.lang.porter import stem
 ##MM imports
 import polmap.polmap as plmp
 import postprocess.postprocess as pspr
+import keywords as kwrd
 
 
 ######################################
@@ -19,7 +20,6 @@ The results are provided for both the whole run and for each documents, together
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='output')
 parser.add_argument('-k', '--keywords', help='Path to keywords file', default=False)
-#parser.add_argument('-ref', '--sdg_reftable', help='SDG reference table file', default='postprocess/goal_target_list.xlsx')
 parser.add_argument('-lo', '--label_output', help='Label parent output directory and outputfiles with {input dir name}_{timestamp}', type=bool, default=False)
 
 args = parser.parse_args()
@@ -107,7 +107,7 @@ if args.keywords:
     keywords = pd.ExcelFile(args.keywords)
     keywords_path = args.keywords
 else:    
-    with rsrc.path("polmap", "keywords.xlsx") as res_path:
+    with rsrc.path("keywords", "keywords.xlsx") as res_path:
         keywords = pd.ExcelFile(res_path)
         keywords_path = res_path
 
@@ -125,8 +125,8 @@ stop_words = set(stopwords.words('english'))-set(['no','not','nor'])
 stop_words.remove('all')
 
 for sheet in keywords_sheets:
-    keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', keywords))
-    keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(keyword, stop_words) for keyword in keywords.split(';')])
+    keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', str(keywords)))
+    keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(str(keyword), stop_words) for keyword in keywords.split(';')])
     #keywords[sheet].iloc[:,2:]=keywords[sheet].iloc[:,2:].applymap(lambda keyword: plmp.preprocess_text(str(keyword), stop_words))
 
 countries = keywords['developing_countries']['Name'].values.tolist()
@@ -405,7 +405,7 @@ target_df['Target'] = pspr.stringify_id(target_df['Target'])
 results_dict = {}
 
 #sdg_df=pspr.sdg_reference_df #MM we need to have that file available whenever running the script from other locations.
-with rsrc.path("postprocess", "goal_target_list.xlsx") as res_path:
+with rsrc.path("keywords", "goal_target_list.xlsx") as res_path:
     sdg_df = pd.read_excel(res_path)
 
 ## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
