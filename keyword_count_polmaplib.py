@@ -272,6 +272,10 @@ for policy, item in doc_texts.items():
                     target_ls.append(row)
                     doc_target_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
+                elif counter == 0:
+                    row=[policy, target, 'None', counter, item['textlength']]
+                    target_ls.append(row)
+                    doc_target_ls.append(row)
                 else:
                     continue
         dfObj= pd.DataFrame(doc_target_ls, columns=target_col_names)
@@ -320,6 +324,10 @@ for policy, item in doc_texts.items():
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
+                elif counter == 0:
+                    row=[policy, goal, 'None', counter, item['textlength']]
+                    goal_ls.append(row)
+                    doc_goal_ls.append(row)
                 else:
                     continue
         dfObj = pd.DataFrame(doc_goal_ls, columns=goal_col_names)
@@ -365,6 +373,10 @@ for policy, item in doc_texts.items():
                         row = [policy, moi, word, counter, item['textlength']]
                         moi_ls.append(row)
                         doc_moi_ls.append(row)
+                    # elif counter == 0:
+                    #     row = [policy, moi, word, counter, item['textlength']]
+                    #     moi_ls.append(row)
+                    #     doc_moi_ls.append(row)
         dfObj = pd.DataFrame(doc_moi_ls,columns=dev_countries_colnames)
         dfObj.to_excel(destfile, sheet_name='Dev_countries_raw_count')
         destfile.save()

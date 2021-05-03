@@ -83,6 +83,8 @@ def aggregate_to_targets(raw_df, sdg_references):
         policy_id_dict[policy_ls[i]] = i
     #match dict keys with df and add id as new column
     dat_target_level["ID"] = dat_target_level["Policy"].apply(lambda ID: policy_id_dict.get(ID))
+    dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace('None - ', '')
+    dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace(' - None', '')
     return dat_target_level
 
 
@@ -202,8 +204,11 @@ def aggregate_to_goals(goal_level_count, sdg_references):
     dat_goal_level = sdg_references.join(dat_goal_level.set_index('Goal'), on='Goal', how="inner")
     dat_goal_level.drop_duplicates(inplace=True, ignore_index=True)
     dat_goal_level = dat_goal_level.sort_values("Policy")
+    dat_goal_level = dat_goal_level.sort_values(['Policy', 'goal_id'], ascending=[True,True])
     # use filter to drop rows < 2 (or another criteria??)
     # dat_goal_level = dat_goal_level.loc[dat_goal_level['Count'] > 1]
+    dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace('None - ', '')
+    dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace(' - None', '')
     return dat_goal_level
 
 ###########################################
