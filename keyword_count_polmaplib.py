@@ -1,4 +1,4 @@
-import argparse, json, logging, pathlib, pprint, re, time
+import argparse, json, logging, pathlib, pickle, re, time
 import datetime as dt
 import importlib.resources as rsrc
 from nltk.corpus import stopwords
@@ -404,8 +404,11 @@ with open(log_file, 'a') as f:
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
 
-# target_df.to_pickle("gd_target_df.pkl")
-# goal_df.to_pickle("gd_goal_df.pkl")
+# target_df.to_pickle("test_target_df.pkl")
+# goal_df.to_pickle("test_goal_df.pkl")
+
+target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
+goal_df['Group']=goal_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
 
 ######################################
 ########### 7) Postprocessing of keyword count
@@ -442,7 +445,7 @@ results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if 
 results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
-results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+results_dict['goals_grouped_by_document'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
@@ -450,9 +453,12 @@ results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results
 # # 7.9) get list of priorities
 results_dict['priorities'] = pspr.map_target_dat_to_priorities(results_dict['target_dat_pp'], sdg_df)
 
+results_dict['target_dat_by_group'] = pspr.aggregate_to_targets(target_df, sdg_df, grouping_factor='Group')
+results_dict['goal_dat_by_group'] = pspr.aggregate_to_goals(goal_df, sdg_df, grouping_factor='Group')
+results_dict['goals_grouped_by_folder'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat_by_group'], results_dict['goal_dat_by_group'], sdg_df, grouping_factor='Group')
 
-sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
-
+# with open('results.pkl', 'wb') as pkl_f:
+#     pickle.dump(results_dict, pkl_f)
 
 # sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_by_document', 'total_count']
 
@@ -475,7 +481,7 @@ with open(log_file, 'a') as f:
         f'- Analyzing results and preparing summary tables: {time.time()-start_count_time:.3e} seconds.'
         )
 
-print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}')
+print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}\n')
 step += 1
 
 ######################################

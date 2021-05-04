@@ -73,6 +73,9 @@ sdg_color = {label : color for label, color in zip(df['Name'].tolist(),color_ls)
 # whole=[8,205,46,8,2,105,17,97,282,2,18,109,233,89,210,23,31]
 # jrc=[79,436,234,231,19,171,329,706,1959,60,427,450,996,104,230,343,106]
 
+f2f=[1,88,7,0,0,3,7,5,12,1,0,42,23,8,15,0,8]
+
+
 whole=[0,2,0,8,0,1,10,18,124,1,3,48,80,8,6,5,8]
 rd_sl_rrp=[0,1,0,3,0,0,6,12,88,1,2,17,35,0,0,5,4]
 rd_sl_rrp_annex_EN=[0,1,0,5,0,1,4,6,36,0,1,31,45,8,6,0,4]
@@ -92,10 +95,10 @@ X = np.arange(len(whole))
 # # Passing the parameters to the bar function, this is the main function which creates the bar plot
 # # Using X now to align the bars side by side
 #plt.bar(X, whole, color = sdg_color.values(), alpha = 1, width = 0.75)    
-plt.bar(X, rd_sl_rrp, color = sdg_color.values(), alpha = 0.95, width = 0.5)
-plt.bar(X + 0.5, rd_sl_rrp_annex_EN, color = sdg_color.values(), alpha = 0.75, width = 0.5)
+plt.bar(X, f2f, color = sdg_color.values(), alpha = 0.95, width = 0.5)
+#plt.bar(X + 0.5, rd_sl_rrp_annex_EN, color = sdg_color.values(), alpha = 0.75, width = 0.5)
 # Creating the legend of the bars in the plot
-plt.legend(['maindoc+annex', 'rd_sl_rrp', 'rd_sl_rrp_annex'])
+#plt.legend(['maindoc+annex', 'rd_sl_rrp', 'rd_sl_rrp_annex'])
 # Overiding the x axis with the country names
 plt.xticks([i for i in range(0,17,1)], df['Name'].tolist(), fontsize='large', fontweight='bold', rotation=45)
 plt.yticks(fontsize='large', fontweight='bold')
@@ -104,7 +107,7 @@ plt.title("Mentions", fontsize='large', fontweight='bold') #within {path.name}
 # Namimg the x and y axis
 #plt.xlabel('Countries')
 plt.ylabel('Counts',fontsize='large', fontweight='bold')
-plt.savefig('rd_sl_rrp_perdoc.svg', dpi=300)
+plt.savefig('f2f.svg', dpi=600)
 # Saving the plot as a 'png'
 # if save_plot=True:
 #     plt.savefig(svg_filepath_variable)
