@@ -13,7 +13,7 @@ and a (the second) column named 'Keys'where the keys are stored in a single cell
 """)
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='keywords')
-parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
+parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=False)
 
 args = parser.parse_args()
 
@@ -25,20 +25,34 @@ timestamp =  dt.datetime.now().isoformat(timespec='seconds').replace(':','').rep
 if args.add_timestamp is not None:
     filename += f'_{timestamp}'
 
-output = pathlib.Path(args.output) / f'{filename}_expanded.xlsx'
+output = pathlib.Path(args.output) / f'{filename}_collapsed.xlsx'
+
 
 #sheets = a list of sheets where keywords are
 #keys_df = [keywords.parse(sheet) for sheet in sheets]
 keys_dfs = [keywords.parse('Target_keys'), keywords.parse('Goal_keys'), keywords.parse('MOI')]
 
+
 for index, df in enumerate(keys_dfs):
-    df=df.iloc[:, [0,1]]
-    df['Keys']=df['Keys'].apply(lambda keywords: re.sub(';$', '', str(keywords)))
-    df['Keys']=df['Keys'].apply(lambda keywords: re.sub(';;', ';', str(keywords)))
+    #temp_out = pathlib.Path(args.output) / f'{filename}_temp_{index}.xlsx'
     #if translate exectule lines below
-    ex_df=df['Keys'].str.split(';', expand=True)
-    lab_df=df.drop(columns='Keys')
-    keys_dfs[index]=lab_df.join(ex_df)
+
+    col_df=df.iloc[:, 2:].fillna(value=False)
+    col_df=col_df.apply(lambda x: list(filter(None, x)), axis=1)
+    #col_df=col_df.apply(lambda x: filter(None, x))
+    #print(col_df)
+    col_df=col_df.apply(lambda x: ";".join(map(str, x)))
+    # col_df=col_df.str.replace('nan', '')
+    # col_df=col_df.apply(lambda keywords: re.sub(r', ,', '', str(keywords)))
+    # col_df=col_df.apply(lambda keywords: re.sub(r' {2,}', '', str(keywords)))
+    # col_df=col_df.str.replace("', '", ";")
+    # col_df=col_df.str.replace("', ","")
+    # col_df=col_df.apply(lambda keywords: re.sub(r"\['|'\]|\]", '', str(keywords)))
+    #col_df.to_excel(temp_out, engine='xlsxwriter')
+    col_df.rename('Keys', inplace=True)
+    lab_df=df.iloc[:, 1]
+    keys_dfs[index] = pd.merge(lab_df, col_df, right_index = True,
+               left_index = True)
     #df['Keys']=df['Keys'].apply(lambda keywords: re.sub(r'[^a-zA-Z0-9; -.]+', ';', keywords))
 
 keys_dfs.append(keywords.parse('developing_countries'))

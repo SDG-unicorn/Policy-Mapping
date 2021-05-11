@@ -226,7 +226,7 @@ start_time = time.time()
 for policy, text in doc_texts.items():
     stemmed_text = text.replace('. ', ' . ')
     stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
-    stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
+    #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
@@ -488,7 +488,7 @@ step += 1
 ########### 8) Create JSON files for visualization
 
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
-sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'], results_dict['goal_overview'])
+sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
