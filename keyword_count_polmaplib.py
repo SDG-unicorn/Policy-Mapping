@@ -269,6 +269,7 @@ for policy, item in doc_texts.items():
                 #first write output to list
                 if counter > 0:
                     row=[policy, target, keyword, counter, item['textlength']]
+                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{target}< {keyword.upper()} >> s')
                     target_ls.append(row)
                     doc_target_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
@@ -321,6 +322,7 @@ for policy, item in doc_texts.items():
                 #first write output to list
                 if counter > 0:
                     row=[policy, goal, keyword, counter, item['textlength']]
+                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{goal}< {keyword.upper()} >> ')
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
@@ -334,6 +336,13 @@ for policy, item in doc_texts.items():
         dfObj.to_excel(destfile, sheet_name='Goal_raw_count')
         destfile.save()
                 
+for policy, text in doc_texts.items():
+    marked_text = item['stemmed_text']
+    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
+    with open(item_path, 'w', encoding='utf-8') as markdoctext:
+           markdoctext.write(f'{marked_text}\n\ntextlength: {len(marked_text)}')
+
 
 goal_df = pd.DataFrame(goal_ls, columns=goal_col_names)
 
