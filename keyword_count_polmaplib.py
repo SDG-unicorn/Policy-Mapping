@@ -337,7 +337,7 @@ for policy, item in doc_texts.items():
         destfile.save()
                 
 for policy, text in doc_texts.items():
-    marked_text = item['stemmed_text']
+    marked_text = text['stemmed_text']
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
     with open(item_path, 'w', encoding='utf-8') as markdoctext:

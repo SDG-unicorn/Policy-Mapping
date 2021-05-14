@@ -36,10 +36,15 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-mock_target_df = pd.DataFrame({
-    'Name': target_list,
-    'Value': [np.random.randint(0, 100) for i in target_list]
-})
+filename='Regione_puglia_filtered'
+
+mock_target_df = pd.read_excel('./output/Regione_puglia_EN_/output/6-results/results_regione_puglia.xlsx',sheet_name='target_dat') #pd.DataFrame({
+#     'Name': target_list,
+#     'Value': [np.random.randint(0, 100) for i in target_list]
+# })
+mock_target_df=mock_target_df[['Target','Count']]
+mock_target_df.rename(columns={"Target": "Name", "Count": "Value"}, inplace=True)
+mock_target_df =  mock_target_df[mock_target_df['Value'] != 0]
 
 mock_goals = [np.random.randint(0,100) for count in range(1,18,1)]
 
@@ -130,7 +135,7 @@ def sdg_barplot(sdg_item, color_dict, outfile=None):
         plt.savefig(f'{outfile}', dpi=600)
     return fig
 
-sdg_barplot(mock_goals, goal_colors, outfile='test_sdg_barlpot.png')
+sdg_barplot(mock_goals, goal_colors, outfile=f'{filename}_sdg_barlpot.png')
 
 ##### Goal or target horizontal barplot for 1 group #####
 
@@ -162,7 +167,7 @@ def sdg_hbars(sdg_item, sdg_labels, color_dict, outfile=None):
     plt.show()
     return fig
 
-sdg_hbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile='test_hbars.png')
+sdg_hbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile=f'{filename}_hbars.png')
 
 ##### Goal or target vertical barplot for 1 group #####
 
@@ -194,18 +199,24 @@ def sdg_vbars(sdg_item, sdg_labels, color_dict, outfile=None):
     plt.show()
     return fig
 
-sdg_vbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile='test_vbars.png')
+sdg_vbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile=f'{filename}_vbars.png')
 
 def sdg_circbars(sdg_item, sdg_labels, color_dict, outfile=None):
+    
+    params_dict={'resolution':[20, 20],'plot_title' : '',
+    'alpha':0.95, 'width' : 0.9, 'yval_offset' : 0.05,
+    'xtick_labels' : sdg_labels,'y_label': 'Count', 
+    'fontsize': 22, 'fontweight':850}
+
     # initialize the figure
-    fig = plt.figure(figsize=(30,30))
+    fig = plt.figure(figsize=params_dict['resolution'])
     ax = plt.subplot(111, polar=True)
     plt.axis('off')
 
     # Constants = parameters controling the plot layout:
     upperLimit = max(sdg_item)
     lowerLimit = min(sdg_item)
-    labelPadding = 1
+    labelPadding = 1.2
 
     # Compute max and min in the dataset
     # Let's compute heights: they are a conversion of each item value in those new coordinates
@@ -250,17 +261,23 @@ def sdg_circbars(sdg_item, sdg_labels, color_dict, outfile=None):
             alignment = "left"
 
         # Finally add the labels
+        label_string=f'{label} ({count})'
+        #y_pos= height - (labelPadding + len(label_string))
+
         ax.text(
-            x=angle, 
-            y=upperLimit+2, #bar.get_height() + labelPadding ,#+ lowerLimit, 
-            s=f'{label} ({count})', 
+            x=angle,
+            s=label_string,  
+            y= bar.get_height() + labelPadding, #upperLimit+2#
             ha=alignment, 
             va='center', 
             rotation=rotation, 
-            rotation_mode="anchor")
+            rotation_mode="anchor",
+            fontsize=params_dict['fontsize'], 
+            fontweight=params_dict['fontweight']
+            )
     if outfile != None:
         plt.savefig(f'{outfile}', dpi=300)
     plt.show()
     return fig
 
-sdg_circbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile='test_circbars.png')
+sdg_circbars(mock_target_df['Value'].tolist(), mock_target_df['Name'].tolist(), target_colors, outfile=f'{filename}_circbars.png')
