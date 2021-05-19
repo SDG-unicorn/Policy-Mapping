@@ -36,9 +36,11 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-filename='Regione_puglia_filtered'
+filename='ES_RRP'
 
-mock_target_df = pd.read_excel('./output/Regione_puglia_EN_/output/6-results/results_regione_puglia.xlsx',sheet_name='target_dat') #pd.DataFrame({
+res_path = pathlib.Path('./output/ES_RRP_/output/6-results/results_.xlsx')
+
+mock_target_df = pd.read_excel(res_path,sheet_name='target_dat') #pd.DataFrame({
 #     'Name': target_list,
 #     'Value': [np.random.randint(0, 100) for i in target_list]
 # })
@@ -46,7 +48,8 @@ mock_target_df=mock_target_df[['Target','Count']]
 mock_target_df.rename(columns={"Target": "Name", "Count": "Value"}, inplace=True)
 mock_target_df =  mock_target_df[mock_target_df['Value'] != 0]
 
-mock_goals = [np.random.randint(0,100) for count in range(1,18,1)]
+mock_goals = pd.read_excel(res_path,sheet_name='goal_overview')
+mock_goals = mock_goals['Count']
 
 # #####Define hierarchical bubbles based on data.
 # #def
@@ -132,7 +135,7 @@ def sdg_barplot(sdg_item, color_dict, outfile=None):
     # plt.xlabel('SDGs')
     plt.ylabel(params_dict['y_label'], fontsize='large', fontweight='bold')
     if outfile != None:
-        plt.savefig(f'{outfile}', dpi=600)
+        plt.savefig(f'{outfile}', dpi=300)
     return fig
 
 sdg_barplot(mock_goals, goal_colors, outfile=f'{filename}_sdg_barlpot.png')
@@ -163,7 +166,7 @@ def sdg_hbars(sdg_item, sdg_labels, color_dict, outfile=None):
     # plt.xlabel('SDGs')
     plt.xlabel(params_dict['y_label'], fontsize='large', fontweight='bold')
     if outfile != None:
-        plt.savefig(f'{outfile}', dpi=600)
+        plt.savefig(f'{outfile}', dpi=300)
     plt.show()
     return fig
 
@@ -195,7 +198,7 @@ def sdg_vbars(sdg_item, sdg_labels, color_dict, outfile=None):
     # plt.xlabel('SDGs')
     plt.ylabel(params_dict['y_label'], fontsize='large', fontweight='bold')
     if outfile != None:
-        plt.savefig(f'{outfile}', dpi=600)
+        plt.savefig(f'{outfile}', dpi=300)
     plt.show()
     return fig
 
