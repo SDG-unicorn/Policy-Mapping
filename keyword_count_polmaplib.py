@@ -67,7 +67,7 @@ print(f"Output folder is: \n{out_dir}\n")
 
 ## 1.b) Read all files in input directory and select allowed filetypes
 
-allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] # ['.doc','.docx'] # 
+allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx','.txt'] # ['.doc','.docx'] # 
 
 if input_dir.is_dir(): 
     files = sorted(input_dir.glob('**/*.*'))

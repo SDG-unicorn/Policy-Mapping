@@ -65,6 +65,8 @@ def doc2text(a_document_path):
 
     suffix = a_document_path.suffix
 
+    plain_text = ['.txt']
+
     ms_word = ['.doc','.docx']
 
     html = ['.html', '.mhtml']
@@ -76,7 +78,10 @@ def doc2text(a_document_path):
                 '.mhtml' : BeautifulSoup                
     }
 
-    if suffix in ms_word:
+    if suffix in plain_text:
+        with open(a_document_path,'r') as file_:
+            text_from_doc = file_.read()
+    elif suffix in ms_word:
         text_from_doc = d2t_dict[suffix](a_document_path).text
     elif suffix in html:
         with open(a_document_path, 'r') as file_:

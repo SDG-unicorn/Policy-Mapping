@@ -36,9 +36,9 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-filename='ES_RRP'
+filename='PT_RRP'
 
-res_path = pathlib.Path('./output/ES_RRP_/output/6-results/results_.xlsx')
+res_path = pathlib.Path('./output/PT_RRP_/output/6-results/results_.xlsx')
 
 mock_target_df = pd.read_excel(res_path,sheet_name='target_dat') #pd.DataFrame({
 #     'Name': target_list,
@@ -138,7 +138,7 @@ def sdg_barplot(sdg_item, color_dict, outfile=None):
         plt.savefig(f'{outfile}', dpi=300)
     return fig
 
-sdg_barplot(mock_goals, goal_colors, outfile=f'{filename}_sdg_barlpot.png')
+sdg_barplot(mock_goals.to_list(), goal_colors, outfile=f'{filename}_sdg_barlpot.png')
 
 ##### Goal or target horizontal barplot for 1 group #####
 
@@ -158,7 +158,7 @@ def sdg_hbars(sdg_item, sdg_labels, color_dict, outfile=None):
     plt.barh(X, sdg_item, color = [color_dict[label] for label in sdg_labels], 
     alpha = params_dict['alpha'])#, width = params_dict['width'])
    
-    plt.yticks([i for i in range(0,len(params_dict['xtick_labels']),1)], params_dict['xtick_labels'])
+    plt.yticks([i for i in range(0,len(params_dict['xtick_labels']),1)], params_dict['xtick_labels'],fontsize='large', fontweight='bold')
     plt.xticks(fontsize='large', fontweight='bold')
     
     plt.title(params_dict['plot_title'], fontsize='large', fontweight='bold') #within {path.name}
@@ -190,7 +190,7 @@ def sdg_vbars(sdg_item, sdg_labels, color_dict, outfile=None):
     plt.bar(X, sdg_item, color = [color_dict[label] for label in sdg_labels], alpha = params_dict['alpha'], 
     width = params_dict['width'])
    
-    plt.xticks([i for i in range(0,len(params_dict['xtick_labels']),1)], params_dict['xtick_labels'], rotation=90)
+    plt.xticks([i for i in range(0,len(params_dict['xtick_labels']),1)], params_dict['xtick_labels'], fontsize='large', fontweight='bold',rotation=45)
     plt.yticks(fontsize='large', fontweight='bold')
     
     plt.title(params_dict['plot_title'], fontsize='large', fontweight='bold') #within {path.name}
@@ -270,7 +270,7 @@ def sdg_circbars(sdg_item, sdg_labels, color_dict, outfile=None):
         ax.text(
             x=angle,
             s=label_string,  
-            y= bar.get_height() + labelPadding, #upperLimit+2#
+            y= upperLimit+2 , #bar.get_height() + labelPadding,
             ha=alignment, 
             va='center', 
             rotation=rotation, 
