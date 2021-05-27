@@ -161,16 +161,16 @@ doc_texts = {} #This can easily become a dictionary with filepath as a key and t
 for counter, file_path in enumerate(files):
     try:
         doc_text = plmp.doc2text(file_path)
-       # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
+        # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         textfile_dest_ = file_path.parts[file_path.parts.index(input_dir.name)+1:]
         textfile_dest =  doctext_dir.joinpath(*textfile_dest_)
         textfile_dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
         textfile_dest = textfile_dest.parent / str(textfile_dest.name.replace('.','_')+'.txt')
         with open(textfile_dest, 'w', encoding='utf-8') as file_:
-           file_.write(doc_text)
+            file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
     except Exception as exception: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
-        print(exception)
+        print(f'{file_path.name}:\n{exception}\n')
         logging.exception(f'{file_path.name} raised exception: {exception} \n\n')
 
 
@@ -250,6 +250,8 @@ step += 1
 start_count_time = time.time()
 start_time = time.time()
 
+fullcountout = False
+
 target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
 
 target_ls = []
@@ -273,7 +275,7 @@ for policy, item in doc_texts.items():
                     target_ls.append(row)
                     doc_target_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0:
+                elif counter == 0 and fullcountout:
                     row=[policy, target, 'None', counter, item['textlength']]
                     target_ls.append(row)
                     doc_target_ls.append(row)
@@ -297,7 +299,11 @@ writer = pd.ExcelWriter(count_destfile, engine='openpyxl')
 print(f'Final results are stored in:\n{count_destfile}\n')
 
 #export final output
-target_df.to_excel(writer, sheet_name='Target_raw_count')
+try:
+    target_df.to_excel(writer, sheet_name='Target_raw_count')
+except Exception as exception:
+        print(f'Writing target counts raised: \n{exception}\n')
+        logging.exception(f'Writing target counts raised: {exception} \n\n')
 #writer.save()
 
 with open(log_file, 'a') as f:
@@ -326,7 +332,7 @@ for policy, item in doc_texts.items():
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0:
+                elif counter == 0 and fullcountout:
                     row=[policy, goal, 'None', counter, item['textlength']]
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
@@ -347,7 +353,11 @@ for policy, text in doc_texts.items():
 goal_df = pd.DataFrame(goal_ls, columns=goal_col_names)
 
 #export final output
-goal_df.to_excel(writer, sheet_name='Goal_raw_count')
+try:
+    goal_df.to_excel(writer, sheet_name='Goal_raw_count')
+except Exception as exception:
+        print(f'Writing goal counts raised: \n{exception}\n')
+        logging.exception(f'Writing goal counts raised: {exception} \n\n')
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -392,7 +402,11 @@ for policy, item in doc_texts.items():
 
 
 moi_df = pd.DataFrame(moi_ls, columns=dev_countries_colnames)
-moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+try:
+    moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+except Exception as exception:
+        print(f'Writing MOI counts raised: \n{exception}\n')
+        logging.exception(f'Writing MOI counts raised: {exception} \n\n')
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -403,7 +417,6 @@ with open(log_file, 'a') as f:
 detected_pol = moi_df['Policy'].tolist()
 
 writer.save()
-
 
 with open(log_file, 'a') as f:
     f.write( 
