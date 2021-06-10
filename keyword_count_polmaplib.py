@@ -1,6 +1,11 @@
 import argparse, json, logging, pathlib, pprint, re, time
 import datetime as dt
-import importlib.resources as rsrc
+try:
+    # For Python =+3.7.
+    import importlib.resources as rsrc
+except ImportError:
+    # Try backported to Python <=3.6 `importlib_resources`.
+    import importlib_resources as rsrc
 from nltk.corpus import stopwords
 import pandas as pd
 #from nltk.tokenize import word_tokenize
