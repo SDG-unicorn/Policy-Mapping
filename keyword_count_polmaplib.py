@@ -1,4 +1,4 @@
-import argparse, json, logging, pathlib, pprint, re, time
+import argparse, json, logging, pathlib, pickle, re, time
 import datetime as dt
 try:
     # For Python =+3.7.
@@ -72,7 +72,7 @@ print(f"Output folder is: \n{out_dir}\n")
 
 ## 1.b) Read all files in input directory and select allowed filetypes
 
-allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx'] # ['.doc','.docx'] # 
+allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx','.txt'] # ['.doc','.docx'] # 
 
 if input_dir.is_dir(): 
     files = sorted(input_dir.glob('**/*.*'))
@@ -175,7 +175,7 @@ for counter, file_path in enumerate(files):
            file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
     except Exception as exception: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
-        print(exception)
+        print(f'{file_path.name}:\n{exception}\n')
         logging.exception(f'{file_path.name} raised exception: {exception} \n\n')
 
 
@@ -231,7 +231,7 @@ start_time = time.time()
 for policy, text in doc_texts.items():
     stemmed_text = text.replace('. ', ' . ')
     stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
-    stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
+    #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
@@ -255,6 +255,8 @@ step += 1
 start_count_time = time.time()
 start_time = time.time()
 
+fullcountout = False
+
 target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
 
 target_ls = []
@@ -274,9 +276,14 @@ for policy, item in doc_texts.items():
                 #first write output to list
                 if counter > 0:
                     row=[policy, target, keyword, counter, item['textlength']]
+                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{target}< {keyword.upper()} >> s')
                     target_ls.append(row)
                     doc_target_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
+                elif counter == 0 and fullcountout:
+                    row=[policy, target, 'None', counter, item['textlength']]
+                    target_ls.append(row)
+                    doc_target_ls.append(row)
                 else:
                     continue
         dfObj= pd.DataFrame(doc_target_ls, columns=target_col_names)
@@ -297,7 +304,11 @@ writer = pd.ExcelWriter(count_destfile, engine='openpyxl')
 print(f'Final results are stored in:\n{count_destfile}\n')
 
 #export final output
-target_df.to_excel(writer, sheet_name='Target_raw_count')
+try:
+    target_df.to_excel(writer, sheet_name='Target_raw_count')
+except Exception as exception:
+        print(f'Writing target counts raised: \n{exception}\n')
+        logging.exception(f'Writing target counts raised: {exception} \n\n')
 #writer.save()
 
 with open(log_file, 'a') as f:
@@ -322,20 +333,37 @@ for policy, item in doc_texts.items():
                 #first write output to list
                 if counter > 0:
                     row=[policy, goal, keyword, counter, item['textlength']]
+                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{goal}< {keyword.upper()} >> ')
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
                     #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
+                elif counter == 0 and fullcountout:
+                    row=[policy, goal, 'None', counter, item['textlength']]
+                    goal_ls.append(row)
+                    doc_goal_ls.append(row)
                 else:
                     continue
         dfObj = pd.DataFrame(doc_goal_ls, columns=goal_col_names)
         dfObj.to_excel(destfile, sheet_name='Goal_raw_count')
         destfile.save()
-                
+
+for policy, text in doc_texts.items():
+    marked_text = text['stemmed_text']
+    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
+    with open(item_path, 'w', encoding='utf-8') as markdoctext:
+           markdoctext.write(f'{marked_text}\n\ntextlength: {len(marked_text)}')
+
 
 goal_df = pd.DataFrame(goal_ls, columns=goal_col_names)
 
 #export final output
-goal_df.to_excel(writer, sheet_name='Goal_raw_count')
+try:
+    goal_df.to_excel(writer, sheet_name='Goal_raw_count')
+except Exception as exception:
+        print(f'Writing goal counts raised: \n{exception}\n')
+        logging.exception(f'Writing goal counts raised: {exception} \n\n')
+
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -370,13 +398,22 @@ for policy, item in doc_texts.items():
                         row = [policy, moi, word, counter, item['textlength']]
                         moi_ls.append(row)
                         doc_moi_ls.append(row)
+                    # elif counter == 0:
+                    #     row = [policy, moi, word, counter, item['textlength']]
+                    #     moi_ls.append(row)
+                    #     doc_moi_ls.append(row)
         dfObj = pd.DataFrame(doc_moi_ls,columns=dev_countries_colnames)
         dfObj.to_excel(destfile, sheet_name='Dev_countries_raw_count')
         destfile.save()
 
 
 moi_df = pd.DataFrame(moi_ls, columns=dev_countries_colnames)
-moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+try:
+    moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
+except Exception as exception:
+        print(f'Writing MOI counts raised: \n{exception}\n')
+        logging.exception(f'Writing MOI counts raised: {exception} \n\n')
+
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -391,7 +428,7 @@ writer.save()
 
 with open(log_file, 'a') as f:
     f.write( 
-        f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.'
+        f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
 print(f'Step {step}: Counted keywords in texts.\n')
@@ -399,6 +436,10 @@ step += 1
 
 # target_df.to_pickle("gd_target_df.pkl")
 # goal_df.to_pickle("gd_goal_df.pkl")
+
+target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
+goal_df['Group']=goal_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
+
 
 ######################################
 ########### 7) Postprocessing of keyword count
@@ -435,7 +476,7 @@ results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if 
 results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
-results_dict['goals_grouped_by_document'] = pspr.group_byNAme_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+results_dict['goals_grouped_by_document'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
 results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
@@ -443,6 +484,12 @@ results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results
 # # 7.9) get list of priorities
 results_dict['priorities'] = pspr.map_target_dat_to_priorities(results_dict['target_dat_pp'], sdg_df)
 
+results_dict['target_dat_by_group'] = pspr.aggregate_to_targets(target_df, sdg_df, grouping_factor='Group')
+results_dict['goal_dat_by_group'] = pspr.aggregate_to_goals(goal_df, sdg_df, grouping_factor='Group')
+results_dict['goals_grouped_by_folder'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat_by_group'], results_dict['goal_dat_by_group'], sdg_df, grouping_factor='Group')
+
+# with open('results.pkl', 'wb') as pkl_f:
+#     pickle.dump(results_dict, pkl_f)
 
 sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
 
@@ -465,16 +512,19 @@ with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as d
 
 with open(log_file, 'a') as f:
     f.write( 
-        f'- Analyzing results and preparing summary tables: {time.time()-start_count_time:.3e} seconds.'
+        f'{step}) Analyzed results and saved summary tables in {mappingresults_destfile}\n{time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
-print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}')
+print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}\n')
 step += 1
 
 ######################################
 ########### 8) Create JSON files for visualization
 
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+
+start_time = time.time() 
+
 sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
@@ -486,6 +536,16 @@ priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['prioritie
 priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
 with priority_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(priority_bubbleplot_dict, f)
+
+bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists, pathlib.Path(priority_bubbles).exists])
+
+with open(log_file, 'a') as f:
+    f.write( 
+        f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
+        )
+
+print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
+step += 1
 
 #To be moved somewhere in modules
 # pp_colors={'Human Development':'#F68D4A',
@@ -522,3 +582,9 @@ with priority_bubbles.open(mode='w', encoding='utf-8') as f:
 # # pol_coher_df=create_policy_coherence_data(dat_filtered, sdg_df)#output_path=out_dir
 # # pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
+with open(log_file, 'a') as f:
+    f.write( 
+        f'Mapping completed'
+        )
+
+print('Mapping completed')

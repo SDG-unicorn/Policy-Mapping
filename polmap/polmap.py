@@ -65,6 +65,8 @@ def doc2text(a_document_path):
 
     suffix = a_document_path.suffix
 
+    plain_text = ['.txt']
+
     ms_word = ['.doc','.docx']
 
     html = ['.html', '.mhtml']
@@ -76,7 +78,10 @@ def doc2text(a_document_path):
                 '.mhtml' : BeautifulSoup                
     }
 
-    if suffix in ms_word:
+    if suffix in plain_text:
+        with open(a_document_path,'r') as file_:
+            text_from_doc = file_.read()
+    elif suffix in ms_word:
         text_from_doc = d2t_dict[suffix](a_document_path).text
     elif suffix in html:
         with open(a_document_path, 'r') as file_:
@@ -89,7 +94,7 @@ def doc2text(a_document_path):
 
 ####### Preprocess and stem text.
 
-std_stopwords = stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
+stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
 
 def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     """
@@ -114,7 +119,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     
 
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9. -]+', ''), (r'([\w-]+)', r' \1 ')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ''), (r'([\w-]+)', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
 
@@ -151,7 +156,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     for word in stop_words: #Remove stopwords
         text_string = text_string.replace(' '+word+' ', '') 
     
-    text_string = re.sub(r'[a-zA-z&-]+', #Find words wirth regex. It can be improved by capturing pattern between word boundaries.
+    text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
     lambda rgx_word: ' '+stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
     text_string)
         
