@@ -1,6 +1,11 @@
 import argparse, json, logging, pathlib, pickle, re, time
 import datetime as dt
-import importlib.resources as rsrc
+try:
+    # For Python =+3.7.
+    import importlib.resources as rsrc
+except ImportError:
+    # Try backported to Python <=3.6 `importlib_resources`.
+    import importlib_resources as rsrc
 from nltk.corpus import stopwords
 import pandas as pd
 #from nltk.tokenize import word_tokenize
@@ -161,13 +166,13 @@ doc_texts = {} #This can easily become a dictionary with filepath as a key and t
 for counter, file_path in enumerate(files):
     try:
         doc_text = plmp.doc2text(file_path)
-        # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
+       # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         textfile_dest_ = file_path.parts[file_path.parts.index(input_dir.name)+1:]
         textfile_dest =  doctext_dir.joinpath(*textfile_dest_)
         textfile_dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
         textfile_dest = textfile_dest.parent / str(textfile_dest.name.replace('.','_')+'.txt')
         with open(textfile_dest, 'w', encoding='utf-8') as file_:
-            file_.write(doc_text)
+           file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
     except Exception as exception: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
         print(f'{file_path.name}:\n{exception}\n')
@@ -341,7 +346,7 @@ for policy, item in doc_texts.items():
         dfObj = pd.DataFrame(doc_goal_ls, columns=goal_col_names)
         dfObj.to_excel(destfile, sheet_name='Goal_raw_count')
         destfile.save()
-                
+
 for policy, text in doc_texts.items():
     marked_text = text['stemmed_text']
     item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
@@ -358,6 +363,7 @@ try:
 except Exception as exception:
         print(f'Writing goal counts raised: \n{exception}\n')
         logging.exception(f'Writing goal counts raised: {exception} \n\n')
+
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -408,6 +414,7 @@ except Exception as exception:
         print(f'Writing MOI counts raised: \n{exception}\n')
         logging.exception(f'Writing MOI counts raised: {exception} \n\n')
 
+
 with open(log_file, 'a') as f:
     f.write( 
         f'- {step+0.3}) Counting developing countries keywords in texts: {time.time()-start_time:.3e} seconds\n\n'
@@ -418,19 +425,21 @@ detected_pol = moi_df['Policy'].tolist()
 
 writer.save()
 
+
 with open(log_file, 'a') as f:
     f.write( 
-        f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.'
+        f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
 
-# target_df.to_pickle("test_target_df.pkl")
-# goal_df.to_pickle("test_goal_df.pkl")
+# target_df.to_pickle("gd_target_df.pkl")
+# goal_df.to_pickle("gd_goal_df.pkl")
 
 target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
 goal_df['Group']=goal_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
+
 
 ######################################
 ########### 7) Postprocessing of keyword count
@@ -482,6 +491,9 @@ results_dict['goals_grouped_by_folder'] = pspr.group_by_name_and_get_goalovervie
 # with open('results.pkl', 'wb') as pkl_f:
 #     pickle.dump(results_dict, pkl_f)
 
+sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
+
+
 # sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_by_document', 'total_count']
 
 # sheetnames = { df : sheetname for df, sheetname in zip(list(results_dict.keys()), sheetnames_list)}
@@ -500,7 +512,7 @@ with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as d
 
 with open(log_file, 'a') as f:
     f.write( 
-        f'- Analyzing results and preparing summary tables: {time.time()-start_count_time:.3e} seconds.'
+        f'{step}) Analyzed results and saved summary tables in {mappingresults_destfile}\n{time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
 print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}\n')
@@ -510,6 +522,9 @@ step += 1
 ########### 8) Create JSON files for visualization
 
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+
+start_time = time.time() 
+
 sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
@@ -521,6 +536,16 @@ priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['prioritie
 priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
 with priority_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(priority_bubbleplot_dict, f)
+
+bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists, pathlib.Path(priority_bubbles).exists])
+
+with open(log_file, 'a') as f:
+    f.write( 
+        f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
+        )
+
+print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
+step += 1
 
 #To be moved somewhere in modules
 # pp_colors={'Human Development':'#F68D4A',
@@ -557,3 +582,9 @@ with priority_bubbles.open(mode='w', encoding='utf-8') as f:
 # # pol_coher_df=create_policy_coherence_data(dat_filtered, sdg_df)#output_path=out_dir
 # # pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
+with open(log_file, 'a') as f:
+    f.write( 
+        f'Mapping completed'
+        )
+
+print('Mapping completed')
