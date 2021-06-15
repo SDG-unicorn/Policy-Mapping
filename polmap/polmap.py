@@ -65,7 +65,7 @@ def doc2text(a_document_path):
 
     suffix = a_document_path.suffix
 
-    plain_text = ['.txt']
+    plain_text = ['.txt','.rtf']
 
     ms_word = ['.doc','.docx']
 
