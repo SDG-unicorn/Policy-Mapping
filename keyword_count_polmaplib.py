@@ -72,7 +72,7 @@ print(f"Output folder is: \n{out_dir}\n")
 
 ## 1.b) Read all files in input directory and select allowed filetypes
 
-allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx','.txt'] # ['.doc','.docx'] # 
+allowed_filetypes =  ['.pdf','.html','.mhtml','.doc','.docx','.txt','.rtf'] # ['.doc','.docx'] # 
 
 if input_dir.is_dir(): 
     files = sorted(input_dir.glob('**/*.*'))
@@ -92,6 +92,14 @@ policy_documents['Paths'].to_csv(results_dir.joinpath('file_list.txt'), sep='\t'
 ## 1.c) Create logfile for current run.
 
 log_file = log_dir / f'mapping_{project_title}.log'
+
+if log_file.exists:
+    log_file = log_dir / f'mapping_{project_title}.log'
+    with open(log_file, 'a') as f:
+        f.write( 
+            f"\n\nLogfiles already exist, updates appended the \
+            {dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')}\n\n"
+        )
 log_file.touch(mode=0o666)
 logging.basicConfig(filename=log_file, filemode='a', level=logging.WARNING)
 
