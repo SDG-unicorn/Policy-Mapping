@@ -60,33 +60,36 @@ def stringify_id(pd_id_column, type=str):
 #new column with number of keywords
 # join all detected keywords in new column
 def aggregate_to_targets(raw_df, sdg_references, grouping_factor='Policy'):
-    #group rows by policy and by target and sum count
-    dat_target_level = raw_df.groupby([grouping_factor, 'Target'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
-    dat_target_join_keys = raw_df.groupby([grouping_factor, 'Target'])['Keyword'].apply(lambda x : ' - '.join(x.astype(str))).reset_index()
-    dat_target_txtlength = raw_df.groupby([grouping_factor, 'Target']).first().reset_index()
-    dat_number_of_keywords = raw_df.groupby([grouping_factor, 'Target']).count().reset_index()
-    #merge both dataframes
-    dat_target_level['Keyword'] = dat_target_join_keys['Keyword']
-    dat_target_level['Textlength'] = dat_target_txtlength['Textlength']
-    dat_target_level['Num_keys'] = dat_number_of_keywords['Count']
-    #add Goal Column to DF
-    #join SDG label as new column to target-lvel-dat, information coming from goal_df
-    dat_target_level = sdg_references.join(dat_target_level.set_index('Target'), on='Target', how='inner')
-    #drop target_ID column
-    dat_target_level = dat_target_level.sort_values(grouping_factor)
-    #sort by policy and then by tar_id
-    dat_target_level = dat_target_level.sort_values([grouping_factor, 'tar_ID'], ascending=[True,True])
-    #add Policy ID column to df
-    policy_ls = dat_target_level[grouping_factor].unique().tolist()
-    policy_id_dict = {}
-    for i in range(0, len(policy_ls)):
-        policy_id_dict[policy_ls[i]] = i
-    #match dict keys with df and add id as new column
-    dat_target_level['ID'] = dat_target_level[grouping_factor].apply(lambda ID: policy_id_dict.get(ID))
-    dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace('None - ', '')
-    dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace(' - None', '')
-    dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace('None', '')
-    dat_target_level['Num_keys'] = dat_target_level['Keyword'].apply(lambda x_str: 0 if x_str=='' else len(x_str.split(' - ')))
+    if raw_df.empty:
+        dat_target_level = pd.DataFrame()
+    else:
+        #group rows by policy and by target and sum count
+        dat_target_level = raw_df.groupby([grouping_factor, 'Target'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+        dat_target_join_keys = raw_df.groupby([grouping_factor, 'Target'])['Keyword'].apply(lambda x : ' - '.join(x.astype(str))).reset_index()
+        dat_target_txtlength = raw_df.groupby([grouping_factor, 'Target']).first().reset_index()
+        dat_number_of_keywords = raw_df.groupby([grouping_factor, 'Target']).count().reset_index()
+        #merge both dataframes
+        dat_target_level['Keyword'] = dat_target_join_keys['Keyword']
+        dat_target_level['Textlength'] = dat_target_txtlength['Textlength']
+        dat_target_level['Num_keys'] = dat_number_of_keywords['Count']
+        #add Goal Column to DF
+        #join SDG label as new column to target-lvel-dat, information coming from goal_df
+        dat_target_level = sdg_references.join(dat_target_level.set_index('Target'), on='Target', how='inner')
+        #drop target_ID column
+        dat_target_level = dat_target_level.sort_values(grouping_factor)
+        #sort by policy and then by tar_id
+        dat_target_level = dat_target_level.sort_values([grouping_factor, 'tar_ID'], ascending=[True,True])
+        #add Policy ID column to df
+        policy_ls = dat_target_level[grouping_factor].unique().tolist()
+        policy_id_dict = {}
+        for i in range(0, len(policy_ls)):
+            policy_id_dict[policy_ls[i]] = i
+        #match dict keys with df and add id as new column
+        dat_target_level['ID'] = dat_target_level[grouping_factor].apply(lambda ID: policy_id_dict.get(ID))
+        dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace('None - ', '')
+        dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace(' - None', '')
+        dat_target_level['Keyword'] = dat_target_level['Keyword'].str.replace('None', '')
+        dat_target_level['Num_keys'] = dat_target_level['Keyword'].apply(lambda x_str: 0 if x_str=='' else len(x_str.split(' - ')))
     return dat_target_level
 
 
@@ -602,27 +605,30 @@ def create_policy_coherence_data(df, sdg_references): #filename_policy_coherence
 
 ## function for filtering target dat by priority
 def map_target_dat_to_priorities(target_df, sdg_references):
-    #group by first priority column + aggregate to goal, within the grouped priority
-    main_priority_df = target_df.groupby(['MAIN_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
-    main_priority_df.rename(columns={'MAIN_priority': 'priority'}, inplace=True)
-    #group by second priority + aggregate to goal, within the grouped priority
-    sec_priority_df = target_df.groupby(['SEC_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
-    sec_priority_df.rename(columns={'SEC_priority': 'priority'}, inplace=True)
-    #append both dataframes
-    priority_target_df = main_priority_df.append(sec_priority_df, ignore_index=True)
-    #drop multi-level column index coming from groupby functions
-    priority_target_df.columns = priority_target_df.columns.droplevel(1)
-    priority_target_df = priority_target_df.groupby(['priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
-    priority_target_df.columns = priority_target_df.columns.droplevel(1)
-    #add goal information from sdg_references to final output
-    sdg_references = sdg_references.loc[:,['Goal', 'goal_id', 'goal_description', 'goal_color']]
-    #drop duplicates
-    sdg_references = sdg_references.drop_duplicates(ignore_index=True)
-    priority_target_df = sdg_references.join(priority_target_df.set_index('Goal'), on='Goal', how='inner', lsuffix='_left',rsuffix='_right')
-    #make goal_id int for sorting
-    priority_target_df.goal_id = priority_target_df.goal_id.astype(int)
-    priority_target_df = priority_target_df.sort_values(['priority', 'goal_id'],
-                   ascending=[True, True])
+    if target_df.empty:
+        priority_target_df = pd.DataFrame()
+    else:
+        #group by first priority column + aggregate to goal, within the grouped priority
+        main_priority_df = target_df.groupby(['MAIN_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+        main_priority_df.rename(columns={'MAIN_priority': 'priority'}, inplace=True)
+        #group by second priority + aggregate to goal, within the grouped priority
+        sec_priority_df = target_df.groupby(['SEC_priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+        sec_priority_df.rename(columns={'SEC_priority': 'priority'}, inplace=True)
+        #append both dataframes
+        priority_target_df = main_priority_df.append(sec_priority_df, ignore_index=True)
+        #drop multi-level column index coming from groupby functions
+        priority_target_df.columns = priority_target_df.columns.droplevel(1)
+        priority_target_df = priority_target_df.groupby(['priority', 'Goal']).agg({'Count': ['sum']}).reset_index()
+        priority_target_df.columns = priority_target_df.columns.droplevel(1)
+        #add goal information from sdg_references to final output
+        sdg_references = sdg_references.loc[:,['Goal', 'goal_id', 'goal_description', 'goal_color']]
+        #drop duplicates
+        sdg_references = sdg_references.drop_duplicates(ignore_index=True)
+        priority_target_df = sdg_references.join(priority_target_df.set_index('Goal'), on='Goal', how='inner', lsuffix='_left',rsuffix='_right')
+        #make goal_id int for sorting
+        priority_target_df.goal_id = priority_target_df.goal_id.astype(int)
+        priority_target_df = priority_target_df.sort_values(['priority', 'goal_id'],
+                    ascending=[True, True])
     return priority_target_df
 
 #####################################
@@ -638,28 +644,31 @@ def map_target_dat_to_priorities(target_df, sdg_references):
 
 #function that takes filtered target dat + priority df as input to create bubblecharts
 def create_json_for_priorities(filtered_targets):
-    children_2nd_level = []
-    for item in list(filtered_targets.priority.unique()):
-        #subset dataframe by priority
-        temp_df = filtered_targets.loc[filtered_targets['priority'] == item]
-        temp_df.reset_index(drop=True, inplace=True)
-        #rename columns for json export
-        temp_df = temp_df.rename(columns={'Goal': 'name', 'Count': 'size'})
-        #get sum of priority counts
-        priority_size = temp_df['size'].sum()
-        #make size and goal_id columns str for json export
-        temp_df.loc[:,'size'] = temp_df['size'].astype(str)
-        temp_df.loc[:,'goal_id'] = temp_df['goal_id'].astype(str)
-        #get label for priority
-        priority_name = temp_df.iloc[0]['priority']
-        children_3rd_level = []
-        #drop priority column from temp_df
-        temp_df = temp_df.drop('priority', axis='columns')
-        for i in range(0, len(temp_df['name'])):
-            dict_3rd_level = temp_df.loc[i].to_dict()
-            children_3rd_level.append(dict_3rd_level)
-        dict_2nd_level = {'name':priority_name, 'size': str(priority_size), 'children':children_3rd_level}
-        children_2nd_level.append(dict_2nd_level)
+    if filtered_targets.empty:
+        children_2nd_level = [{"name": "No Targets Detected", "size": "100"}]
+    else:
+        children_2nd_level = []
+        for item in list(filtered_targets.priority.unique()):
+            #subset dataframe by priority
+            temp_df = filtered_targets.loc[filtered_targets['priority'] == item]
+            temp_df.reset_index(drop=True, inplace=True)
+            #rename columns for json export
+            temp_df = temp_df.rename(columns={'Goal': 'name', 'Count': 'size'})
+            #get sum of priority counts
+            priority_size = temp_df['size'].sum()
+            #make size and goal_id columns str for json export
+            temp_df.loc[:,'size'] = temp_df['size'].astype(str)
+            temp_df.loc[:,'goal_id'] = temp_df['goal_id'].astype(str)
+            #get label for priority
+            priority_name = temp_df.iloc[0]['priority']
+            children_3rd_level = []
+            #drop priority column from temp_df
+            temp_df = temp_df.drop('priority', axis='columns')
+            for i in range(0, len(temp_df['name'])):
+                dict_3rd_level = temp_df.loc[i].to_dict()
+                children_3rd_level.append(dict_3rd_level)
+            dict_2nd_level = {'name':priority_name, 'size': str(priority_size), 'children':children_3rd_level}
+            children_2nd_level.append(dict_2nd_level)
     final_dict = {'name': 'sdgs', 'children': children_2nd_level}
     return final_dict
 
