@@ -143,12 +143,15 @@ def filter_data(df_target_level):
 
 
 def get_target_overview(df, sdg_references):
-    #groupby SDG column and count
-    target_df = df.groupby('Target')['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
-    #keep only necessary columns
-    target_df = target_df[['Target', 'Count']]
-    #add SDG label
-    target_df = sdg_references.join(target_df.set_index('Target'), on='Target', how='inner')
+    if df.empty:
+        target_df = pd.DataFrame()
+    else:
+        #groupby SDG column and count
+        target_df = df.groupby('Target')['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+        #keep only necessary columns
+        target_df = target_df[['Target', 'Count']]
+        #add SDG label
+        target_df = sdg_references.join(target_df.set_index('Target'), on='Target', how='inner')
     return target_df
 
 
@@ -192,30 +195,33 @@ def find_undetected_targets(df, sdg_references):
 ##############################################
 
 def aggregate_to_goals(goal_level_count, sdg_references, grouping_factor='Policy'):
-    #drop target-related columns from sdg_references
-    sdg_references = sdg_references[['Goal', 'goal_id', 'goal_description']]
-    # choose results from goal level count output
-    #group rows by policy and by target and sum count
-    dat_goal_level = goal_level_count.groupby([grouping_factor, 'Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
-    dat_goal_join_keys = goal_level_count.groupby([grouping_factor, 'Goal'])['Keyword'].apply(lambda x : ' - '.join(x.astype(str))).reset_index()
-    dat_goal_txtlength = goal_level_count.groupby([grouping_factor, 'Goal']).first().reset_index()
-    dat_number_of_keywords = goal_level_count.groupby([grouping_factor, 'Goal']).count().reset_index()
-    #merge both dataframes
-    dat_goal_level['Keyword'] = dat_goal_join_keys['Keyword']
-    dat_goal_level['Textlength'] = dat_goal_txtlength['Textlength']
-    dat_goal_level['Num_keys'] = dat_number_of_keywords['Count']
-    dat_goal_level = dat_goal_level.sort_values(grouping_factor)
-    #add Goal ID and Goal Description
-    dat_goal_level = sdg_references.join(dat_goal_level.set_index('Goal'), on='Goal', how='inner')
-    dat_goal_level.drop_duplicates(inplace=True, ignore_index=True)
-    dat_goal_level = dat_goal_level.sort_values(grouping_factor)
-    dat_goal_level = dat_goal_level.sort_values([grouping_factor, 'goal_id'], ascending=[True,True])
-    # use filter to drop rows < 2 (or another criteria??)
-    # dat_goal_level = dat_goal_level.loc[dat_goal_level['Count'] > 1]
-    dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace('None - ', '')
-    dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace(' - None', '')
-    dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace('None', '')
-    dat_goal_level['Num_keys'] = dat_goal_level['Keyword'].apply(lambda x_str: 0 if x_str=='' else len(x_str.split(' - ')))
+    if goal_level_count.empty:
+        dat_goal_level = pd.DataFrame()
+    else:
+        #drop target-related columns from sdg_references
+        sdg_references = sdg_references[['Goal', 'goal_id', 'goal_description']]
+        # choose results from goal level count output
+        #group rows by policy and by target and sum count
+        dat_goal_level = goal_level_count.groupby([grouping_factor, 'Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+        dat_goal_join_keys = goal_level_count.groupby([grouping_factor, 'Goal'])['Keyword'].apply(lambda x : ' - '.join(x.astype(str))).reset_index()
+        dat_goal_txtlength = goal_level_count.groupby([grouping_factor, 'Goal']).first().reset_index()
+        dat_number_of_keywords = goal_level_count.groupby([grouping_factor, 'Goal']).count().reset_index()
+        #merge both dataframes
+        dat_goal_level['Keyword'] = dat_goal_join_keys['Keyword']
+        dat_goal_level['Textlength'] = dat_goal_txtlength['Textlength']
+        dat_goal_level['Num_keys'] = dat_number_of_keywords['Count']
+        dat_goal_level = dat_goal_level.sort_values(grouping_factor)
+        #add Goal ID and Goal Description
+        dat_goal_level = sdg_references.join(dat_goal_level.set_index('Goal'), on='Goal', how='inner')
+        dat_goal_level.drop_duplicates(inplace=True, ignore_index=True)
+        dat_goal_level = dat_goal_level.sort_values(grouping_factor)
+        dat_goal_level = dat_goal_level.sort_values([grouping_factor, 'goal_id'], ascending=[True,True])
+        # use filter to drop rows < 2 (or another criteria??)
+        # dat_goal_level = dat_goal_level.loc[dat_goal_level['Count'] > 1]
+        dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace('None - ', '')
+        dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace(' - None', '')
+        dat_goal_level['Keyword'] = dat_goal_level['Keyword'].str.replace('None', '')
+        dat_goal_level['Num_keys'] = dat_goal_level['Keyword'].apply(lambda x_str: 0 if x_str=='' else len(x_str.split(' - ')))
     return dat_goal_level
 
 ###########################################
@@ -235,12 +241,22 @@ def get_goal_overview(df_filtered, dat_goal_level, sdg_references):
     #drop target-related columns from sdg_references
     sdg_references = sdg_references[['Goal', 'goal_id', 'goal_description']]
     #create new df with policy and goals only, drop duplicates
-    df = df_filtered.groupby(['Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+    df = df_filtered.groupby(['Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index() if not df_filtered.empty else pd.DataFrame()
     #select certain colums
-    dat_goal_level = dat_goal_level[['Goal', 'Count']]
-    dat_goal_level = dat_goal_level.groupby(['Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+    if not dat_goal_level.empty:
+        dat_goal_level = dat_goal_level[['Goal', 'Count']]
+        dat_goal_level = dat_goal_level.groupby(['Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
+    else:
+        dat_goal_level = pd.DataFrame()
     #merge with dfs
-    merged_df = df.append(dat_goal_level, ignore_index=True)
+    if df.empty and not dat_goal_level.empty:
+        merged_df = dat_goal_level
+    elif dat_goal_level.empty and not df.empty:
+        merged_df = df
+    elif df.empty and dat_goal_level.empty:
+        merged_df = pd.DataFrame()
+    else:
+        merged_df = df.append(dat_goal_level, ignore_index=True)
     #group by goal and sum count again
     merged_df = merged_df.groupby(['Goal'])['Count'].apply(lambda x : x.astype(int).sum()).reset_index()
     merged_df = sdg_references.join(merged_df.set_index('Goal'), on='Goal', how='inner')

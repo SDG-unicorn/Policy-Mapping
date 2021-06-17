@@ -475,19 +475,19 @@ else:
 # #results_dict['dat_filtered'] = pspr.filter_data(results_dict['target_dat'])
 # #try targets
 # ## 7.3) get overview on target-level --> export this to final results workbook
-# results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['target_dat'], sdg_df)
+results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['target_dat'], sdg_df)
 
 # ## 7.4) get undetected targets --> export this to final results workbook
 # #results_dict['undetected_targets'] = pspr.find_undetected_targets(results_dict['target_dat'], sdg_df)
 # #end try
 # #try goals
-# ## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
-# results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if no goals are detected? We need to handle this scenario
-# #end try goals
+## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
+results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if no goals are detected? We need to handle this scenario
+#end try goals
 
 # #try handling joins
 # # 7.6) get goal_overview from target counts and goal counts --> export this to final results workbook
-# results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
+results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
 # # 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
 # results_dict['goals_grouped_by_document'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
@@ -539,11 +539,13 @@ step += 1
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
 
 start_time = time.time() 
-
-# sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
-# sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
-# with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
-#     json.dump(sdg_bubbleplot_dict, f)
+try:
+    sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
+except:
+    sdg_bubbleplot_dict= {'name': 'sdgs', 'children': [{"name": "No Targets Detected", "size": "100"}]}
+sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
+with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
+    json.dump(sdg_bubbleplot_dict, f)
 
 
 # 8.2) create and export json files for bubblecharts on political priorities
