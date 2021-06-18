@@ -473,16 +473,19 @@ else:
 
 # ## 7.2) Filter out target counts based on number of counts, number of keywords and textlenght --> export this to final results workbook
 # #results_dict['dat_filtered'] = pspr.filter_data(results_dict['target_dat'])
-
+# #try targets
 # ## 7.3) get overview on target-level --> export this to final results workbook
 results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['target_dat'], sdg_df)
 
 # ## 7.4) get undetected targets --> export this to final results workbook
 # #results_dict['undetected_targets'] = pspr.find_undetected_targets(results_dict['target_dat'], sdg_df)
-
+# #end try
+# #try goals
 ## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
 results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if no goals are detected? We need to handle this scenario
+#end try goals
 
+# #try handling joins
 # # 7.6) get goal_overview from target counts and goal counts --> export this to final results workbook
 results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
 
@@ -549,7 +552,7 @@ priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
 with priority_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(priority_bubbleplot_dict, f)
 
-bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists, pathlib.Path(priority_bubbles).exists])
+bubblecharts_exists = pathlib.Path(priority_bubbles).exists() # all([pathlib.Path(sdg_bubbles).exists(), pathlib.Path(priority_bubbles).exists()])
 
 with open(log_file, 'a') as f:
     f.write( 
