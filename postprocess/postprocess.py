@@ -255,6 +255,7 @@ def get_goal_overview(df_filtered, dat_goal_level, sdg_references):
         merged_df = df
     elif df.empty and dat_goal_level.empty:
         merged_df = pd.DataFrame()
+        return merged_df
     else:
         merged_df = df.append(dat_goal_level, ignore_index=True)
     #group by goal and sum count again
@@ -384,33 +385,43 @@ def get_number_of_policies_per_goal(df_filtered, dat_goal_level):
 
 
 def create_json_files_for_bubbleplots(target_df, aggregated_goal_counts): #filename = None, output_path = None
-    target_df['Target'] = 'Target ' + target_df['Target'].astype(str)
-    target_df.Count = target_df.Count.astype(int)
-    aggregated_goal_counts.Count = aggregated_goal_counts.Count.astype(int)
-    #rename both df's for JSON output
-    goal_subset = aggregated_goal_counts.rename(columns={'Goal': 'name', 'Count': 'size'}, inplace=False)
-    target_subset = target_df.rename(columns={'Target': 'name', 'Count': 'size', 'Goal': 'Goal'}, inplace=False)
-    # creating list of dicts for each SDG
-    # gb = target_subset.groupby('Goal', sort=False)
-    # ls = [gb.get_group(x) for x in gb.groups]
-    dict_ls = []
-    for i in range(0, len(goal_subset)):
-        label = goal_subset['name'][i]
-        #subset target data
-        temp_target_df = target_subset[target_subset['Goal'] == label]
-        #drop first index column to not export to json
-        temp_target_df.drop(temp_target_df.columns[0], axis = 1, inplace = True)
-        # get size for SDG bubble
-        size = goal_subset.iloc[i]['size']
-        # create list of dicts for each SDG
-        tmp_ls = []
-        for row_dict in temp_target_df.to_dict(orient='records'):
-            # print(row_dict)
-            tmp_ls.append(row_dict)
-        # make final dict with label, size, list of dicts and append to dict_list
-        tmp_dict = {'name': label, 'size': int(size), 'children': tmp_ls}
-        dict_ls.append(tmp_dict)
-    final_dict = {'name': 'sdgs', 'children': dict_ls}
+    if aggregated_goal_counts.empty:
+        final_dict = {'name': 'sdgs', 'children': [{"name": "No SDGs detected", "size": "100"}]}
+        return final_dict
+    elif target_df.empty:
+        goal_subset = aggregated_goal_counts.rename(columns={'Goal': 'name', 'Count': 'size'}, inplace=False)
+        labels = goal_subset['name'].tolist()
+        counts = goal_subset['size'].tolist()
+        final_dict = {'name': 'sdgs', 'children':
+             [{"name": name, "size": value} for name, value in zip(labels, counts)]}
+    else:
+        target_df['Target'] = 'Target ' + target_df['Target'].astype(str)
+        target_df.Count = target_df.Count.astype(int)
+        aggregated_goal_counts.Count = aggregated_goal_counts.Count.astype(int)
+        #rename both df's for JSON output
+        goal_subset = aggregated_goal_counts.rename(columns={'Goal': 'name', 'Count': 'size'}, inplace=False)
+        target_subset = target_df.rename(columns={'Target': 'name', 'Count': 'size', 'Goal': 'Goal'}, inplace=False)
+        # creating list of dicts for each SDG
+        # gb = target_subset.groupby('Goal', sort=False)
+        # ls = [gb.get_group(x) for x in gb.groups]
+        dict_ls = []
+        for i in range(0, len(goal_subset)):
+            label = goal_subset['name'][i]
+            #subset target data
+            temp_target_df = target_subset[target_subset['Goal'] == label]
+            #drop first index column to not export to json
+            temp_target_df.drop(temp_target_df.columns[0], axis = 1, inplace = True)
+            # get size for SDG bubble
+            size = goal_subset.iloc[i]['size']
+            # create list of dicts for each SDG
+            tmp_ls = []
+            for row_dict in temp_target_df.to_dict(orient='records'):
+                # print(row_dict)
+                tmp_ls.append(row_dict)
+            # make final dict with label, size, list of dicts and append to dict_list
+            tmp_dict = {'name': label, 'size': int(size), 'children': tmp_ls}
+            dict_ls.append(tmp_dict)
+        final_dict = {'name': 'sdgs', 'children': dict_ls}
     # if output_path == None:
     #     root = Tk()
     #     output_path = filedialog.askdirectory(parent=root, initialdir='/', title='Please select output folder')

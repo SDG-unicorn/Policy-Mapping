@@ -539,10 +539,8 @@ step += 1
 # 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
 
 start_time = time.time() 
-try:
-    sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
-except:
-    sdg_bubbleplot_dict= {'name': 'sdgs', 'children': [{"name": "No Targets Detected", "size": "100"}]}
+
+sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
