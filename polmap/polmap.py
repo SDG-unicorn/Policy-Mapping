@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 #check https://textract.readthedocs.io/en/stable/
 
 #preprocess_text
-from whoosh.lang.porter import stem
+import whoosh.lang as whla
 import nltk as nltk
 from nltk.corpus import stopwords
 #get_ref_to_SDGs
@@ -100,7 +100,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     """
     Prepare text for mapping.
     """
-    text_string = a_string
+    text_string = str(a_string)
 
     if text_string is None: #this should be moved to the prepare keywords wrapper function
         return None
@@ -122,6 +122,10 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
         regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ''), (r'([\w-]+)', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
+
+
+    #Instantiate stemmer
+    stemmer = nltk.stem.PorterStemmer()
 
     #remove all from stop_words to keep in keywords.
     # Review scoping rules in python, this fails with:
@@ -157,7 +161,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
         text_string = text_string.replace(' '+word+' ', '') 
     
     text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
-    lambda rgx_word: ' '+stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
+    lambda rgx_word: ' '+stemmer.stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
     text_string)
         
     for key, value in exception_dict.items(): #Restore words from exception protection
