@@ -1,5 +1,8 @@
 import argparse, json, logging, pathlib, pickle, re, time
+from itertools import count
 import datetime as dt
+
+from six import print_
 try:
     # For Python =+3.7.
     import importlib.resources as rsrc
@@ -8,6 +11,7 @@ except ImportError:
     import importlib_resources as rsrc
 from nltk.corpus import stopwords
 import pandas as pd
+import numpy as np
 #from nltk.tokenize import word_tokenize
 from whoosh.lang.porter import stem
 
@@ -137,7 +141,8 @@ def stem_text(my_keyword):
     my_keyword = plmp.preprocess_text(str(my_keyword), stop_words)
     return my_keyword
 
-keywords[keywd_cols]= keywords[keywd_cols].applymap(stem_text, na_action='ignore')
+keywords[keywd_cols] = keywords[keywd_cols].applymap(stem_text, na_action='ignore')
+labels = keywords[['Goal', 'Target']]
 
 # countries = keywords['developing_countries']['Name'].values.tolist()
 # country_ls = []
@@ -151,7 +156,7 @@ keywords[keywd_cols]= keywords[keywd_cols].applymap(stem_text, na_action='ignore
 keywords_destfilename = processed_keywords_dir / f'{project_title}_processed_{pathlib.Path(keywords_path).name}'
 
 with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
-       keywords.to_excel(_destfile, sheetname="Processed_keywords")
+       keywords.to_excel(_destfile, sheet_name="Processed_keywords")
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -265,33 +270,47 @@ target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
 target_ls = []
 count_destfile_dict={}
 ##make the count
-for policy, item in doc_texts.items():
-    doc_target_ls =[]
+for policy, doc_text in doc_texts.items():
     targetcount_filedest = keyword_count_dir / pathlib.PurePath(policy)
     targetcount_filedest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     targetcount_filedest = targetcount_filedest.parent / (targetcount_filedest.name.replace('.','_')+'.xlsx')
-    count_destfile_dict[policy]=targetcount_filedest
-    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='openpyxl') as destfile: #replace with xlsx writer, make full target ls per document and save it
-        for target, target_keyword_list in zip(keywords['Target_keys']['Target'],keywords['Target_keys']['Keys']): # range(0, len(keys['Keys'])):
-            for keyword in target_keyword_list: #keywords['Target_keys'] #range(0,len(keys['Keys'][i])):
-                counter = item['stemmed_text'].count(keyword)
-                #write counter together with target, policy, keyword as new row in df
-                #first write output to list
-                if counter > 0:
-                    row=[policy, target, keyword, counter, item['textlength']]
-                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{target}< {keyword.upper()} >> s')
-                    target_ls.append(row)
-                    doc_target_ls.append(row)
-                    #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0 and fullcountout:
-                    row=[policy, target, 'None', counter, item['textlength']]
-                    target_ls.append(row)
-                    doc_target_ls.append(row)
-                else:
-                    continue
-        dfObj= pd.DataFrame(doc_target_ls, columns=target_col_names)
-        dfObj.to_excel(destfile, sheet_name='Target_raw_count')
-        destfile.save()
+    count_destfile_dict[policy]=targetcount_filedest    
+
+    count_matrix = keywords[keywd_cols].applymap(lambda keyword: doc_text['stemmed_text'].count(keyword), na_action='ignore')
+    count_matrix.fillna(0, inplace=True)
+
+    detected_keywords = keywords[keywd_cols][count_matrix > 0]
+    detected_keywords.fillna('', inplace=True)
+
+    count_matrix.replace({0: None}, inplace=True)    
+    
+    summary=pd.DataFrame(labels)
+    #summary['List_of_keys']=detected_keywords.apply(lambda x: ', '.join(str(x)),axis=1)
+    
+    count_matrix=pd.merge(labels, count_matrix, left_index=True, right_index=True)
+    detected_keywords=pd.merge(labels, detected_keywords, left_index=True, right_index=True)
+
+    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='xlsxwriter') as destfile:
+        count_matrix.to_excel(destfile, sheet_name='Counts')
+        detected_keywords.to_excel(destfile, sheet_name='Keywords')
+
+        summary['Sum_of_keys'] = count_matrix[keywd_cols].sum(axis=1)
+        summary['Count_of_keys'] = detected_keywords[keywd_cols].count(axis=1)
+        detected_keywords.replace(np.nan, '',inplace=True)
+        summary['list_of_keys'] = detected_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+        summary.to_excel(destfile, sheet_name='Summary')
+
+    doc_text['marked_text'] = plmp.mark_text(doc_text['stemmed_text'], detected_keywords)
+
+    #print(doc_text['marked_text'])
+    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
+    with open(item_path, 'w', encoding='utf-8') as markdoctext:
+           markdoctext.write(str(doc_text["marked_text"]))
+
+
+ #replace with xlsx writer, make full target ls per document and save it
+ 
     
 
 target_df = pd.DataFrame(target_ls, columns=target_col_names)
@@ -318,116 +337,6 @@ with open(log_file, 'a') as f:
     f.write( 
         f'- {step+0.1}) Counting target keywords in texts: {time.time()-start_time:.3e} seconds\n\n'
     )
-
-## 5.2) Count Goals keywords
-start_time = time.time()
-
-goal_col_names=['Policy', 'Goal', 'Keyword', 'Count', 'Textlength']
-
-goal_ls = []
-##make the count
-for policy, item in doc_texts.items():
-    doc_goal_ls=[]
-    with pd.ExcelWriter(count_destfile_dict[policy], mode='a', engine='openpyxl') as destfile:
-        for goal, goal_keyword_list in zip(keywords['Goal_keys']['Goal'],keywords['Goal_keys']['Keys']):
-            for keyword in goal_keyword_list:
-                counter = item['stemmed_text'].count(keyword)
-                #write counter together with target, policy, keyword as new row in df
-                #first write output to list
-                if counter > 0:
-                    row=[policy, goal, keyword, counter, item['textlength']]
-                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{goal}< {keyword.upper()} >> ')
-                    goal_ls.append(row)
-                    doc_goal_ls.append(row)
-                    #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0 and fullcountout:
-                    row=[policy, goal, 'None', counter, item['textlength']]
-                    goal_ls.append(row)
-                    doc_goal_ls.append(row)
-                else:
-                    continue
-        dfObj = pd.DataFrame(doc_goal_ls, columns=goal_col_names)
-        dfObj.to_excel(destfile, sheet_name='Goal_raw_count')
-        destfile.save()
-
-for policy, text in doc_texts.items():
-    marked_text = text['stemmed_text']
-    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
-    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
-    with open(item_path, 'w', encoding='utf-8') as markdoctext:
-           markdoctext.write(f'{marked_text}\n\ntextlength: {len(marked_text)}')
-
-
-goal_df = pd.DataFrame(goal_ls, columns=goal_col_names)
-
-#export final output
-try:
-    goal_df.to_excel(writer, sheet_name='Goal_raw_count')
-except Exception as exception:
-        print(f'Writing goal counts raised: \n{exception}\n')
-        logging.exception(f'Writing goal counts raised: {exception} \n\n')
-
-
-with open(log_file, 'a') as f:
-    f.write( 
-        f'- {step+0.2}) Counting goal keywords in texts: {time.time()-start_time:.3e} seconds\n\n'
-    )
-
-## 5.3) Count developing countries keywords
-start_time = time.time()
-
-dev_countries_colnames=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
-#make final count
-moi_ls = []
-##make the count
-for policy, item in doc_texts.items():
-    doc_moi_ls=[]
-    with pd.ExcelWriter(count_destfile_dict[policy], mode='a', engine='openpyxl') as destfile:
-        for moi, moi_keyword_list in zip(keywords['MOI']['Target'],keywords['MOI']['Keys']):
-            for keyword in moi_keyword_list:
-                if len(keyword) > 0:
-                    counter = 0
-                    sentence = item['stemmed_text']
-                    word = str(keyword)
-                    for match in re.finditer(word, sentence):
-                        for element in country_ls:
-                            #check for element 30 chars before match and until the end of the sentence
-                            if element in sentence[match.start()-30:match.start()] or element in sentence[match.end():sentence.find('.',match.end())]:
-                                word = word + ' ' + element
-                                counter = counter + 1
-                    #write counter together with target, policy, keyword as new row in df
-                    #first write output to list
-                    if counter > 0:
-                        row = [policy, moi, word, counter, item['textlength']]
-                        moi_ls.append(row)
-                        doc_moi_ls.append(row)
-                    # elif counter == 0:
-                    #     row = [policy, moi, word, counter, item['textlength']]
-                    #     moi_ls.append(row)
-                    #     doc_moi_ls.append(row)
-        dfObj = pd.DataFrame(doc_moi_ls,columns=dev_countries_colnames)
-        dfObj.to_excel(destfile, sheet_name='Dev_countries_raw_count')
-        destfile.save()
-
-
-moi_df = pd.DataFrame(moi_ls, columns=dev_countries_colnames)
-try:
-    moi_df.to_excel(writer, sheet_name='Dev_countries_raw_count')
-except Exception as exception:
-        print(f'Writing MOI counts raised: \n{exception}\n')
-        logging.exception(f'Writing MOI counts raised: {exception} \n\n')
-
-
-with open(log_file, 'a') as f:
-    f.write( 
-        f'- {step+0.3}) Counting developing countries keywords in texts: {time.time()-start_time:.3e} seconds\n\n'
-    )
-
-#policies for which no keys were detected
-detected_pol = moi_df['Policy'].tolist()
-
-writer.save()
-
 
 with open(log_file, 'a') as f:
     f.write( 
