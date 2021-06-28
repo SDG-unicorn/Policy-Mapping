@@ -119,10 +119,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     
 
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.,;:\s-]+', ''), 
-        (r'([\w-]+)', r' \1 '),
-        (r'(\w)([.,;:])', r'\1 \2'),
-        (r'([\w ])\n([\w ])', r'\1 \2')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ''), (r'([\w-]+)', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
 
@@ -150,7 +147,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     
     text_string = text_string.replace(' rd ', ' R&D ')
     
-    text_string = re.sub(r'([a-zA-z-]{3,}|ph|no|eu)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
+    text_string = re.sub(r'([a-zA-z-]{3,}|ph|no)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
     
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,
@@ -205,40 +202,3 @@ def SDGrefs_mapper(document_text, refs_keywords=None):
             refs_sentences[tagged_sentence.capitalize()] = ', '.join([f'<span>{ref_keyword.capitalize()}</span>' for ref_keyword in refs_keywords if ref_keyword in sentence])        
     
     return refs_sentences
-
-def join_str(numpy_array):
-
-    numpy_array = numpy_array.tolist()
-    numpy_array = [ item for item in numpy_array if item ]
-    numpy_array = ', '.join(numpy_array)
-    
-    return numpy_array
-
-# def mark_text(pd_row, doc_text, keywd_cols=list(range(57))):
-#     #print(pd_row)
-#     label = str(pd_row['Target'])
-#     flag = label.split('.')[-1]
-#     flag = 'SDG' if flag=='0' else 'Target'
-#     for keywd in pd_row[keywd_cols]:
-#         #print(keywd, type(keywd))
-#         if not isinstance(keywd, float):
-#             doc_text=doc_text.replace(keywd, f'< {flag} {label} <{keywd.upper()}>>')
-#         else:
-#             continue
-#         if flag=='SDG':
-#             doc_text=doc_text.replace('.0','') 
-#     return doc_text
-
-def mark_text(document_text, detected_keywords_df):
-
-    marked_text = document_text 
-
-    for _, row in detected_keywords_df.iterrows():
-
-        label = row['Target'] if row['Target'].split('.')[-1] != '0' else row['Goal']
-        
-        for keyword in row[range(57)]:
-            if keyword:
-                marked_text = marked_text.replace(keyword ,f' < {label} >< {keyword.upper()} > ')
-
-    return marked_text
