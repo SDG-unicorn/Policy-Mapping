@@ -1,5 +1,6 @@
 import argparse, json, logging, pathlib, pickle, re, time
 from itertools import count
+import functools as fntl
 import datetime as dt
 
 from six import print_
@@ -266,15 +267,19 @@ start_time = time.time()
 fullcountout = False
 
 target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
-
-target_ls = []
 count_destfile_dict={}
+
 ##make the count
 for policy, doc_text in doc_texts.items():
+
     targetcount_filedest = keyword_count_dir / pathlib.PurePath(policy)
     targetcount_filedest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     targetcount_filedest = targetcount_filedest.parent / (targetcount_filedest.name.replace('.','_')+'.xlsx')
-    count_destfile_dict[policy]=targetcount_filedest    
+    count_destfile_dict[policy] = targetcount_filedest    
+
+    count_matrix = pd.DataFrame()
+    detected_keywords = pd.DataFrame()
+    summary = pd.DataFrame()
 
     count_matrix = keywords[keywd_cols].applymap(lambda keyword: doc_text['stemmed_text'].count(keyword), na_action='ignore')
     count_matrix.fillna(0, inplace=True)
@@ -283,23 +288,28 @@ for policy, doc_text in doc_texts.items():
     detected_keywords.fillna('', inplace=True)
 
     count_matrix.replace({0: None}, inplace=True)    
-    
-    summary=pd.DataFrame(labels)
-    #summary['List_of_keys']=detected_keywords.apply(lambda x: ', '.join(str(x)),axis=1)
-    
+      
     count_matrix=pd.merge(labels, count_matrix, left_index=True, right_index=True)
     detected_keywords=pd.merge(labels, detected_keywords, left_index=True, right_index=True)
 
+    summary=pd.DataFrame(labels)
+
+    # summary['Sum_of_keys'] = count_matrix[keywd_cols].sum(axis=1)
+    # summary['Count_of_keys'] = detected_keywords[keywd_cols].count(axis=1)
+    # summary['list_of_keys'] = detected_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    
     with pd.ExcelWriter(targetcount_filedest, mode='w', engine='xlsxwriter') as destfile:
         count_matrix.to_excel(destfile, sheet_name='Counts')
         detected_keywords.to_excel(destfile, sheet_name='Keywords')
-
-        summary['Sum_of_keys'] = count_matrix[keywd_cols].sum(axis=1)
-        summary['Count_of_keys'] = detected_keywords[keywd_cols].count(axis=1)
-        detected_keywords.replace(np.nan, '',inplace=True)
-        summary['list_of_keys'] = detected_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
         summary.to_excel(destfile, sheet_name='Summary')
 
+        # summary['Sum_of_keys'] = count_matrix[keywd_cols].sum(axis=1)
+        # summary['Count_of_keys'] = detected_keywords[keywd_cols].count(axis=1)
+        # summary['list_of_keys'] = detected_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+        # summary.to_excel(destfile, sheet_name='Summary')
+
+    doc_text['count_matrix'] = count_matrix
+    doc_text['detectedkeywd_matrix'] = detected_keywords
     doc_text['marked_text'] = plmp.mark_text(doc_text['stemmed_text'], detected_keywords)
 
     #print(doc_text['marked_text'])
@@ -308,12 +318,21 @@ for policy, doc_text in doc_texts.items():
     with open(item_path, 'w', encoding='utf-8') as markdoctext:
            markdoctext.write(str(doc_text["marked_text"]))
 
+count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values()]
 
- #replace with xlsx writer, make full target ls per document and save it
- 
-    
+# df1 = pd.DataFrame({'val':{'a': 1, 'b':2, 'c':3}})
+# df2 = pd.DataFrame({'val':{'a': 1, 'b':2, 'd':3}})
+# df3 = pd.DataFrame({'val':{'e': 1, 'c':2, 'd':3}})
+# df4 = pd.DataFrame({'val':{'f': 1, 'a':2, 'd':3}})
+# df5 = pd.DataFrame({'val':{'g': 1, 'f':2, 'd':3}})
 
-target_df = pd.DataFrame(target_ls, columns=target_col_names)
+total_count = fntl.reduce(lambda a, b: a[keywd_cols].add(b[keywd_cols], fill_value=0), count_matrixes)
+
+total_count = pd.merge(labels, total_count, left_index=True, right_index=True)
+
+# total_count = pd.DataFrame()
+# for policy, item in doc_texts.items():
+#     total_count = total_count.add(item['count_matrix'], fill_value=0)
 
 count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 
@@ -321,17 +340,15 @@ count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 #     target_df = pd.DataFrame(target_ls, columns=target_col_names)
 #     target_df.to_excel(_destfile, sheet_name = 'Target_raw_count' )
 
-writer = pd.ExcelWriter(count_destfile, engine='openpyxl')
+with pd.ExcelWriter(count_destfile, mode='w', engine='xlsxwriter') as writer:
 
+    try:
+        total_count.to_excel(writer, sheet_name='Keyword_count')
+    except Exception as exception:
+            print(f'Writing target counts raised: \n{exception}\n')
+            logging.exception(f'Writing target counts raised: {exception} \n\n')
+    #writer.save()
 print(f'Final results are stored in:\n{count_destfile}\n')
-
-#export final output
-try:
-    target_df.to_excel(writer, sheet_name='Target_raw_count')
-except Exception as exception:
-        print(f'Writing target counts raised: \n{exception}\n')
-        logging.exception(f'Writing target counts raised: {exception} \n\n')
-#writer.save()
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -350,8 +367,6 @@ step += 1
 # goal_df.to_pickle("gd_goal_df.pkl")
 
 target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
-goal_df['Group']=goal_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
-
 
 ######################################
 ########### 7) Postprocessing of keyword count

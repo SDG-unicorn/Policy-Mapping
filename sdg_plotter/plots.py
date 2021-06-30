@@ -36,9 +36,11 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-filename='PT_RRP'
+filename= pathlib.Path('./output/France_/output') / 'FR_RRP'
 
-res_path = pathlib.Path('./output/PT_RRP_/output/6-results/results_.xlsx')
+Country = str(filename).split('/')[1].replace('_','')
+print(Country)
+res_path = pathlib.Path('./output/France_/output/6-results/results_.xlsx')
 
 mock_target_df = pd.read_excel(res_path,sheet_name='target_dat') #pd.DataFrame({
 #     'Name': target_list,
@@ -96,18 +98,39 @@ mock_goals = mock_goals['Count']
 # #     plt.savefig(svg_filepath_variable)
 # #return
 
+EU_recplan=[104,39,667,130,19,6,113,297,115,46,49,94,140,16,24,115,67]
+EU_recplan=np.array(EU_recplan)
+EU_recplan=EU_recplan/np.sum(EU_recplan)*100
+
+mock_goals=np.array(mock_goals.to_list())
+mock_goals=mock_goals/np.sum(mock_goals)*100
+
+sdg_dict={'Eu Recovery': EU_recplan, Country:mock_goals}
 
 ##### Goal Barplot for 1 or more groups #####
 
-def sdg_barplot(sdg_item, color_dict, outfile=None):
+def sdg_barplot(sdg_item, color_dict, outfile=None, relative=False):
     
     params_dict={'resolution':[15, 10],'plot_title' : '',
     'alpha':0.95, 'width' : 0.9, 'yval_offset' : 0.05,
-    'xtick_labels' : [f'SDG {count}' for count in range(1,18,1)],'y_label': 'Count'}
+    'xtick_labels' : [f'SDG {count}' for count in range(1,18,1)],'y_label': '% of Count'}
     #if params_dict == None: if params dict diff none update keys/values with passed dictionary else use standard
 
     # Declaring the figure or the plot (y, x) or (width, height)
     fig = plt.figure(figsize=params_dict['resolution'])
+
+    # if relative:
+    #     if isinstance(sdg_item, list):
+    #         sdg_item=np.array(sdg_item)
+    #         sdg_item=(sdg_item/np.sum(sdg_item))*100
+    #         sdg_item=sdg_item.tolist()
+    #         print(sdg_item)
+    #     elif isinstance(sdg_item,dict):
+    #         for key in sdg_item.keys():
+    #             sdg_item[key]=np.array(sdg_item[key])
+    #             sdg_item[key]=(sdg_item[key]/np.sum(sdg_item[key]))*100
+    #             sdg_item[key]=sdg_item[key].tolist()
+    #             print(key, sdg_item[key])
 
     # Data to be plotted
     X = np.arange(len(sdg_item))
@@ -120,6 +143,7 @@ def sdg_barplot(sdg_item, color_dict, outfile=None):
     
     elif isinstance(sdg_item,dict):
         for counter, key in enumerate(sdg_item.keys()):
+            X = np.arange(len(sdg_item[key]))
             plt.bar(X+counter*params_dict['width']/(len(sdg_item)), 
             sdg_item[key], color = color_dict.values(), 
             alpha = params_dict['alpha']-(counter*params_dict['alpha']/(len(sdg_item))/1.5), 
@@ -138,7 +162,8 @@ def sdg_barplot(sdg_item, color_dict, outfile=None):
         plt.savefig(f'{outfile}', dpi=300)
     return fig
 
-sdg_barplot(mock_goals.to_list(), goal_colors, outfile=f'{filename}_sdg_barlpot.png')
+#sdg_barplot(mock_goals.to_list(), goal_colors, outfile=f'{filename}_sdg_barlpot.png')
+sdg_barplot(sdg_dict, goal_colors, outfile=f'{filename}_vs_EU.png')
 
 ##### Goal or target horizontal barplot for 1 group #####
 
