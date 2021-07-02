@@ -14,7 +14,7 @@
 
 #Imports
 #Built-in
-import re, collections, pathlib
+import re, collections, pathlib, math
 
 #doc2txt
 from docx2python import docx2python
@@ -209,7 +209,7 @@ def SDGrefs_mapper(document_text, refs_keywords=None):
 def join_str(numpy_array):
 
     numpy_array = numpy_array.tolist()
-    numpy_array = [ item for item in numpy_array if item ]
+    numpy_array = [ item for item in numpy_array if not isinstance(item, float) ]
     numpy_array = ', '.join(numpy_array)
     
     return numpy_array
@@ -238,7 +238,8 @@ def mark_text(document_text, detected_keywords_df):
         label = row['Target'] if row['Target'].split('.')[-1] != '0' else row['Goal']
         
         for keyword in row[range(57)]:
-            if keyword:
+            #print(keyword)
+            if keyword and not isinstance(keyword, float):
                 marked_text = marked_text.replace(keyword ,f' < {label} >< {keyword.upper()} > ')
 
     return marked_text
