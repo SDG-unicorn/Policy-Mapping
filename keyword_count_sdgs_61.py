@@ -311,10 +311,12 @@ for policy, doc_text in doc_texts.items():
 #For some strange reasons this does not works if done in the previous loop
 for policy, item in doc_texts.items():
 
-    summary=pd.DataFrame(labels)
-    summary['Sum_of_keys'] = item['count_matrix'][keywd_cols].sum(axis=1)
-    summary['Count_of_keys'] = item['detectedkeywd_matrix'][keywd_cols].count(axis=1) #Use explicit fraction?
-    summary['list_of_keys'] = item['detectedkeywd_matrix'][keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    summary=labels.copy(deep=True)
+    count_df = item['count_matrix'].copy(deep=True)
+    detkeyw_df = item['detectedkeywd_matrix'].copy(deep=True)
+    summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
+    summary['Count_of_keys'] = detkeyw_df[keywd_cols].count(axis=1) #Use explicit fraction?
+    summary['list_of_keys'] = detkeyw_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
 
     with pd.ExcelWriter(count_destfile_dict[policy], mode='a', engine='openpyxl') as destfile:
         summary.to_excel(destfile, sheet_name='Summary')
@@ -330,7 +332,7 @@ total_keywords =  keywords[keywd_cols][total_count > 0]
 total_count = pd.merge(labels, total_count, left_index=True, right_index=True)
 total_keywords = pd.merge(labels, total_keywords, left_index=True, right_index=True)
 
-total_summary=pd.DataFrame(labels)
+total_summary=labels.copy(deep=True)
 total_summary['Sum_of_keys'] = total_count[keywd_cols].sum(axis=1)
 total_summary['Count_of_keys'] = total_keywords[keywd_cols].count(axis=1) #Use explicit fraction?
 total_summary['list_of_keys'] = total_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
