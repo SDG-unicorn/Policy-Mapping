@@ -8,33 +8,44 @@ import os
 
 #######################################################
 #######################################################
-######  SET OPTIONS AND READ IN RELEVANT DATA  ########
+######  Functions for expanded keyword count  ########
 #######################################################
 #######################################################
 
-# parser = argparse.ArgumentParser(description='''Aggregate mapping results.''')
-# parser.add_argument('-i', '--input', help='Input file')
-# parser.add_argument('-o', '--output', help='Output directory', default='cwd')
-# parser.add_argument('-at', '--add_timestamp', help='Add a timestamp to output directory', type=bool, default=True)
+def make_bubbleplot(results_df):
+    #Later on, think about a way to make bubbleplot for PP
+    sdg_bubbledict={"name": "sdgs", "children": None}
+    goal_ls=[]
 
-# args = parser.parse_args()
+    goals=results_df.groupby(by=["Goal"]).sum()
 
-# #get current time
-# date = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
-
-# #for testing/checking df outputs
-# pd.set_option('display.max_rows', 500)
-# pd.set_option('display.max_columns', 500)
-
-# #print all columns
-# # pd.set_option('display.max_columns', None)
-# # pd.set_option('display.max_rows', None)
-
-# input_dir=pathlib.Path(args.input)
+    for goal, count in zip(goals.index.tolist(), goals['Sum_of_keys']):
+        goal_dict={}
+        if count > 0:
+            goal_dict["name"]=goal
+            goal_dict["size"]=count
+            goal_dict["children"] = None
+            goal_ls.append(goal_dict)
+        else:
+            continue
 
 
-#reference table with all goals, targets, id's, descriptions, hexcolorcodes
-#sdg_reference_df = pd.read_excel('polmap/goal_target_list.xlsx', sheet_name='Sheet1') #MM not the correct way to import files in a module?
+    for goal in goal_ls:
+        target_ls=[]
+        if goal["size"] >0:
+            targetdf = results_df[results_df.Goal == goal["name"]] 
+            for target, count in zip(targetdf['Target'], targetdf['Sum_of_keys']):
+                target_dict={}
+                target_dict["name"]=f'Target {target}'
+                target_dict["size"]=count
+                target_ls.append(target_dict)
+            goal['children']=target_ls
+        else:
+            continue
+
+    sdg_bubbledict['children']=goal_ls
+    
+    return sdg_bubbledict
 
 #######################################################
 #######################################################

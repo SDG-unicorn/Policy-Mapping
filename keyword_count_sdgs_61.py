@@ -366,83 +366,7 @@ step += 1
 ######################################
 ########### 7) Postprocessing of keyword count
 
-start_time = time.time()
-
-target_df['Target'] = pspr.stringify_id(target_df['Target'])
-
-results_dict = {}
-
-#sdg_df=pspr.sdg_reference_df #MM we need to have that file available whenever running the script from other locations.
-with rsrc.path("keywords", "goal_target_list.xlsx") as res_path:
-    sdg_df = pd.read_excel(res_path)
-
-## 7.1) Aggregate count of keywords to target-level --> export this to final results workbook
-results_dict['target_dat'] = pspr.aggregate_to_targets(target_df, sdg_df)
-
-results_dict['target_dat_pp'] = results_dict['target_dat'].copy()
-if not results_dict['target_dat'].empty:
-    results_dict['target_dat'] = results_dict['target_dat'].drop(columns=['MAIN_priority', 'SEC_priority'])
-else:
-    pass
-
-# ## 7.2) Filter out target counts based on number of counts, number of keywords and textlenght --> export this to final results workbook
-# #results_dict['dat_filtered'] = pspr.filter_data(results_dict['target_dat'])
-
-# ## 7.3) get overview on target-level --> export this to final results workbook
-results_dict['target_overview_df'] = pspr.get_target_overview(results_dict['target_dat'], sdg_df)
-
-# ## 7.4) get undetected targets --> export this to final results workbook
-# #results_dict['undetected_targets'] = pspr.find_undetected_targets(results_dict['target_dat'], sdg_df)
-
-## 7.5)  aggregate goal counts to goal-level --> export this to final results workbook
-results_dict['goal_dat'] = pspr.aggregate_to_goals(goal_df, sdg_df) #MM What if no goals are detected? We need to handle this scenario
-
-# # 7.6) get goal_overview from target counts and goal counts --> export this to final results workbook
-results_dict['goal_overview'] = pspr.get_goal_overview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
-
-# # 7.7) group by document and aggregate to goals, when running this sheetname list  and sheetnames need to be adapted
-# results_dict['goals_grouped_by_document'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat'], results_dict['goal_dat'], sdg_df)
-
-# # 7.8) get goal overview but not with aggregated counts but with number of policies relating to a goal
-# results_dict['policies_per_goal'] = pspr.get_number_of_policies_per_goal(results_dict['target_dat'], results_dict['goal_dat'])
-
-# # 7.9) get list of priorities
-results_dict['priorities'] = pspr.map_target_dat_to_priorities(results_dict['target_dat_pp'], sdg_df)
-
-# results_dict['target_dat_by_group'] = pspr.aggregate_to_targets(target_df, sdg_df, grouping_factor='Group')
-# results_dict['goal_dat_by_group'] = pspr.aggregate_to_goals(goal_df, sdg_df, grouping_factor='Group')
-# results_dict['goals_grouped_by_folder'] = pspr.group_by_name_and_get_goaloverview(results_dict['target_dat_by_group'], results_dict['goal_dat_by_group'], sdg_df, grouping_factor='Group')
-
-# with open('results.pkl', 'wb') as pkl_f:
-#     pickle.dump(results_dict, pkl_f)
-
-sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_(goals_+_targets)', 'priorities']
-
-
-# sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets', 'goal_count', 'goal_overview', 'total_count_by_document', 'total_count']
-
-# sheetnames = { df : sheetname for df, sheetname in zip(list(results_dict.keys()), sheetnames_list)}
-
-# pprint.pprint(sheetnames)
-
-mappingresults_destfile = results_dir / f'results_{project_title}.xlsx'
-
 #Skip saving if all df are ampty or save an empyt excel file?
-with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as destfile:
-    for sheetname, df in results_dict.items():#zip( sheetnames.values()):
-
-        #print(f'\n{} - {}')
-        if not df.empty:
-            df.to_excel(destfile, sheet_name=sheetname)
-
-
-with open(log_file, 'a') as f:
-    f.write( 
-        f'{step}) Analyzed results and saved summary tables in {mappingresults_destfile}\n{time.time()-start_count_time:.3e} seconds.\n\n'
-        )
-
-print(f'Step {step}: Analyzed results and saved summary tables in {mappingresults_destfile}\n')
-step += 1
 
 ######################################
 ########### 8) Create JSON files for visualization
@@ -451,24 +375,24 @@ step += 1
 
 start_time = time.time() 
 
-sdg_bubbleplot_dict=pspr.create_json_files_for_bubbleplots(results_dict['target_overview_df'].fillna(""), results_dict['goal_overview'])
+sdg_bubbleplot_dict=pspr.make_bubbleplot(total_summary)
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
 
 
-# 8.2) create and export json files for bubblecharts on political priorities
-priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['priorities'])
-priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
-with priority_bubbles.open(mode='w', encoding='utf-8') as f:
-    json.dump(priority_bubbleplot_dict, f)
+# # 8.2) create and export json files for bubblecharts on political priorities
+# priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['priorities'])
+# priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
+# with priority_bubbles.open(mode='w', encoding='utf-8') as f:
+#     json.dump(priority_bubbleplot_dict, f)
 
-bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists, pathlib.Path(priority_bubbles).exists])
+bubblecharts_exists = pathlib.Path(sdg_bubbles).exists() #all([pathlib.Path(sdg_bubbles).exists(), pathlib.Path(priority_bubbles).exists()])
 
-with open(log_file, 'a') as f:
-    f.write( 
-        f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
-        )
+# with open(log_file, 'a') as f:
+#     f.write( 
+#         f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
+#         )
 
 print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
 step += 1
