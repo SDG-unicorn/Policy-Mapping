@@ -1,7 +1,10 @@
 import pathlib , argparse, json
 import datetime as dt
+from numpy.lib.function_base import append
 import pandas as pd
 import os
+
+from six import print_
 # from tkinter import filedialog
 # from tkinter import *
 # from nltk import tokenize
@@ -32,14 +35,41 @@ def make_bubbleplot(results_df):
 
     for goal in goal_ls:
         target_ls=[]
+
         if goal["size"] >0:
-            targetdf = results_df[results_df.Goal == goal["name"]] 
+            targetdf = results_df[results_df.Goal == goal["name"]]
+
             for target, count in zip(targetdf['Target'], targetdf['Sum_of_keys']):
+                if count == 0:
+                    continue
                 target_dict={}
-                target_dict["name"]=f'Target {target}'
-                target_dict["size"]=count
-                target_ls.append(target_dict)
+
+                if str(target.split('.')[-1])=='0':
+                    floor = round(count // 10)
+                    remainder = round(count % 10)
+                    mock = [10 for _ in range(floor)]
+                    if not mock: #to troubleshoot
+                        mock.append(remainder)
+                    elif mock[0]==10 and len(mock)==1:
+                        mock.append(remainder)
+                    elif len(mock)>1:
+                        mock[-1]=remainder
+                    print(f'Target {target}', int(count))
+                    print(floor, remainder)
+                    print(mock)
+
+                    for item in mock:
+                        target_dict["name"]='Target 0'
+                        target_dict["size"]=item
+                        target_ls.append(target_dict)
+
+                else:
+                    target_dict["name"]=f'Target {target}'
+                    target_dict["size"]=count
+                    target_ls.append(target_dict)
+            
             goal['children']=target_ls
+        
         else:
             continue
 

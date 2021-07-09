@@ -323,13 +323,13 @@ for policy, item in doc_texts.items():
 
 
 count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values() ]
-
 total_count = fntl.reduce(lambda a, b: a[keywd_cols].add(b[keywd_cols], fill_value=0), count_matrixes)
-total_keywords =  keywords[keywd_cols][total_count > 0]
+total_keywords =  keywords[keywd_cols][total_count[keywd_cols] > 0]
+
 # Using reduce with df.count will give the number of policies adressing a certain target
 # This can be leveraged to build sankey diagrams and poilicy mapping for the platform
 
-total_count = pd.merge(labels, total_count, left_index=True, right_index=True)
+total_count = pd.merge(labels, total_count[keywd_cols], left_index=True, right_index=True)
 total_keywords = pd.merge(labels, total_keywords, left_index=True, right_index=True)
 
 total_summary=labels.copy(deep=True)
