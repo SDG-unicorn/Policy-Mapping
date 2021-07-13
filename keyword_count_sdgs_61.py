@@ -358,79 +358,39 @@ with open(log_file, 'a') as f:
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
 
-# target_df.to_pickle("gd_target_df.pkl")
-# goal_df.to_pickle("gd_goal_df.pkl")
-
-#target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
-
 ######################################
-########### 7) Postprocessing of keyword count
-
-#Skip saving if all df are ampty or save an empyt excel file?
-
-######################################
-########### 8) Create JSON files for visualization
-
-# 8.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+########### 7) Process results for visualization
 
 start_time = time.time() 
 
-sdg_bubbleplot_dict=pspr.make_bubbleplot(total_summary)
+with rsrc.path("keywords", "goal_target_list.xlsx") as pp_path:
+    keywords_path = res_path
+    pp_def = pd.read_excel(pp_path)
+
+priorities_df=pspr.make_polpridf(total_summary, pp_def)
+
+# 7.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
+
+sdg_bubbleplot_dict=pspr.make_sdgbubbleplot(total_summary)
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
 
 
-# # 8.2) create and export json files for bubblecharts on political priorities
-# priority_bubbleplot_dict=pspr.create_json_for_priorities(results_dict['priorities'])
-# priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
-# with priority_bubbles.open(mode='w', encoding='utf-8') as f:
-#     json.dump(priority_bubbleplot_dict, f)
+priority_bubbleplot_dict=pspr.make_polpribubbleplot(priorities_df)
+priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
+with priority_bubbles.open(mode='w', encoding='utf-8') as f:
+    json.dump(priority_bubbleplot_dict, f)
 
-bubblecharts_exists = pathlib.Path(sdg_bubbles).exists() #all([pathlib.Path(sdg_bubbles).exists(), pathlib.Path(priority_bubbles).exists()])
+bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists(), pathlib.Path(priority_bubbles).exists()])
 
-# with open(log_file, 'a') as f:
-#     f.write( 
-#         f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
-#         )
+with open(log_file, 'a') as f:
+    f.write( 
+        f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
+        )
 
 print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
 step += 1
-
-#To be moved somewhere in modules
-# pp_colors={'Human Development':'#F68D4A',
-# 'Growth Jobs':'#FABE13',
-# 'Green Deal':'#1A6835',
-# 'Governance':'#005C95',
-# 'Digitalisation':'#4D9CD5',
-# 'Migration':'#DE6189',
-# 'None':'#000000'
-# }
-
-# results_dict['priorities'].rename(columns = {'priority':'name', 'Count':'size'}, inplace = True)
-# results_dict['priorities']['goal_color']=results_dict['priorities']['name'].map(pp_colors)
-# pp_bubbleplot_dict= {'name': 'pp',
-# 'children': list(results_dict['priorities'].to_dict('index').values())}
-# polprior_bubbles = jsonfiles_dir / 'polprior_bubbles.json'
-# with polprior_bubbles.open(mode='w', encoding='utf-8') as f:
-#     json.dump(pp_bubbleplot_dict, f)
-#
-# print(jsonfiles_dir)
-
-#MM 11,12,13 for the moment not needed
-
-# 11.) export individual json files for each policy, input for individual sankey charts on knowSDGs platform
-# sankeychart_dict=pspr.create_json_files_for_sankey_charts(results_dict['info_added_df'])
-# sankeychart_path = jsonfiles_dir / 'sankeychart.json'
-# with sankeychart_path.open(mode='w', encoding='utf-8') as f:
-#     json.dump(sankeychart_dict, f)
-
-# # 12.) export csv table with list of policies (second viz on knowSDGs platform = List of Policies)
-# #policy_df = export_csv_for_policy_list(info_added_df)
-
-# # 13.) create and export policy coherence df (third viz knowSDGs platform)
-# # pol_coher_df=create_policy_coherence_data(dat_filtered, sdg_df)#output_path=out_dir
-# # pol_coher_df.to_csv((pathlib.Path(out_dir) / 'policy_coherence.csv'), sep=";", index=False, encoding='utf-8-sig')
 
 with open(log_file, 'a') as f:
     f.write( 
