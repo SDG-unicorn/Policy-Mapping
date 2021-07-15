@@ -66,7 +66,7 @@ if args.label_output:
 else:
     project_title=''
 
-out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir, results_dir, jsonfiles_dir = outdirtree_dict.values()
+out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, processedtext_dir, keyword_count_dir, results_dir, jsonfiles_dir = outdirtree_dict.values()
 
 print(f"Output folder is: \n{out_dir}\n")
 
@@ -124,8 +124,6 @@ else:
         keywords = pd.ExcelFile(res_path)
         keywords_path = res_path
 
-    
- # if args.keywords is not None else pathlib.Path('keywords/keywords.xlsx')
 
 sheets = keywords.sheet_names
 print(f"Reading keywords dataset in {keywords_path}.\nSheets: {', '.join(sheets)}\n")
@@ -140,8 +138,7 @@ stop_words.remove('all')
 for sheet in keywords_sheets:
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', str(keywords)))
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(str(keyword), stop_words) for keyword in keywords.split(';')])
-    #keywords[sheet].iloc[:,2:]=keywords[sheet].iloc[:,2:].applymap(lambda keyword: plmp.preprocess_text(str(keyword), stop_words))
-
+    
 countries = keywords['developing_countries']['Name'].values.tolist()
 country_ls = []
 for element in countries:
@@ -174,7 +171,6 @@ doc_texts = {} #This can easily become a dictionary with filepath as a key and t
 for counter, file_path in enumerate(files):
     try:
         doc_text = plmp.doc2text(file_path)
-       # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         textfile_dest_ = file_path.parts[file_path.parts.index(input_dir.name)+1:]
         textfile_dest =  doctext_dir.joinpath(*textfile_dest_)
         textfile_dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
@@ -182,7 +178,7 @@ for counter, file_path in enumerate(files):
         with open(textfile_dest, 'w', encoding='utf-8') as file_:
            file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
-    except Exception as exception: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
+    except Exception as exception:
         print(f'{file_path.name}:\n{exception}\n')
         logging.exception(f'{file_path.name} raised exception: {exception} \n\n')
 
@@ -194,10 +190,6 @@ with open(log_file, 'a') as f:
 
 print(f'Step {step}: Converted {len(doc_texts)} documents to text.\n')
 step += 1
-
-#pprint.pprint(doc_texts)
-# for policy, text, in doc_texts.items():
-#     print(f'{policy} lenght is {len(text)}')
 
 ######################################
 ########### 4) Check for and extract references to SDG agenda in text
@@ -241,13 +233,12 @@ for policy, text in doc_texts.items():
     stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
     #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
-    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = processedtext_dir / 'stemmed' /pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_stemmed.txt')
     with open(item_path, 'w', encoding='utf-8') as stemdoctext:
            stemdoctext.write(f'{stemmed_text}\n\ntextlength: {len(stemmed_text)}')
-    #Append textlength
-    doc_texts[policy] = { 'text' : text, 'stemmed_text': stemmed_text, 'textlength' : len(stemmed_text)} #MM @
+    doc_texts[policy] = { 'text' : text, 'stemmed_text': stemmed_text, 'textlength' : len(stemmed_text)}
 
 
 with open(log_file, 'a') as f:
@@ -263,12 +254,13 @@ step += 1
 start_count_time = time.time()
 start_time = time.time()
 
-fullcountout = False
+fullcount = True
 
 target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
 
 target_ls = []
 count_destfile_dict={}
+
 ##make the count
 for policy, item in doc_texts.items():
     doc_target_ls =[]
@@ -276,19 +268,15 @@ for policy, item in doc_texts.items():
     targetcount_filedest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     targetcount_filedest = targetcount_filedest.parent / (targetcount_filedest.name.replace('.','_')+'.xlsx')
     count_destfile_dict[policy]=targetcount_filedest
-    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='openpyxl') as destfile: #replace with xlsx writer, make full target ls per document and save it
-        for target, target_keyword_list in zip(keywords['Target_keys']['Target'],keywords['Target_keys']['Keys']): # range(0, len(keys['Keys'])):
-            for keyword in target_keyword_list: #keywords['Target_keys'] #range(0,len(keys['Keys'][i])):
+    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='openpyxl') as destfile:
+        for target, target_keyword_list in zip(keywords['Target_keys']['Target'],keywords['Target_keys']['Keys']):
+            for keyword in target_keyword_list:
                 counter = item['stemmed_text'].count(keyword)
-                #write counter together with target, policy, keyword as new row in df
-                #first write output to list
                 if counter > 0:
                     row=[policy, target, keyword, counter, item['textlength']]
-                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{target}< {keyword.upper()} >> s')
                     target_ls.append(row)
                     doc_target_ls.append(row)
-                    #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0 and fullcountout:
+                elif counter == 0 and fullcount:
                     row=[policy, target, 'None', counter, item['textlength']]
                     target_ls.append(row)
                     doc_target_ls.append(row)
@@ -303,21 +291,16 @@ target_df = pd.DataFrame(target_ls, columns=target_col_names)
 
 count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 
-# with pd.ExcelWriter(count_destfile, engine='openpyxl') as _destfile:
-#     target_df = pd.DataFrame(target_ls, columns=target_col_names)
-#     target_df.to_excel(_destfile, sheet_name = 'Target_raw_count' )
-
 writer = pd.ExcelWriter(count_destfile, engine='openpyxl')
 
 print(f'Final results are stored in:\n{count_destfile}\n')
 
-#export final output
 try:
     target_df.to_excel(writer, sheet_name='Target_raw_count')
 except Exception as exception:
         print(f'Writing target counts raised: \n{exception}\n')
         logging.exception(f'Writing target counts raised: {exception} \n\n')
-#writer.save()
+
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -337,15 +320,11 @@ for policy, item in doc_texts.items():
         for goal, goal_keyword_list in zip(keywords['Goal_keys']['Goal'],keywords['Goal_keys']['Keys']):
             for keyword in goal_keyword_list:
                 counter = item['stemmed_text'].count(keyword)
-                #write counter together with target, policy, keyword as new row in df
-                #first write output to list
                 if counter > 0:
                     row=[policy, goal, keyword, counter, item['textlength']]
-                    item['stemmed_text'] = item['stemmed_text'].replace( keyword, f' <{goal}< {keyword.upper()} >> ')
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
-                    #dfObj = dfObj.append(pd.Series(target_ls[-1], index=target_col_names), ignore_index=True)
-                elif counter == 0 and fullcountout:
+                elif counter == 0 and fullcount:
                     row=[policy, goal, 'None', counter, item['textlength']]
                     goal_ls.append(row)
                     doc_goal_ls.append(row)
@@ -355,13 +334,20 @@ for policy, item in doc_texts.items():
         dfObj.to_excel(destfile, sheet_name='Goal_raw_count')
         destfile.save()
 
+keywords_dict={str(target): target_keyword_list for target, target_keyword_list in zip(keywords['Target_keys']['Target'],keywords['Target_keys']['Keys'])}
+keywords_dict={str(goal): goal_keyword_list for goal, goal_keyword_list in zip(keywords['Goal_keys']['Goal'],keywords['Goal_keys']['Keys'])}
+
 for policy, text in doc_texts.items():
     marked_text = text['stemmed_text']
-    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    for label, keyword_list in keywords_dict.items(): 
+            for keyword in keyword_list:
+                if keyword in marked_text:
+                    marked_text = marked_text.replace( keyword, f' <{label}>< {keyword.upper()} > ')
+    item_path = processedtext_dir / 'marked' / pathlib.PurePath(policy)
+    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
     with open(item_path, 'w', encoding='utf-8') as markdoctext:
            markdoctext.write(f'{marked_text}\n\ntextlength: {len(marked_text)}')
-
 
 goal_df = pd.DataFrame(goal_ls, columns=goal_col_names)
 
@@ -433,7 +419,6 @@ detected_pol = moi_df['Policy'].tolist()
 
 writer.save()
 
-
 with open(log_file, 'a') as f:
     f.write( 
         f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.\n\n'
@@ -441,9 +426,6 @@ with open(log_file, 'a') as f:
 
 print(f'Step {step}: Counted keywords in texts.\n')
 step += 1
-
-# target_df.to_pickle("gd_target_df.pkl")
-# goal_df.to_pickle("gd_goal_df.pkl")
 
 target_df['Group']=target_df['Policy'].apply(lambda x_str: x_str.split('/')[0])
 goal_df['Group']=goal_df['Policy'].apply(lambda x_str: x_str.split('/')[0])

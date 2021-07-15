@@ -42,9 +42,9 @@ def make_dirtree(output_directory):
         'out_dir' : output_directory ,
         'log_dir' : output_directory / '0-logs' ,
         'processed_keywords_dir' : output_directory / '1-processed_keywords' ,
-        'doctext_dir' : output_directory / '2-doctext' ,
+        'doctext_dir' : output_directory / '2-doc_text' ,
         'references_dir' : output_directory / '3-references',
-        'doctext_stemmed_dir' : output_directory / '4-doctext_stemmed' ,        
+        'processedtext_dir' : output_directory / '4-processed_text' ,        
         'keyword_count_dir' : output_directory / '5-keyword_count',
         'results_dir' : output_directory / '6-results',
         'jsonfiles_dir' : output_directory / '7-json_results'
@@ -119,7 +119,8 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     
 
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ''), (r'([\w-]+)', r' \1 ')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ' '),(r'([\w]) \n([\w\'\"‘])', r'\1 \2'),
+        (r'([\w-]+)', r' \1 '), (r' {2,}(\w+) {2,}', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
 
@@ -136,8 +137,11 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
 
     text_string = text_string.lower().strip()
 
+    print(text_string)
+
     for pattern, substitution in regex_dict.items():
         text_string = re.sub(pattern, substitution, text_string)
+        print(text_string)
     
     #text_string = re.sub(r'([\w-]+)', r' \1 ', text_string) #Equivalent to center, adds leading and trailing space to the captured group
     

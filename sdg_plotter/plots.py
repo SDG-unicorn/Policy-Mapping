@@ -36,9 +36,9 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-filename='PT_RRP'
+filename='Regione_puglia_'
 
-res_path = pathlib.Path('./output/PT_RRP_/output/6-results/results_.xlsx')
+res_path = pathlib.Path('./output/Regione_puglia_/output/6-results/results_.xlsx')
 
 mock_target_df = pd.read_excel(res_path,sheet_name='target_dat') #pd.DataFrame({
 #     'Name': target_list,
