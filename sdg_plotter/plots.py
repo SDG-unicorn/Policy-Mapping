@@ -36,15 +36,16 @@ target_colors = { target : goal_colors[f"SDG {target.split('.')[0]}"] for target
 
 ##### Mocke data for goals and targets
 
-filename='Regione_puglia_'
+res_path = pathlib.Path('./output/DirD_cleaned_/output/6-results/results_.xlsx')
 
-res_path = pathlib.Path('./output/Regione_puglia_/output/6-results/results_.xlsx')
+filename=res_path.parent / 'DirD_cleaned_'
 
 mock_target_df = pd.read_excel(res_path,sheet_name='target_dat') #pd.DataFrame({
 #     'Name': target_list,
 #     'Value': [np.random.randint(0, 100) for i in target_list]
 # })
 mock_target_df=mock_target_df[['Target','Count']]
+mock_target_df=mock_target_df.groupby(by=['Target']).sum().reset_index()
 mock_target_df.rename(columns={"Target": "Name", "Count": "Value"}, inplace=True)
 mock_target_df =  mock_target_df[mock_target_df['Value'] != 0]
 

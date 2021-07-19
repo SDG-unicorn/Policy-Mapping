@@ -137,11 +137,8 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
 
     text_string = text_string.lower().strip()
 
-    print(text_string)
-
     for pattern, substitution in regex_dict.items():
         text_string = re.sub(pattern, substitution, text_string)
-        print(text_string)
     
     #text_string = re.sub(r'([\w-]+)', r' \1 ', text_string) #Equivalent to center, adds leading and trailing space to the captured group
     
