@@ -415,10 +415,17 @@ def create_json_files_for_bubbleplots(target_df, aggregated_goal_counts): #filen
             size = goal_subset.iloc[i]['size']
             # create list of dicts for each SDG
             tmp_ls = []
+            total_target_count = 0
+            #print(f'\n\n{label}: {size}')
             for row_dict in temp_target_df.to_dict(orient='records'):
-                # print(row_dict)
+                #print(f"\n{row_dict['name']}: {row_dict['size']}")
+                total_target_count = total_target_count + row_dict['size']
+                #print(total_target_count)
                 tmp_ls.append(row_dict)
             # make final dict with label, size, list of dicts and append to dict_list
+            tmp_ls.append({'name': f'{label}_undetected','size': int(size - total_target_count),
+            'goal_color':row_dict['goal_color']})
+            #print(f'\n{label}_undetected: {int(size - total_target_count)}')
             tmp_dict = {'name': label, 'size': int(size), 'children': tmp_ls}
             dict_ls.append(tmp_dict)
         final_dict = {'name': 'sdgs', 'children': dict_ls}
