@@ -390,6 +390,8 @@ def create_json_files_for_bubbleplots(target_df, aggregated_goal_counts): #filen
         return final_dict
     elif target_df.empty:
         goal_subset = aggregated_goal_counts.rename(columns={'Goal': 'name', 'Count': 'size'}, inplace=False)
+        goal_subset = goal_subset[goal_subset['size'] != 0]
+        goal_subset = goal_subset.reset_index(drop=True)
         labels = goal_subset['name'].tolist()
         counts = goal_subset['size'].tolist()
         final_dict = {'name': 'sdgs', 'children':
@@ -401,6 +403,10 @@ def create_json_files_for_bubbleplots(target_df, aggregated_goal_counts): #filen
         #rename both df's for JSON output
         goal_subset = aggregated_goal_counts.rename(columns={'Goal': 'name', 'Count': 'size'}, inplace=False)
         target_subset = target_df.rename(columns={'Target': 'name', 'Count': 'size', 'Goal': 'Goal'}, inplace=False)
+        goal_subset = goal_subset[goal_subset['size'] != 0]
+        goal_subset = goal_subset.reset_index(drop=True)
+        target_subset = target_subset[target_subset['size'] != 0]
+        target_subset = target_subset.reset_index(drop=True)
         # creating list of dicts for each SDG
         # gb = target_subset.groupby('Goal', sort=False)
         # ls = [gb.get_group(x) for x in gb.groups]
