@@ -179,7 +179,7 @@ for counter, file_path in enumerate(files):
            file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
     except Exception as exception:
-        print(f'{file_path.name}:\n{exception}\n')
+        print(f'ERROR:\t{exception}\nwas raised by\n{file_path.name}\n')
         logging.exception(f'{file_path.name} raised exception: {exception} \n\n')
 
 
@@ -231,6 +231,7 @@ start_time = time.time()
 for policy, text in doc_texts.items():
     stemmed_text = text.replace('. ', ' . ')
     stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
+    stemmed_text = re.sub(r'-{4}([\w.\/]+)-{4}', r' --\1-- ', stemmed_text)
     #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
     item_path = processedtext_dir / 'stemmed' /pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
@@ -254,7 +255,7 @@ step += 1
 start_count_time = time.time()
 start_time = time.time()
 
-fullcount = True
+fullcount = False
 
 target_col_names=['Policy', 'Target', 'Keyword', 'Count', 'Textlength']
 

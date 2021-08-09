@@ -96,7 +96,7 @@ def doc2text(a_document_path):
 
 stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
 
-def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
+def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None, verbose=False):
     """
     Prepare text for mapping.
     """
@@ -117,10 +117,11 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     elif exception_dict is not dict:
         raise TypeError(f'{exception_dict} is not of type dict')
     
-
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.\s-]+', ' '),(r'([\w]) \n([\w\'\"‘])', r'\1 \2'),
-        (r'([\w-]+)', r' \1 '), (r' {2,}(\w+) {2,}', r' \1 ')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9&.\s-]+', ' '),
+        (r'([\w]) \n([\w\'\"‘])', r'\1 \2'),
+        (r'([\w&-]+)', r' \1 '), 
+        (r' {2,}(\w+) {2,}', r' \1 ')])
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
 
@@ -135,17 +136,23 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
        
     #text_string = text_string.replace('\xa0',' ') #Remove some weird \xa0 characters
 
+    if verbose: print(f'Original:\n{text_string}')
+
     text_string = text_string.lower().strip()
+
+    if verbose: print(f'Lowercase:\n{text_string}')
 
     for pattern, substitution in regex_dict.items():
         text_string = re.sub(pattern, substitution, text_string)
+        if verbose: print(f'Replace {pattern} with {substitution}:\n{text_string}')
     
     #text_string = re.sub(r'([\w-]+)', r' \1 ', text_string) #Equivalent to center, adds leading and trailing space to the captured group
     
-    text_string = text_string.replace(' rd ', ' R&D ')
-    
+    #text_string = text_string.replace(' rd ', ' R&D ')
+        
     text_string = re.sub(r'([a-zA-z-]{3,}|ph|no)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
-    
+    if verbose: print(f'Remove words shorter than 3 characters:\n{text_string}')
+
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,
     # it is not  as we are however counting also spaces.
@@ -154,20 +161,31 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     for key, value in exception_dict.items(): #Protect exceptions from stemming
         text_string = text_string.replace(key, value)
     
+    if verbose: print(f'Protect exceptions from stemming:\n{text_string}')
+    
     for word in stop_words: #Remove stopwords
-        text_string = text_string.replace(' '+word+' ', '') 
+        text_string = text_string.replace(f' {word} ', ' ')
+        #if verbose: print(f'Remove stopwords {word}:\n{text_string}') 
+    
+    if verbose: print(f'Remove stopwords:\n{text_string}') 
     
     text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
     lambda rgx_word: ' '+stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
     text_string)
+
+    if verbose: print(f'Stemming:\n{text_string}') 
         
     for key, value in exception_dict.items(): #Restore words from exception protection
         text_string = text_string.replace(value, key)
     
-    text_string = ' '+text_string+' '
+    if verbose: print(f'Restore exceptions:\n{text_string}')
+    
+    #text_string = ' '+text_string+' '
     
     text_string = re.sub(r' {2,}', r' ', text_string)
-        
+
+    if verbose: print(f'Result:\n{text_string}')
+
     return text_string
 
 
