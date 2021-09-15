@@ -55,7 +55,7 @@ def make_dirtree(output_directory):
 
 ###### Extract text from doc and docx files.
 
-def doc2text(a_document_path):
+def doc2text(a_document_path , enc='cp1252'): #Use 'cp1252' for text files extracted using r Eurlex package
     """
     Helper function that calls different document to text converting functions 
     based on the document filetype.
@@ -79,7 +79,7 @@ def doc2text(a_document_path):
     }
 
     if suffix in plain_text:
-        with open(a_document_path,'r') as file_:
+        with open(a_document_path,'r', encoding = enc) as file_:
             text_from_doc = file_.read()
     elif suffix in ms_word:
         text_from_doc = d2t_dict[suffix](a_document_path).text
