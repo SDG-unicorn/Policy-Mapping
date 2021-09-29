@@ -12,7 +12,7 @@ import pandas as pd
 from whoosh.lang.porter import stem
 
 ##MM imports
-import polmap.polmap as plmp
+import polmap as plmp
 import postprocess.postprocess as pspr
 import keywords as kwrd
 
