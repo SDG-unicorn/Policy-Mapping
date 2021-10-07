@@ -3,6 +3,7 @@
 !keywords/validated_translation/*.xlsx
 !keywords/previous_keywords_archive/*.xlsx
 !keywords/keywords.xlsx
+!keywords/processed_keywords/processed_keywords.xlsx
 !keywords/keywords_expanded_manually_reordered.xlsx
 !keywords/goal_target_list.xlsx
 keywords/machine_translation/*.*
