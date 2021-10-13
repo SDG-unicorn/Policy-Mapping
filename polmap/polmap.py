@@ -42,9 +42,9 @@ def make_dirtree(output_directory):
         'out_dir' : output_directory ,
         'log_dir' : output_directory / '0-logs' ,
         'processed_keywords_dir' : output_directory / '1-processed_keywords' ,
-        'doctext_dir' : output_directory / '2-doctext' ,
+        'doctext_dir' : output_directory / '2-doc_text' ,
         'references_dir' : output_directory / '3-references',
-        'doctext_stemmed_dir' : output_directory / '4-doctext_stemmed' ,        
+        'processedtext_dir' : output_directory / '4-processed_text' ,        
         'keyword_count_dir' : output_directory / '5-keyword_count',
         'results_dir' : output_directory / '6-results',
         'jsonfiles_dir' : output_directory / '7-json_results'
@@ -96,7 +96,7 @@ def doc2text(a_document_path):
 
 stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
 
-def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
+def preprocess_text(a_string, stop_words=stop_words, exception_dict=None, regex_dict=None, verbose=False):
     """
     Prepare text for mapping.
     """
@@ -109,20 +109,20 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     #     #How to return the name of the variable passed by user with format?
     # Get error when using it with apply and lambda in pandas
     
-    if exception_dict is None:
-        exception_dict = {"aids": "ai&ds&",
-                          "productivity": "pro&ductivity&",
+    if exception_dict is None: #split the dictionary into a dictionary of exceptions for woard and one for abbreaviations
+        exception_dict = {"abbreviations":{"AIDS": "&aids&"},
+                          "words":{"productivity": "pro&ductivity&",
                           "remittances" : "remit&tance&"                 
-                          }
+                          }}
     elif exception_dict is not dict:
         raise TypeError(f'{exception_dict} is not of type dict')
     
 
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.,;:\s-]+', ''), 
-        (r'([\w-]+)', r' \1 '),
-        (r'(\w)([.,;:])', r'\1 \2'),
-        (r'([\w ])\n([\w ])', r'\1 \2')])
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.,;:&\s-]+', ' '),
+        (r'([\w]) \n([\w\'\"‘])', r'\1 \2'), #Remove line returns between words
+        (r'([\w&-]+)', r' \1 '), 
+        (r' {2,}(\w+) {2,}', r' \1 ')]) #Remove repeated spaces between words
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
 
@@ -141,6 +141,10 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
        
     #text_string = text_string.replace('\xa0',' ') #Remove some weird \xa0 characters
 
+    if verbose: print(f'Original:\n{text_string}')
+    for key, value in exception_dict['abbreviations'].items(): #Protect exceptions from stemming
+        text_string = text_string.replace(key, value)
+
     text_string = text_string.lower().strip()
 
     for pattern, substitution in regex_dict.items():
@@ -157,7 +161,7 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     # it is not  as we are however counting also spaces.
     # an easy fix would be to move it before the centering of the terms
     
-    for key, value in exception_dict.items(): #Protect exceptions from stemming
+    for key, value in exception_dict['words'].items(): #Protect exceptions from stemming
         text_string = text_string.replace(key, value)
     
     for word in stop_words: #Remove stopwords
@@ -166,9 +170,12 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None):
     text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
     lambda rgx_word: ' '+stemmer.stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
     text_string)
+
+    if verbose: print(f'Stemming:\n{text_string}') 
         
-    for key, value in exception_dict.items(): #Restore words from exception protection
-        text_string = text_string.replace(value, key)
+    for dict_exc in exception_dict.values():
+        for key, value in dict_exc.items(): #Restore words from exception protection
+            text_string = text_string.replace(value, key)
     
     text_string = ' '+text_string+' '
     
@@ -205,41 +212,3 @@ def SDGrefs_mapper(document_text, refs_keywords=None):
             refs_sentences[tagged_sentence.capitalize()] = ', '.join([f'<span>{ref_keyword.capitalize()}</span>' for ref_keyword in refs_keywords if ref_keyword in sentence])        
     
     return refs_sentences
-
-def join_str(numpy_array):
-
-    numpy_array = numpy_array.tolist()
-    numpy_array = [ item for item in numpy_array if not isinstance(item, float) ]
-    numpy_array = ', '.join(numpy_array)
-    
-    return numpy_array
-
-# def mark_text(pd_row, doc_text, keywd_cols=list(range(57))):
-#     #print(pd_row)
-#     label = str(pd_row['Target'])
-#     flag = label.split('.')[-1]
-#     flag = 'SDG' if flag=='0' else 'Target'
-#     for keywd in pd_row[keywd_cols]:
-#         #print(keywd, type(keywd))
-#         if not isinstance(keywd, float):
-#             doc_text=doc_text.replace(keywd, f'< {flag} {label} <{keywd.upper()}>>')
-#         else:
-#             continue
-#         if flag=='SDG':
-#             doc_text=doc_text.replace('.0','') 
-#     return doc_text
-
-def mark_text(document_text, detected_keywords_df):
-
-    marked_text = document_text 
-
-    for _, row in detected_keywords_df.iterrows():
-
-        label = row['Target'] if row['Target'].split('.')[-1] != '0' else row['Goal']
-        
-        for keyword in row[range(57)]:
-            #print(keyword)
-            if keyword and not isinstance(keyword, float):
-                marked_text = marked_text.replace(keyword ,f' < {label} >< {keyword.upper()} > ')
-
-    return marked_text

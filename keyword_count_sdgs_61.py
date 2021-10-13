@@ -17,8 +17,8 @@ import numpy as np
 from whoosh.lang.porter import stem
 
 ##MM imports
-import polmap.polmap as plmp
-import postprocess.postprocess as pspr
+import polmap as plmp
+import postprocess as pspr
 import keywords as kwrd
 
 
@@ -131,7 +131,7 @@ else:
     with rsrc.path("keywords", "keywords_expanded_manually_reordered.xlsx") as res_path:
         keywords_path = res_path
     
-keywords = pd.read_excel(res_path, index_col=0)
+keywords = pd.read_excel(keywords_path, index_col=0)
 
 stop_words = set(stopwords.words('english'))-set(['no','not','nor'])
 stop_words.remove('all')
@@ -364,7 +364,6 @@ step += 1
 start_time = time.time() 
 
 with rsrc.path("keywords", "goal_target_list.xlsx") as pp_path:
-    keywords_path = res_path
     pp_def = pd.read_excel(pp_path)
 
 priorities_df=pspr.make_polpridf(total_summary, pp_def)
