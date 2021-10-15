@@ -14,7 +14,7 @@
 
 #Imports
 #Built-in
-import re, collections, pathlib
+import re, collections, pathlib, math
 
 #doc2txt
 from docx2python import docx2python
@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 #check https://textract.readthedocs.io/en/stable/
 
 #preprocess_text
-from whoosh.lang.porter import stem
+import whoosh.lang as whla
 import nltk as nltk
 from nltk.corpus import stopwords
 #get_ref_to_SDGs
@@ -55,7 +55,7 @@ def make_dirtree(output_directory):
 
 ###### Extract text from doc and docx files.
 
-def doc2text(a_document_path , enc='cp1252'): #Use 'cp1252' for text files extracted using r Eurlex package
+def doc2text(a_document_path):
     """
     Helper function that calls different document to text converting functions 
     based on the document filetype.
@@ -79,7 +79,7 @@ def doc2text(a_document_path , enc='cp1252'): #Use 'cp1252' for text files extra
     }
 
     if suffix in plain_text:
-        with open(a_document_path,'r', encoding = enc) as file_:
+        with open(a_document_path,'r') as file_:
             text_from_doc = file_.read()
     elif suffix in ms_word:
         text_from_doc = d2t_dict[suffix](a_document_path).text
@@ -96,11 +96,11 @@ def doc2text(a_document_path , enc='cp1252'): #Use 'cp1252' for text files extra
 
 stop_words = set(stopwords.words('english'))-set(['no','not','nor']) 
 
-def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None, verbose=False):
+def preprocess_text(a_string, stop_words=stop_words, exception_dict=None, regex_dict=None, verbose=False):
     """
     Prepare text for mapping.
     """
-    text_string = a_string
+    text_string = str(a_string)
 
     if text_string is None: #this should be moved to the prepare keywords wrapper function
         return None
@@ -109,21 +109,26 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None, 
     #     #How to return the name of the variable passed by user with format?
     # Get error when using it with apply and lambda in pandas
     
-    if exception_dict is None:
-        exception_dict = {"aids": "ai&ds&",
-                          "productivity": "pro&ductivity&",
+    if exception_dict is None: #split the dictionary into a dictionary of exceptions for woard and one for abbreaviations
+        exception_dict = {"abbreviations":{"AIDS": "&aids&"},
+                          "words":{"productivity": "pro&ductivity&",
                           "remittances" : "remit&tance&"                 
-                          }
+                          }}
     elif exception_dict is not dict:
         raise TypeError(f'{exception_dict} is not of type dict')
     
+
     if regex_dict is None:
-        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9&.\s-]+', ' '),
-        (r'([\w]) \n([\w\'\"‘])', r'\1 \2'),
+        regex_dict = collections.OrderedDict([(r'[^a-zA-Z0-9.,;:&\s-]+', ' '),
+        (r'([\w]) \n([\w\'\"‘])', r'\1 \2'), #Remove line returns between words
         (r'([\w&-]+)', r' \1 '), 
-        (r' {2,}(\w+) {2,}', r' \1 ')])
+        (r' {2,}(\w+) {2,}', r' \1 ')]) #Remove repeated spaces between words
     elif not isinstance(regex_dict, collections.OrderedDict): #Requires Python => 3.7, otherwise needs OrderedDict object
         raise TypeError(f'{regex_dict} is not of type Ordered dict')       
+
+
+    #Instantiate stemmer
+    stemmer = nltk.stem.PorterStemmer()
 
     #remove all from stop_words to keep in keywords.
     # Review scoping rules in python, this fails with:
@@ -137,55 +142,45 @@ def preprocess_text(a_string, stop_words, exception_dict=None, regex_dict=None, 
     #text_string = text_string.replace('\xa0',' ') #Remove some weird \xa0 characters
 
     if verbose: print(f'Original:\n{text_string}')
+    for key, value in exception_dict['abbreviations'].items(): #Protect exceptions from stemming
+        text_string = text_string.replace(key, value)
 
     text_string = text_string.lower().strip()
 
-    if verbose: print(f'Lowercase:\n{text_string}')
-
     for pattern, substitution in regex_dict.items():
         text_string = re.sub(pattern, substitution, text_string)
-        if verbose: print(f'Replace {pattern} with {substitution}:\n{text_string}')
     
     #text_string = re.sub(r'([\w-]+)', r' \1 ', text_string) #Equivalent to center, adds leading and trailing space to the captured group
     
-    #text_string = text_string.replace(' rd ', ' R&D ')
-        
-    text_string = re.sub(r'([a-zA-z-]{3,}|ph|no)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
-    if verbose: print(f'Remove words shorter than 3 characters:\n{text_string}')
-
+    text_string = text_string.replace(' rd ', ' R&D ')
+    
+    text_string = re.sub(r'([a-zA-z-]{3,}|ph|no|eu)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
+    
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,
     # it is not  as we are however counting also spaces.
     # an easy fix would be to move it before the centering of the terms
     
-    for key, value in exception_dict.items(): #Protect exceptions from stemming
+    for key, value in exception_dict['words'].items(): #Protect exceptions from stemming
         text_string = text_string.replace(key, value)
     
-    if verbose: print(f'Protect exceptions from stemming:\n{text_string}')
-    
     for word in stop_words: #Remove stopwords
-        text_string = text_string.replace(f' {word} ', ' ')
-        #if verbose: print(f'Remove stopwords {word}:\n{text_string}') 
-    
-    if verbose: print(f'Remove stopwords:\n{text_string}') 
+        text_string = text_string.replace(' '+word+' ', '') 
     
     text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
-    lambda rgx_word: ' '+stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
+    lambda rgx_word: ' '+stemmer.stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.
     text_string)
 
     if verbose: print(f'Stemming:\n{text_string}') 
         
-    for key, value in exception_dict.items(): #Restore words from exception protection
-        text_string = text_string.replace(value, key)
+    for dict_exc in exception_dict.values():
+        for key, value in dict_exc.items(): #Restore words from exception protection
+            text_string = text_string.replace(value, key)
     
-    if verbose: print(f'Restore exceptions:\n{text_string}')
-    
-    #text_string = ' '+text_string+' '
+    text_string = ' '+text_string+' '
     
     text_string = re.sub(r' {2,}', r' ', text_string)
-
-    if verbose: print(f'Result:\n{text_string}')
-
+        
     return text_string
 
 
