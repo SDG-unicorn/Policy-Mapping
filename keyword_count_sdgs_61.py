@@ -364,13 +364,16 @@ step += 1
 start_time = time.time() 
 
 with rsrc.path("keywords", "goal_target_list.xlsx") as pp_path:
-    pp_def = pd.read_excel(pp_path)
+    pp_def = pd.read_excel(pp_path)# index_col='Target')
+    #pp_def['Target'] = pp_def['Target'].astype(str)
+    ppsdg_dict = pd.read_excel('keywords/goal_target_list.xlsx', index_col='Target').to_dict('index')
+     
 
 priorities_df=pspr.make_polpridf(total_summary, pp_def)
 
 # 7.1) create and export json files for bubblecharts on knowSDGs platform ## Fix this
 
-sdg_bubbleplot_dict=pspr.make_sdgbubbleplot(total_summary)
+sdg_bubbleplot_dict=pspr.make_sdgbubbleplot(total_summary, ppsdg_dict)
 sdg_bubbles = jsonfiles_dir / 'sdg_bubbles.json'
 with sdg_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(sdg_bubbleplot_dict, f)
