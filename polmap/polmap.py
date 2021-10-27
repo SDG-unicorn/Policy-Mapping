@@ -110,7 +110,7 @@ def preprocess_text(a_string, stop_words=stop_words, exception_dict=None, regex_
     # Get error when using it with apply and lambda in pandas
     
     if exception_dict is None: #split the dictionary into a dictionary of exceptions for woard and one for abbreaviations
-        exception_dict = {"abbreviations":{"AIDS": "&aids&"},
+        exception_dict = {"abbreviations":{"AIDS": "ai&ds&"},
                           "words":{"productivity": "pro&ductivity&",
                           "remittances" : "remit&tance&"                 
                           }}
@@ -165,7 +165,7 @@ def preprocess_text(a_string, stop_words=stop_words, exception_dict=None, regex_
         text_string = text_string.replace(key, value)
     
     for word in stop_words: #Remove stopwords
-        text_string = text_string.replace(' '+word+' ', '') 
+        text_string = text_string.replace(' '+word+' ', ' ') 
     
     text_string = re.sub(r'[a-zA-z&-]+', #Find words with regex. It can be improved by capturing pattern between word boundaries.
     lambda rgx_word: ' '+stemmer.stem(rgx_word.group())+' ', #Stem words, however stemming is skipped if string contains space.

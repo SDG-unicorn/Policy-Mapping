@@ -240,9 +240,10 @@ start_time = time.time()
 for policy, text in doc_texts.items():
     stemmed_text = text.replace('. ', ' . ')
     stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
+    stemmed_text = re.sub(r'-{4}([\w.\/]+)-{4}', r' --\1-- ', stemmed_text)
     #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
     stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
-    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = doctext_stemmed_dir / 'stemmed' /pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_stemmed.txt')
     with open(item_path, 'w', encoding='utf-8') as stemdoctext:
@@ -302,7 +303,8 @@ for policy, doc_text in doc_texts.items():
     doc_text['marked_text'] = plmp.mark_text(doc_text['stemmed_text'], detected_keywords)
 
     #print(doc_text['marked_text'])
-    item_path = doctext_stemmed_dir / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path = doctext_stemmed_dir / 'marked' / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
     with open(item_path, 'w', encoding='utf-8') as markdoctext:
            markdoctext.write(str(doc_text["marked_text"]))
