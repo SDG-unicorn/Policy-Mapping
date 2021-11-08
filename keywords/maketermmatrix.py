@@ -16,4 +16,4 @@ matrix = term_matrix['Keys'].str.split(';' , expand=True)
 matrix.fillna("", inplace=True)
 
 term_matrix = pd.concat([term_matrix, matrix], axis='columns').drop(columns=['index', 'Keys'])
-term_matrix.to_excel('term_matrix.xlsx')
+term_matrix.to_excel('term_matrix.xlsx',sheet_name='Term_matrix', index_label='Index')

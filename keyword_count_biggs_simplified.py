@@ -1,4 +1,4 @@
-import argparse, json, logging, pathlib, pickle, re, time
+import argparse, json, logging, pathlib, pickle, re, time, random
 from itertools import count
 import functools as fntl
 import datetime as dt
@@ -89,6 +89,8 @@ if input_dir.is_dir():
 elif input_dir.is_file():
     files = [input_dir]
 
+files = random.choices(files, k=1000)
+
 if not (files or input_dir.exists()):
     raise ValueError((f'{input_dir} yields an empty file list. Check if input exists or is not empty'))
 
@@ -128,7 +130,7 @@ start_time = time.time()
 if args.keywords:
     keywords_path = args.keywords
 else:    
-    with rsrc.path("keywords", "term_matrix.xlsx") as res_path:
+    with rsrc.path("keywords", "biggs_terms_v2.xlsx") as res_path:
         keywords_path = res_path
     
 keywords = pd.read_excel(keywords_path, index_col=0)
@@ -204,45 +206,50 @@ step += 1
 ########### 4) Check for and extract references to SDG agenda in text
 start_time = time.time()
 
-with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as refs_file:
+# with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as refs_file:
 
-    references_dict = {}
+#     references_dict = {}
 
-    for policy, text in doc_texts.items():
-        refs = plmp.SDGrefs_mapper(text)
-        if bool(refs):
-            references_dict[str(policy)] = {'References' : refs, 'Number of sentences' : len(refs)}
+#     for policy, text in doc_texts.items():
+#         refs = plmp.SDGrefs_mapper(text)
+#         if bool(refs):
+#             references_dict[str(policy)] = {'References' : refs, 'Number of sentences' : len(refs)}
 
-    json.dump(references_dict, refs_file)
+#     json.dump(references_dict, refs_file)
 
-    for policies, references in references_dict.items():
+#     for policies, references in references_dict.items():
 
-        dest = refs_dir / f"{policies.replace('.','_')}.json"
-        dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+#         dest = refs_dir / f"{policies.replace('.','_')}.json"
+#         dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
 
-        with open(dest, 'a') as docref_file:
-            json.dump(references, docref_file)
+#         with open(dest, 'a') as docref_file:
+#             json.dump(references, docref_file)
 
 
-with open(log_file, 'a') as f:
-    f.write( 
-        f'''{step}) Finding and extracting {len(references_dict)} sentences with direct
-        references to UN 2030 agenda in {len(doc_texts)} documents: {time.time()-start_time:.3e} seconds\n\n'''
-    )
+# with open(log_file, 'a') as f:
+#     f.write( 
+#         f'''{step}) Finding and extracting {len(references_dict)} sentences with direct
+#         references to UN 2030 agenda in {len(doc_texts)} documents: {time.time()-start_time:.3e} seconds\n\n'''
+#     )
 
-print(f'Step {step}: Found {len(references_dict)} sentences with direct references to UN 2030 Agenda in {len(references_dict)} documents.\n')
-step += 1
+# print(f'Step {step}: Found {len(references_dict)} sentences with direct references to UN 2030 Agenda in {len(references_dict)} documents.\n')
+# step += 1
 
 ######################################
 ########### 5) Preprocess and stem documents texts for counting
 start_time = time.time()
 
+text_prestemmed = False
+
 for policy, text in doc_texts.items():
-    stemmed_text = text.replace('. ', ' . ')
-    stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
-    stemmed_text = re.sub(r'-{4}([\w.\/]+)-{4}', r' --\1-- ', stemmed_text)
-    #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
-    stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
+    if not text_prestemmed:
+        stemmed_text = text.replace('. ', ' . ')
+        stemmed_text = re.sub(r'-\n', ' ', stemmed_text)
+        stemmed_text = re.sub(r'-{4}([\w.\/]+)-{4}', r' --\1-- ', stemmed_text)
+        #stemmed_text = re.sub(r'\n{1,}', ' ', stemmed_text)
+        stemmed_text = plmp.preprocess_text(stemmed_text, stop_words)
+    else:
+        stemmed_text = text
     item_path = doctext_stemmed_dir / 'stemmed' /pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
     item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
     item_path = item_path.parent / (item_path.name.replace('.','_')+'_stemmed.txt')
@@ -282,7 +289,7 @@ for policy, doc_text in doc_texts.items():
     detected_keywords = pd.DataFrame()
     summary = pd.DataFrame()
 
-    count_matrix = keywords[keywd_cols].applymap(lambda keyword: doc_text['stemmed_text'].count(keyword), na_action='ignore')
+    count_matrix = keywords[keywd_cols].applymap(lambda keyword: doc_text['text'].count(keyword), na_action='ignore')
     count_matrix.fillna(0, inplace=True)
 
     detected_keywords = keywords[keywd_cols][count_matrix > 0]
@@ -292,22 +299,14 @@ for policy, doc_text in doc_texts.items():
       
     count_matrix=pd.merge(labels, count_matrix, left_index=True, right_index=True)
     detected_keywords=pd.merge(labels, detected_keywords, left_index=True, right_index=True)
-    
-
-    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='xlsxwriter') as destfile:
-        count_matrix.to_excel(destfile, sheet_name='Counts')
-        detected_keywords.to_excel(destfile, sheet_name='Keywords')
 
     doc_text['count_matrix'] = count_matrix
     doc_text['detectedkeywd_matrix'] = detected_keywords
     doc_text['marked_text'] = plmp.mark_text(doc_text['stemmed_text'], detected_keywords)
+    
+    #there should be a split in here: first count all the keyws and then save results.
+    #this would enable to use multiprocessing and multithreading
 
-    #print(doc_text['marked_text'])
-    item_path = doctext_stemmed_dir / 'marked' / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
-    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
-    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
-    with open(item_path, 'w', encoding='utf-8') as markdoctext:
-           markdoctext.write(str(doc_text["marked_text"]))
 
 #Get and write summary data (sum, count and list of keys) for each policy
 #For some strange reasons this does not works if done in the previous loop
@@ -320,8 +319,21 @@ for policy, item in doc_texts.items():
     summary['Count_of_keys'] = detkeyw_df[keywd_cols].count(axis=1) #Use explicit fraction?
     summary['list_of_keys'] = detkeyw_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
 
-    with pd.ExcelWriter(count_destfile_dict[policy], mode='a', engine='openpyxl') as destfile:
+    # if summary['Count_of_keys'].sum() > 0:
+
+    #     #if count of keys > 0 save stuff else continue
+
+    with pd.ExcelWriter(count_destfile_dict[policy], mode='w', engine='xlsxwriter') as destfile:
+        item['count_matrix'].to_excel(destfile, sheet_name='Counts')
+        item['detectedkeywd_matrix'].to_excel(destfile, sheet_name='Keywords')
         summary.to_excel(destfile, sheet_name='Summary')
+
+        #print(doc_text['marked_text'])
+    item_path = doctext_stemmed_dir / 'marked' / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
+    with open(item_path, 'w', encoding='utf-8') as markdoctext:
+        markdoctext.write(str(doc_text["marked_text"]))
 
 
 count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values() ]
@@ -390,7 +402,7 @@ with open(log_file, 'a') as f:
         f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
-print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
+print(f'Step {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
 step += 1
 
 with open(log_file, 'a') as f:

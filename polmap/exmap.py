@@ -25,11 +25,13 @@ def mark_text(document_text, detected_keywords_df):
 
     marked_text = document_text 
 
+    keyword_columns = detected_keywords_df.drop(columns=['Goal', 'Target']).columns.tolist()
+
     for _, row in detected_keywords_df.iterrows():
 
         label = row['Target'] if row['Target'].split('.')[-1] != '0' else row['Goal']
         
-        for keyword in row[range(57)]:
+        for keyword in row[keyword_columns]:
             #print(keyword)
             if keyword and not isinstance(keyword, float):
                 marked_text = marked_text.replace(keyword ,f' < {label} >< {keyword.upper()} > ') #Use re.search to find keyword boundaries where to add the tags and markers
