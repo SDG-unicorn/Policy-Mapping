@@ -154,7 +154,7 @@ def preprocess_text(a_string, stop_words=stop_words, exception_dict=None, regex_
     
     text_string = text_string.replace(' rd ', ' R&D ')
     
-    text_string = re.sub(r'([a-zA-z-]{3,}|ph|no|eu)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
+    #text_string = re.sub(r'([a-zA-z-]{3,}|ph|no|eu)', r'\1', text_string) #add |no for detecting 'no poverty' keyword
     
     # not sure this is working the way intended, 
     # if the plan was to drop two characters words,

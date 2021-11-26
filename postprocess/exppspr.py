@@ -9,7 +9,7 @@ def make_polpridf(results_df, pp_def):
     pp_def["Target"]=pp_def["Target"].astype(str)
 
     results_df=pd.merge(results_df, pp_def, on='Target', how='left')    
-    results_df=results_df.drop(['Goal_y','goal_id','Unnamed: 0','tar_ID'],axis=1)
+    results_df=results_df.drop(['Goal_y','goal_id','tar_ID'],axis=1)
 
     results_df=results_df.rename(columns={"Goal_x": "Goal"})
 
@@ -65,11 +65,14 @@ def make_polpribubbleplot(priorities_df):
 
     return polpri_bubbledict
 
-def make_sdgbubbleplot(results_df):
+def make_sdgbubbleplot(results_df, pp_def):
     """
     Create a bubbleplot representing SDG Golas and Targets.
     """
     #Later on, think about a way to make bubbleplot for PP
+
+    sdgdict = pp_def
+
     sdg_bubbledict={"name": "sdgs", "children": None}
     goal_ls=[]
 
@@ -79,7 +82,7 @@ def make_sdgbubbleplot(results_df):
         goal_dict={}
         if count > 0:
             goal_dict["name"]=goal
-            goal_dict["size"]=count
+            goal_dict["size"]=int(count)
             goal_dict["children"] = None
             goal_ls.append(goal_dict)
         else:
@@ -94,34 +97,45 @@ def make_sdgbubbleplot(results_df):
 
             for target, count in zip(targetdf['Target'], targetdf['Sum_of_keys']):
                 
-                if count == 0:
+                if (count == 0): #or (str(target.split('.')[-1])=='0'):
                     continue
                 
-                elif str(target.split('.')[-1])=='0':
-                    floor = round(count // 10)
-                    remainder = round(count % 10)
-                    mock = [10 for _ in range(floor)]
-                    mock.append(remainder)
-                    # if floor==0 or floor==1: #to troubleshoot
-                    #     mock.append(remainder)
-                    # elif mock[0]==10 and len(mock)==1:
-                    #     mock.append(remainder)
-                    # elif len(mock)>1:
-                    #     mock[-1]=remainder
-                    # print(f'Target {target}', int(count))
-                    # print(floor, remainder)
-                    # print(mock)
+                # elif str(target.split('.')[-1])=='0': #assign to SDG X_undetected
+                #     floor = round(count // 10)
+                #     remainder = round(count % 10)
+                #     mock = [10 for _ in range(floor)]
+                #     mock.append(remainder)
+                #     # if floor==0 or floor==1: #to troubleshoot
+                #     #     mock.append(remainder)
+                #     # elif mock[0]==10 and len(mock)==1:
+                #     #     mock.append(remainder)
+                #     # elif len(mock)>1:
+                #     #     mock[-1]=remainder
+                #     # print(f'Target {target}', int(count))
+                #     # print(floor, remainder)
+                #     # print(mock)
 
-                    for item in mock:
-                        target_dict={}
-                        target_dict["name"]='Target 0'
-                        target_dict["size"]=item
-                        target_ls.append(target_dict)
+                #     for item in mock:
+                #         target_dict={}
+                #         target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
+                #         target_dict["size"]=item
+                #         target_ls.append(target_dict)
 
                 else:
                     target_dict={}
-                    target_dict["name"]=f'Target {target}'
-                    target_dict["size"]=count
+                    target_dict["size"]=int(count)
+                    if str(target.split('.')[-1])=='0':
+                        target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
+
+                    else:
+                        target_dict["name"]=f'Target {target}'
+                        target_dict["target_description"]=sdgdict[str(target)]["target_description"]
+                        target_dict["Goal"]=sdgdict[str(target)]["target_description"]
+                        target_dict["goal_description"]=sdgdict[str(target)]["goal_description"]
+                        target_dict["goal_color"]=sdgdict[str(target)]["goal_color"]
+
+                    #move SDG XX_undetected at the end of the dict:
+                    #see https://docs.python.org/3/library/collections.html#collections.OrderedDict.move_to_end
                     target_ls.append(target_dict)
             
             goal['children']=target_ls
