@@ -1,4 +1,7 @@
 import pandas as pd
+import natsort as ntst
+from operator import itemgetter
+#from collections import OrderedDict
 
 def make_polpridf(results_df, pp_def):
     """
@@ -65,13 +68,13 @@ def make_polpribubbleplot(priorities_df):
 
     return polpri_bubbledict
 
-def make_sdgbubbleplot(results_df, pp_def):
+def make_sdgbubbleplot(results_df):
     """
     Create a bubbleplot representing SDG Golas and Targets.
     """
     #Later on, think about a way to make bubbleplot for PP
 
-    sdgdict = pp_def
+    #sdgdict = pp_def
 
     sdg_bubbledict={"name": "sdgs", "children": None}
     goal_ls=[]
@@ -92,57 +95,36 @@ def make_sdgbubbleplot(results_df, pp_def):
     for goal in goal_ls:
         target_ls=[]
 
-        if goal["size"] >0:
+        if goal["size"] > 0:
             targetdf = results_df[results_df.Goal == goal["name"]]
 
             for target, count in zip(targetdf['Target'], targetdf['Sum_of_keys']):
                 
                 if (count == 0): #or (str(target.split('.')[-1])=='0'):
-                    continue
-                
-                # elif str(target.split('.')[-1])=='0': #assign to SDG X_undetected
-                #     floor = round(count // 10)
-                #     remainder = round(count % 10)
-                #     mock = [10 for _ in range(floor)]
-                #     mock.append(remainder)
-                #     # if floor==0 or floor==1: #to troubleshoot
-                #     #     mock.append(remainder)
-                #     # elif mock[0]==10 and len(mock)==1:
-                #     #     mock.append(remainder)
-                #     # elif len(mock)>1:
-                #     #     mock[-1]=remainder
-                #     # print(f'Target {target}', int(count))
-                #     # print(floor, remainder)
-                #     # print(mock)
-
-                #     for item in mock:
-                #         target_dict={}
-                #         target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
-                #         target_dict["size"]=item
-                #         target_ls.append(target_dict)
-
+                    continue                
                 else:
                     target_dict={}
                     target_dict["size"]=int(count)
-                    if str(target.split('.')[-1])=='0':
-                        target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
 
+                    if str(target.split('.')[-1])=='0':                        
+                        target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
                     else:
                         target_dict["name"]=f'Target {target}'
-                        target_dict["target_description"]=sdgdict[str(target)]["target_description"]
-                        target_dict["Goal"]=sdgdict[str(target)]["target_description"]
-                        target_dict["goal_description"]=sdgdict[str(target)]["goal_description"]
-                        target_dict["goal_color"]=sdgdict[str(target)]["goal_color"]
+                        target_dict["Goal"]=f"SDG {target.split('.')[0]}"
 
                     #move SDG XX_undetected at the end of the dict:
                     #see https://docs.python.org/3/library/collections.html#collections.OrderedDict.move_to_end
                     target_ls.append(target_dict)
-            
+
+            if 'undetected' in target_ls[0]['name']:
+                target_ls.append(target_ls[0])
+                target_ls.pop(0)
+
             goal['children']=target_ls
         
         else:
             continue
 
-    sdg_bubbledict['children']=goal_ls
+    sdg_bubbledict['children']=ntst.natsorted(goal_ls, key=itemgetter(*['name'])) 
     
     return sdg_bubbledict
