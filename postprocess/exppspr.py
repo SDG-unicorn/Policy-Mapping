@@ -40,7 +40,7 @@ def make_polpribubbleplot(priorities_df):
         polpri_dict={}
         if count > 0:
             polpri_dict["name"]=polpri
-            polpri_dict["size"]=count
+            polpri_dict["size"]=int(count)
             polpri_dict["children"] = None
             polpri_ls.append(polpri_dict)
         else:
@@ -56,8 +56,7 @@ def make_polpribubbleplot(priorities_df):
                 goal_dict={}
                 if count > 0:
                     goal_dict["name"]=goal
-                    goal_dict["size"]=count
-                    goal_dict["children"] = None
+                    goal_dict["size"]=int(count)
                     goal_ls.append(goal_dict)                    
                 else:
                     continue
@@ -110,7 +109,6 @@ def make_sdgbubbleplot(results_df):
                         target_dict["name"]=f"SDG {target.split('.')[0]}_undetected"
                     else:
                         target_dict["name"]=f'Target {target}'
-                        target_dict["Goal"]=f"SDG {target.split('.')[0]}"
 
                     #move SDG XX_undetected at the end of the dict:
                     #see https://docs.python.org/3/library/collections.html#collections.OrderedDict.move_to_end
