@@ -293,35 +293,42 @@ for policy, doc_text in doc_texts.items():
     count_matrix=pd.merge(labels, count_matrix, left_index=True, right_index=True)
     detected_keywords=pd.merge(labels, detected_keywords, left_index=True, right_index=True)
     
-
-    with pd.ExcelWriter(targetcount_filedest, mode='w', engine='xlsxwriter') as destfile:
-        count_matrix.to_excel(destfile, sheet_name='Counts')
-        detected_keywords.to_excel(destfile, sheet_name='Keywords')
-
     doc_text['count_matrix'] = count_matrix
     doc_text['detectedkeywd_matrix'] = detected_keywords
     doc_text['marked_text'] = plmp.mark_text(doc_text['stemmed_text'], detected_keywords)
 
-    #print(doc_text['marked_text'])
-    item_path = doctext_stemmed_dir / 'marked' / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
-    item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
-    item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
-    with open(item_path, 'w', encoding='utf-8') as markdoctext:
-           markdoctext.write(str(doc_text["marked_text"]))
+    # with pd.ExcelWriter(targetcount_filedest, mode='w', engine='xlsxwriter') as destfile:
+    #     count_matrix.to_excel(destfile, sheet_name='Counts')
+    #     detected_keywords.to_excel(destfile, sheet_name='Keywords')    
+
+    # #print(doc_text['marked_text'])
+    # item_path = doctext_stemmed_dir / 'marked' / pathlib.PurePath(policy) #stemmed_doctext_dir / pathlib.PurePath(item[0])
+    # item_path.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+    # item_path = item_path.parent / (item_path.name.replace('.','_')+'_marked.txt')
+    # with open(item_path, 'w', encoding='utf-8') as markdoctext:
+    #        markdoctext.write(str(doc_text["marked_text"]))
 
 #Get and write summary data (sum, count and list of keys) for each policy
 #For some strange reasons this does not works if done in the previous loop
 for policy, item in doc_texts.items():
 
-    summary=labels.copy(deep=True)
-    count_df = item['count_matrix'].copy(deep=True)
-    detkeyw_df = item['detectedkeywd_matrix'].copy(deep=True)
-    summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
-    summary['Count_of_keys'] = detkeyw_df[keywd_cols].count(axis=1) #Use explicit fraction?
-    summary['list_of_keys'] = detkeyw_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    if item['count_matrix'][keywd_cols].dropna().empty:
+        continue
 
-    with pd.ExcelWriter(count_destfile_dict[policy], mode='a', engine='openpyxl') as destfile:
-        summary.to_excel(destfile, sheet_name='Summary')
+    else:
+        summary=labels.copy(deep=True)
+        count_df = item['count_matrix'].copy(deep=True)
+        dtcdterms_df = item['detectedkeywd_matrix'].copy(deep=True)
+
+        mapping_df = plmp.maketermcounttable(count_df, dtcdterms_df)
+
+        summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
+        summary['Count_of_keys'] = dtcdterms_df[keywd_cols].count(axis=1) #Use explicit fraction?
+        summary['list_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+
+        with pd.ExcelWriter(count_destfile_dict[policy], mode='w', engine='xlsxwriter') as destfile:
+            summary.to_excel(destfile, sheet_name='Summary')
+            mapping_df.to_excel(destfile, sheet_name='Terms_count')
 
 
 count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values() ]

@@ -1,3 +1,5 @@
+import pandas as pd
+
 def join_str(numpy_array):
 
     numpy_array = numpy_array.tolist()
@@ -37,3 +39,20 @@ def mark_text(document_text, detected_keywords_df):
                 marked_text = marked_text.replace(keyword ,f' < {label} >< {keyword.upper()} > ') #Use re.search to find keyword boundaries where to add the tags and markers
 
     return marked_text
+
+def maketermcounttable(count_df, term_df):
+    '''
+    Make a table listing SDG terms and their counts.
+    '''
+    mapping_df=pd.DataFrame()
+    
+    for row1, row2 in zip(count_df.itertuples(), term_df.itertuples()):
+        count=pd.DataFrame(data={'Count':row1,'Terms':row2}).iloc[3:]
+        count['Goal'] = row1.Goal
+        count['Target'] = row1.Target
+        count = count.reindex(columns=['Goal','Target','Count','Terms'])   
+        count.fillna(0, inplace=True)
+        count = count[count.Count > 0]
+        mapping_df = pd.concat([mapping_df, count])
+
+    return mapping_df
