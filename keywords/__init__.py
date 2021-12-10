@@ -13,3 +13,5 @@ for sheet in prockeys.keys():
 #Unit test: load processed_keywords and compare md5sum strin with md5sum of source file, if equal pass test.
 #Purpose: Check that keywords are updated or not corrupted.
 
+indicators = pd.ExcelFile('keywords/indicators.xlsx')
+

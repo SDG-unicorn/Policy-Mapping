@@ -312,23 +312,24 @@ for policy, doc_text in doc_texts.items():
 #For some strange reasons this does not works if done in the previous loop
 for policy, item in doc_texts.items():
 
-    if item['count_matrix'][keywd_cols].dropna().empty:
-        continue
+    # if item['count_matrix'][keywd_cols].dropna().empty:
+    #     continue
 
-    else:
-        summary=labels.copy(deep=True)
-        count_df = item['count_matrix'].copy(deep=True)
-        dtcdterms_df = item['detectedkeywd_matrix'].copy(deep=True)
+    # else:
+    summary=labels.copy(deep=True)
+    count_df = item['count_matrix'].copy(deep=True)
+    dtcdterms_df = item['detectedkeywd_matrix'].copy(deep=True)
 
-        mapping_df = plmp.maketermcounttable(count_df, dtcdterms_df)
+    termcount_df = pspr.maketermcounttable(count_df, dtcdterms_df)
 
-        summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
-        summary['Count_of_keys'] = dtcdterms_df[keywd_cols].count(axis=1) #Use explicit fraction?
-        summary['list_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
+    summary['Count_of_keys'] = dtcdterms_df[keywd_cols].count(axis=1) #Use explicit fraction?
+    summary['list_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    summary = summary[summary['Count_of_keys'] > 0]
 
-        with pd.ExcelWriter(count_destfile_dict[policy], mode='w', engine='xlsxwriter') as destfile:
-            summary.to_excel(destfile, sheet_name='Summary')
-            mapping_df.to_excel(destfile, sheet_name='Terms_count')
+    with pd.ExcelWriter(count_destfile_dict[policy], mode='w', engine='xlsxwriter') as destfile:
+        summary.to_excel(destfile, sheet_name='Summary')
+        termcount_df.to_excel(destfile, sheet_name='Terms_count')
 
 
 count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values() ]
@@ -341,18 +342,21 @@ total_keywords =  keywords[keywd_cols][total_count[keywd_cols] > 0]
 total_count = pd.merge(labels, total_count[keywd_cols], left_index=True, right_index=True)
 total_keywords = pd.merge(labels, total_keywords, left_index=True, right_index=True)
 
+total_termcount_df = pspr.maketermcounttable(total_count, total_keywords)
+
 total_summary=labels.copy(deep=True)
 total_summary['Sum_of_keys'] = total_count[keywd_cols].sum(axis=1)
 total_summary['Count_of_keys'] = total_keywords[keywd_cols].count(axis=1) #Use explicit fraction?
 total_summary['list_of_keys'] = total_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+total_summary = total_summary[total_summary['Count_of_keys'] > 0]
 
 count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 
 try:
-    with pd.ExcelWriter(count_destfile, mode='w', engine='openpyxl') as writer:
-        total_count.to_excel(writer, sheet_name='Count')
-        total_keywords.to_excel(writer, sheet_name='Keywords')
-        total_summary.to_excel(writer, sheet_name='Summary')
+    with pd.ExcelWriter(count_destfile, mode='w', engine='xlsxwriter') as destfile:
+        total_summary.to_excel(destfile, sheet_name='Summary')
+        total_termcount_df.to_excel(destfile, sheet_name='Terms_count')
+
 except Exception as exception:
     print(f'Writing totaL raised: \n{exception}\n')
     logging.exception(f'Writing total raised: {exception} \n\n')

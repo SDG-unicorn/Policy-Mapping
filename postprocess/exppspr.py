@@ -126,3 +126,20 @@ def make_sdgbubbleplot(results_df):
     sdg_bubbledict['children']=ntst.natsorted(goal_ls, key=itemgetter(*['name'])) 
     
     return sdg_bubbledict
+    
+def maketermcounttable(count_df, term_df):
+    '''
+    Make a table listing SDG terms and their counts.
+    '''
+    mapping_df=pd.DataFrame()
+    
+    for row1, row2 in zip(count_df.itertuples(), term_df.itertuples()):
+        count_df=pd.DataFrame(data={'Count':row1,'Terms':row2}).iloc[3:]
+        count_df['Goal'] = row1.Goal
+        count_df['Target'] = row1.Target
+        count_df = count_df.reindex(columns=['Goal','Target','Count','Terms'])   
+        count_df.fillna(0, inplace=True)
+        count_df = count_df[count_df.Count > 0]
+        mapping_df = pd.concat([mapping_df, count_df])
+
+    return mapping_df
