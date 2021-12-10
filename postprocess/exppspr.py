@@ -141,5 +141,6 @@ def maketermcounttable(count_df, term_df):
         count_df.fillna(0, inplace=True)
         count_df = count_df[count_df.Count > 0]
         mapping_df = pd.concat([mapping_df, count_df])
-
+    
+    mapping_df.reset_index(drop=True, inplace=True)
     return mapping_df

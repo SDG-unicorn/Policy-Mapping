@@ -324,12 +324,18 @@ for policy, item in doc_texts.items():
 
     summary['Sum_of_keys'] = count_df[keywd_cols].sum(axis=1)
     summary['Count_of_keys'] = dtcdterms_df[keywd_cols].count(axis=1) #Use explicit fraction?
-    summary['list_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+    summary['List_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
     summary = summary[summary['Count_of_keys'] > 0]
+
+    doc_indicators = pd.merge(summary, kwrd.indicators, how='left', on='Target')\
+    .drop(['Goal_y','Sum_of_keys','Count_of_keys','List_of_keys'], axis=1)\
+        .rename(columns={'Goal_x':'Goal'})
+
 
     with pd.ExcelWriter(count_destfile_dict[policy], mode='w', engine='xlsxwriter') as destfile:
         summary.to_excel(destfile, sheet_name='Summary')
         termcount_df.to_excel(destfile, sheet_name='Terms_count')
+        doc_indicators.to_excel(destfile, sheet_name='Indicators')
 
 
 count_matrixes = [ doc_text['count_matrix'] for doc_text in doc_texts.values() ]
@@ -347,8 +353,12 @@ total_termcount_df = pspr.maketermcounttable(total_count, total_keywords)
 total_summary=labels.copy(deep=True)
 total_summary['Sum_of_keys'] = total_count[keywd_cols].sum(axis=1)
 total_summary['Count_of_keys'] = total_keywords[keywd_cols].count(axis=1) #Use explicit fraction?
-total_summary['list_of_keys'] = total_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
+total_summary['List_of_keys'] = total_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
 total_summary = total_summary[total_summary['Count_of_keys'] > 0]
+
+total_indicators = pd.merge(total_summary, kwrd.indicators, how='left', on='Target')\
+    .drop(['Goal_y','Sum_of_keys','Count_of_keys','List_of_keys'], axis=1)\
+        .rename(columns={'Goal_x':'Goal'})
 
 count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 
@@ -356,6 +366,7 @@ try:
     with pd.ExcelWriter(count_destfile, mode='w', engine='xlsxwriter') as destfile:
         total_summary.to_excel(destfile, sheet_name='Summary')
         total_termcount_df.to_excel(destfile, sheet_name='Terms_count')
+        total_indicators.to_excel(destfile, sheet_name='Indicators')
 
 except Exception as exception:
     print(f'Writing totaL raised: \n{exception}\n')
