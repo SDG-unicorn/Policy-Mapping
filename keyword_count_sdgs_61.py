@@ -19,6 +19,7 @@ from whoosh.lang.porter import stem
 ##MM imports
 import polmap as plmp
 import postprocess as pspr
+from postprocess import sdgmetadata_dict
 import keywords as kwrd
 
 
@@ -144,6 +145,9 @@ def stem_text(my_keyword):
 
 keywords[keywd_cols] = keywords[keywd_cols].applymap(stem_text, na_action='ignore')
 labels = keywords[['Goal', 'Target']]
+
+indicators=kwrd.indicators.copy(deep=True)
+indicators['UN_Indicators'] = indicators['UN_Indicators'].apply(lambda x: ', '.join(x))
 
 # countries = keywords['developing_countries']['Name'].values.tolist()
 # country_ls = []
@@ -327,7 +331,7 @@ for policy, item in doc_texts.items():
     summary['List_of_keys'] = dtcdterms_df[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
     summary = summary[summary['Count_of_keys'] > 0]
 
-    doc_indicators = pd.merge(summary, kwrd.indicators, how='left', on='Target')\
+    doc_indicators = pd.merge(summary, indicators, how='left', on='Target')\
     .drop(['Goal_y','Sum_of_keys','Count_of_keys','List_of_keys'], axis=1)\
         .rename(columns={'Goal_x':'Goal'})
 
@@ -356,9 +360,10 @@ total_summary['Count_of_keys'] = total_keywords[keywd_cols].count(axis=1) #Use e
 total_summary['List_of_keys'] = total_keywords[keywd_cols].apply(plmp.join_str, raw=True, axis=1)
 total_summary = total_summary[total_summary['Count_of_keys'] > 0]
 
-total_indicators = pd.merge(total_summary, kwrd.indicators, how='left', on='Target')\
+total_indicators = pd.merge(total_summary, indicators, how='left', on='Target')\
     .drop(['Goal_y','Sum_of_keys','Count_of_keys','List_of_keys'], axis=1)\
         .rename(columns={'Goal_x':'Goal'})
+
 
 count_destfile = results_dir / f'mapping_{project_title}.xlsx'
 
@@ -372,14 +377,12 @@ except Exception as exception:
     print(f'Writing totaL raised: \n{exception}\n')
     logging.exception(f'Writing total raised: {exception} \n\n')
     
-print(f'Final results are stored in:\n{count_destfile}\n')
-
 with open(log_file, 'a') as f:
     f.write( 
         f'- Total keywords counting time: {time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
-print(f'Step {step}: Counted keywords in texts.\n')
+print(f'Step {step}: Counted keywords in texts:\n\n\tFinal results are stored in\n\t{count_destfile}\n')
 step += 1
 
 ######################################
@@ -405,6 +408,12 @@ priority_bubbles = jsonfiles_dir / 'priority_bubbles.json'
 with priority_bubbles.open(mode='w', encoding='utf-8') as f:
     json.dump(priority_bubbleplot_dict, f)
 
+total_summary = pd.merge(total_summary, kwrd.indicators, how='left', on='Target').drop('Goal_y', axis=1).rename(columns={'Goal_x':'Goal'})
+indicators_dict = pspr.makeindicatorsjson(total_summary)
+indicators_file = jsonfiles_dir / 'indicators.json'
+with indicators_file.open(mode='w', encoding='utf-8') as f:
+    json.dump(indicators_dict, f)
+
 bubblecharts_exists = all([pathlib.Path(sdg_bubbles).exists(), pathlib.Path(priority_bubbles).exists()])
 
 with open(log_file, 'a') as f:
@@ -412,7 +421,7 @@ with open(log_file, 'a') as f:
         f'{step}) Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n{time.time()-start_count_time:.3e} seconds.\n\n'
         )
 
-print(f'\nStep {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
+print(f'Step {step}: Jsonfiles for sdg and priorities bubblecharts succesfully created: {bubblecharts_exists}\n')
 step += 1
 
 with open(log_file, 'a') as f:

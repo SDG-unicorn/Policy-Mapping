@@ -14,4 +14,5 @@ for sheet in prockeys.keys():
 #Purpose: Check that keywords are updated or not corrupted.
 
 indicators = pd.read_excel('keywords/indicators.xlsx')
+indicators['UN_Indicators'] = indicators['UN_Indicators'].apply(lambda x: ast.literal_eval(x))
 

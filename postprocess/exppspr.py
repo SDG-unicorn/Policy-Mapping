@@ -1,6 +1,8 @@
+import re, json
 import pandas as pd
 import natsort as ntst
 from operator import itemgetter
+
 #from collections import OrderedDict
 
 def make_polpridf(results_df, pp_def):
@@ -144,3 +146,48 @@ def maketermcounttable(count_df, term_df):
     
     mapping_df.reset_index(drop=True, inplace=True)
     return mapping_df
+
+with open('./postprocess/sdgmetadata_dict.json',) as f:
+    sdgmetadata_dict = json.load(f)
+
+def makeindicatorsjson(resultstotal_df, metadata_dict='Default'):
+    '''Make a json file containing relevant indicators for the detected targets'''
+    if metadata_dict=='Default':
+        metadata_dict = sdgmetadata_dict
+        
+    
+    indicators_dict = {"name": "sdgs", "goals": []}
+
+    goals = ntst.natsorted(list(set(resultstotal_df['Goal'].values.tolist())))
+
+    for goal in goals:
+        goal_dict = {'name': goal, 'title':metadata_dict[goal]['title'], 'description':metadata_dict[goal]['description'],
+        'targets' : []}
+        indicators_dict['goals'].append(goal_dict)
+    
+        for row in resultstotal_df[resultstotal_df['Goal']==goal].itertuples():
+                
+            target_dict={}
+            target = f'Target {row.Target}'
+            target_dict['name'] = target
+
+            mock_target = re.match(r'Target \d{1,2}.0', target)
+            
+            if mock_target:
+                target_dict['description'] = metadata_dict[goal]['description']
+            else:
+                target_dict['description'] = metadata_dict[goal]['targets'][target]['description']
+            
+            target_dict['indicators'] = {'un':[]}
+
+            for unind in row.UN_Indicators:
+                if unind:
+                    unind_dict={
+                        'name':unind, 
+                        'description':metadata_dict[goal]['targets'][target]['indicators'][unind]['description']
+                    }
+                    target_dict['indicators']['un'].append(unind_dict)
+
+            goal_dict['targets'].append(target_dict)      
+
+    return indicators_dict
