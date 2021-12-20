@@ -12,8 +12,8 @@ import pandas as pd
 from whoosh.lang.porter import stem
 
 ##MM imports
-import polmap.polmap as plmp
-import postprocess.postprocess as pspr
+import polmap as plmp
+import postprocess as pspr
 import keywords as kwrd
 
 
@@ -25,7 +25,7 @@ The results are provided for both the whole run and for each documents, together
 parser.add_argument('-i', '--input', help='Input directory', default='input')
 parser.add_argument('-o', '--output', help='Output directory', default='output')
 parser.add_argument('-k', '--keywords', help='Path to keywords file', default=False)
-parser.add_argument('-lo', '--label_output', help='Label parent output directory and outputfiles with {input dir name}_{timestamp}', type=bool, default=False)
+parser.add_argument('-lo', '--label_output', help='Label output dir and files with either a custom string or timestamp if "CurrentTime" is passed as argument', type=str, default=None)
 
 args = parser.parse_args()
 
@@ -39,13 +39,17 @@ print(f"Input folder is: \n{input_dir}\n")
 step = 1
 
 ## 1.a) Create output folder structure based on input name, date and time of exectution
-if args.label_output:
-    timestamp = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
+if args.label_output == "CurrentTime":
+    label_output = dt.datetime.now().isoformat(timespec='seconds').replace(':','').replace('T','_T')
+elif args.label_output:
+    label_output = args.label_output
 else:
-    timestamp = ''
+    label_output = ''
+
+if label_output: print(f"Output label is: \n{label_output}\n")
 
 if args.output == 'output':
-    output_directory = pathlib.Path(args.output) / f'{input_dir.name}_{timestamp}' #if args.output is not None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
+    output_directory = pathlib.Path(args.output) / f'{input_dir.name}_{label_output}' #if args.output is not None else pathlib.Path('output') / f'{input_dir.name}_{timestamp}'
 else:
     output_directory = pathlib.Path(args.output)
 
@@ -60,11 +64,6 @@ for directory in outdirtree_dict.values():
 
 if all(directory.is_dir() for directory in outdirtree_dict.values()):
     print('Output directories succesfully created.\n')
-
-if args.label_output:
-    project_title=f'{input_dir.name}_{timestamp}'
-else:
-    project_title=''
 
 out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, processedtext_dir, keyword_count_dir, results_dir, jsonfiles_dir = outdirtree_dict.values()
 
@@ -87,14 +86,14 @@ policy_documents = pd.DataFrame(files, columns=['Input_files'])
 policy_documents.index = policy_documents.index + 1
 policy_documents['Paths']=policy_documents['Input_files'].apply(lambda doc_path: pathlib.PurePath(*doc_path.parts[doc_path.parts.index(input_dir.name)+1:]))
 
-policy_documents['Paths'].to_csv(results_dir.joinpath('file_list.txt'), sep='\t', encoding='utf-8')
+policy_documents['Paths'].to_csv(results_dir.joinpath(f'file_list_{label_output}.txt'), sep='\t', encoding='utf-8')
 
 ## 1.c) Create logfile for current run.
 
-log_file = log_dir / f'mapping_{project_title}.log'
+log_file = log_dir / f'mapping_{label_output}.log'
 
 if log_file.exists:
-    log_file = log_dir / f'mapping_{project_title}.log'
+    log_file = log_dir / f'mapping_{label_output}.log'
     with open(log_file, 'a') as f:
         f.write( 
             f"\n\nLogfiles already exist, updates appended the \
@@ -148,7 +147,7 @@ for element in countries:
     element = ' '.join(element)
     country_ls.append(element)
 
-keywords_destfilename = processed_keywords_dir / f'{project_title}_processed_{pathlib.Path(keywords_path).name}'
+keywords_destfilename = processed_keywords_dir / f'{label_output}_processed_{pathlib.Path(keywords_path).name}'
 
 with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
     for sheetname in keywords_sheets:
@@ -195,7 +194,7 @@ step += 1
 ########### 4) Check for and extract references to SDG agenda in text
 start_time = time.time()
 
-with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as refs_file:
+with open(jsonfiles_dir / f'references_to_Agenda2030_.json','a') as refs_file:
 
     references_dict = {}
 
@@ -214,6 +213,19 @@ with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as
         with open(dest, 'a') as docref_file:
             json.dump(references, docref_file)
 
+ref_text = 'References to UN 2030 Agenda for Sustainable DeVelopment'
+for document, doc_dict in references_dict.items():
+    ref_text += f'\n\n\nDocument:\n\t{document}\n\n'
+    for ref_sentence, ref_keyword in doc_dict['References'].items():
+        ref_sentence = re.sub(r"\n{3,}","", ref_sentence)
+        ref_sentence = re.sub(r"<span>|</span>","", str(ref_sentence))
+        ref_text += f'Sentence:\n"""\n{ref_sentence}\n"""\n'
+        ref_keyword = re.sub(r"<span>|</span>","", str(ref_keyword))#</span>
+        ref_text += f'Keywords:\n\t{ref_keyword}\n\n'
+
+
+with open(results_dir/f'references_to_Agenda2030_{label_output}.txt', 'w') as reffile:
+    reffile.write(ref_text)
 
 with open(log_file, 'a') as f:
     f.write( 
@@ -290,7 +302,7 @@ for policy, item in doc_texts.items():
 
 target_df = pd.DataFrame(target_ls, columns=target_col_names)
 
-count_destfile = results_dir / f'mapping_{project_title}.xlsx'
+count_destfile = results_dir / f'mapping_{label_output}.xlsx'
 
 writer = pd.ExcelWriter(count_destfile, engine='openpyxl')
 
@@ -494,7 +506,7 @@ sheetnames_list = ['target_count', 'filtered_target_count', 'undetected_targets'
 
 # pprint.pprint(sheetnames)
 
-mappingresults_destfile = results_dir / f'results_{project_title}.xlsx'
+mappingresults_destfile = results_dir / f'results_{label_output}.xlsx'
 
 #Skip saving if all df are ampty or save an empyt excel file?
 with pd.ExcelWriter(mappingresults_destfile, mode='w', engine='xlsxwriter') as destfile:

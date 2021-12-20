@@ -1,6 +1,6 @@
 # __init__.py
 
-from postprocess import *
+from .postprocess import *
 from .exppspr import *
 import json
 # from .exppspr import make_polpridf

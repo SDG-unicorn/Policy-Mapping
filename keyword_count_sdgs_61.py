@@ -1,9 +1,6 @@
 import argparse, json, logging, pathlib, pickle, re, time
-from itertools import count
 import functools as fntl
 import datetime as dt
-
-from six import print_
 try:
     # For Python =+3.7.
     import importlib.resources as rsrc
@@ -12,7 +9,6 @@ except ImportError:
     import importlib_resources as rsrc
 from nltk.corpus import stopwords
 import pandas as pd
-import numpy as np
 #from nltk.tokenize import word_tokenize
 from whoosh.lang.porter import stem
 
@@ -71,11 +67,6 @@ for directory in outdirtree_dict.values():
 if all(directory.is_dir() for directory in outdirtree_dict.values()):
     print('Output directories succesfully created.\n')
 
-if args.label_output:
-    project_title=f'{input_dir.name}_{label_output}'
-else:
-    project_title=''
-
 out_dir, log_dir, processed_keywords_dir, doctext_dir, refs_dir, doctext_stemmed_dir, keyword_count_dir, results_dir, jsonfiles_dir = outdirtree_dict.values()
 
 print(f"Output folder is: \n{out_dir}\n")
@@ -97,14 +88,14 @@ policy_documents = pd.DataFrame(files, columns=['Input_files'])
 policy_documents.index = policy_documents.index + 1
 policy_documents['Paths']=policy_documents['Input_files'].apply(lambda doc_path: pathlib.PurePath(*doc_path.parts[doc_path.parts.index(input_dir.name)+1:]))
 
-policy_documents['Paths'].to_csv(results_dir.joinpath('file_list.txt'), sep='\t', encoding='utf-8')
+policy_documents['Paths'].to_csv(results_dir.joinpath(f'file_list_{label_output}.txt'), sep='\t', encoding='utf-8')
 
 ## 1.c) Create logfile for current run.
 
-log_file = log_dir / f'mapping_{project_title}.log'
+log_file = log_dir / f'mapping_{label_output}.log'
 
 if log_file.exists:
-    log_file = log_dir / f'mapping_{project_title}.log'
+    log_file = log_dir / f'mapping_{label_output}.log'
     with open(log_file, 'a') as f:
         f.write( 
             f"\n\nLogfiles already exist, updates appended the \
@@ -158,7 +149,7 @@ indicators['UN_Indicators'] = indicators['UN_Indicators'].apply(lambda x: ', '.j
 #     element = ' '.join(element)
 #     country_ls.append(element)
 
-keywords_destfilename = processed_keywords_dir / f'{project_title}_processed_{pathlib.Path(keywords_path).name}'
+keywords_destfilename = processed_keywords_dir / f'{label_output}_processed_{pathlib.Path(keywords_path).name}'
 
 with pd.ExcelWriter(keywords_destfilename, engine='xlsxwriter') as _destfile:
        keywords.to_excel(_destfile, sheet_name="Processed_keywords")
@@ -179,7 +170,6 @@ doc_texts = {} #This can easily become a dictionary with filepath as a key and t
 for counter, file_path in enumerate(files):
     try:
         doc_text = plmp.doc2text(file_path)
-       # while '\n\n\n\n' in doc_text : doc_text = doc_text.replace('\n\n\n\n', '\n\n\n') #docx2python specific fix. would probably fit better elsewhere
         textfile_dest_ = file_path.parts[file_path.parts.index(input_dir.name)+1:]
         textfile_dest =  doctext_dir.joinpath(*textfile_dest_)
         textfile_dest.parent.mkdir(mode=0o777, parents=True, exist_ok=True)
@@ -187,8 +177,8 @@ for counter, file_path in enumerate(files):
         with open(textfile_dest, 'w', encoding='utf-8') as file_:
            file_.write(doc_text)
         doc_texts['/'.join(textfile_dest_)] = doc_text
-    except Exception as exception: #MM I'd log errors as described in https://realpython.com/python-logging/, we need to test this.
-        print(f'{file_path.name}:\n{exception}\n')
+    except Exception as exception:
+        print(f'ERROR:\t{exception}\nwas raised by\n{file_path.name}\n')
         logging.exception(f'{file_path.name} raised exception: {exception} \n\n')
 
 
@@ -200,15 +190,11 @@ with open(log_file, 'a') as f:
 print(f'Step {step}: Converted {len(doc_texts)} documents to text.\n')
 step += 1
 
-#pprint.pprint(doc_texts)
-# for policy, text, in doc_texts.items():
-#     print(f'{policy} lenght is {len(text)}')
-
 ######################################
 ########### 4) Check for and extract references to SDG agenda in text
 start_time = time.time()
 
-with open(results_dir / f'references_to_Agenda2030_{project_title}.json','a') as refs_file:
+with open(jsonfiles_dir / f'references_to_Agenda2030_.json','a') as refs_file:
 
     references_dict = {}
 
@@ -365,7 +351,7 @@ total_indicators = pd.merge(total_summary, indicators, how='left', on='Target')\
         .rename(columns={'Goal_x':'Goal'})
 
 
-count_destfile = results_dir / f'mapping_{project_title}.xlsx'
+count_destfile = results_dir / f'mapping_{label_output}.xlsx'
 
 try:
     with pd.ExcelWriter(count_destfile, mode='w', engine='xlsxwriter') as destfile:
