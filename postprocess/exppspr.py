@@ -1,4 +1,4 @@
-import re, json
+import re, json, pathlib
 import pandas as pd
 import natsort as ntst
 from operator import itemgetter
@@ -147,7 +147,7 @@ def maketermcounttable(count_df, term_df):
     mapping_df.reset_index(drop=True, inplace=True)
     return mapping_df
 
-with open('./postprocess/sdgmetadata_dict.json',) as f:
+with open( pathlib.Path( __file__ ).parent / 'sdgmetadata_dict.json','r') as f:
     sdgmetadata_dict = json.load(f)
 
 def makeindicatorsjson(resultstotal_df, metadata_dict='Default'):

@@ -10,7 +10,6 @@ except ImportError:
 from nltk.corpus import stopwords
 import pandas as pd
 #from nltk.tokenize import word_tokenize
-from whoosh.lang.porter import stem
 
 ##MM imports
 import polmap as plmp
@@ -213,6 +212,19 @@ with open(jsonfiles_dir / f'references_to_Agenda2030_.json','a') as refs_file:
         with open(dest, 'a') as docref_file:
             json.dump(references, docref_file)
 
+ref_text = 'References to UN 2030 Agenda for Sustainable DeVelopment'
+for document, doc_dict in references_dict.items():
+    ref_text += f'\n\n\nDocument:\n\t{document}\n\n'
+    for ref_sentence, ref_keyword in doc_dict['References'].items():
+        ref_sentence = re.sub(r"\n{3,}","", ref_sentence)
+        ref_sentence = re.sub(r"<span>|</span>","", str(ref_sentence))
+        ref_text += f'Sentence:\n"""\n{ref_sentence}\n"""\n'
+        ref_keyword = re.sub(r"<span>|</span>","", str(ref_keyword))#</span>
+        ref_text += f'Keywords:\n\t{ref_keyword}\n\n'
+
+
+with open(results_dir/f'references_to_Agenda2030_{label_output}.txt', 'w') as reffile:
+    reffile.write(ref_text)
 
 with open(log_file, 'a') as f:
     f.write( 

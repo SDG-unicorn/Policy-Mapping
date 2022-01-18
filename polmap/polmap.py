@@ -23,7 +23,6 @@ from bs4 import BeautifulSoup
 #check https://textract.readthedocs.io/en/stable/
 
 #preprocess_text
-import whoosh.lang as whla
 import nltk as nltk
 from nltk.corpus import stopwords
 #get_ref_to_SDGs

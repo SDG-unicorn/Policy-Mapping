@@ -7,9 +7,10 @@ except ImportError:
     # Try backported to Python <=3.6 `importlib_resources`.
     import importlib_resources as rsrc
 from nltk.corpus import stopwords
+import nltk.stem as stem
 import pandas as pd
 #from nltk.tokenize import word_tokenize
-from whoosh.lang.porter import stem
+
 
 ##MM imports
 import polmap as plmp
@@ -137,13 +138,15 @@ stop_words.remove('all')
 for sheet in keywords_sheets:
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: re.sub(';$', '', str(keywords)))
     keywords[sheet]['Keys'] = keywords[sheet]['Keys'].apply(lambda keywords: [plmp.preprocess_text(str(keyword), stop_words) for keyword in keywords.split(';')])
-    
+
+stemmer = stem.PorterStemmer()
+
 countries = keywords['developing_countries']['Name'].values.tolist()
 country_ls = []
 for element in countries:
     element = [re.sub(r'[^a-zA-Z-]+', '', t.lower().strip()) for t in element.split()]
     # countries = [x.strip(' ') for x in countries]
-    element = [stem(word) for word in element if not word in stop_words]
+    element = [stemmer.stem(word) for word in element if not word in stop_words]
     element = ' '.join(element)
     country_ls.append(element)
 
